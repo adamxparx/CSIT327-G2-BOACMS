@@ -60,7 +60,10 @@
 
           <div class="form-submit">
             <div class="requirements-link" style="text-align: center; margin-bottom: 15px;">
-              <a href="{% url 'requirements' %}" style="color: #2196F3; text-decoration: none;">
+              <a href="{% url 'requirements' %}"
+                 id="requirements-link"
+                 data-base-url="{% url 'requirements' %}"
+                 style="color: #2196F3; text-decoration: none;">
                 <i class="fas fa-list"></i> See list of requirements
               </a>
             </div>
@@ -79,5 +82,64 @@
 <script src="{% static 'appointments/js/date_restriction.js' %}"></script>
 <script src="{% static 'appointments/js/time_restriction.js' %}"></script>
 <script src="{% static 'appointments/js/disabled_booking_button.js' %}"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const form = document.getElementById('appointment-form');
+    const requirementsLink = document.getElementById('requirements-link');
+
+    if (!form || !requirementsLink) {
+      return;
+    }
+
+    const baseUrl = requirementsLink.dataset.baseUrl || requirementsLink.href;
+    const fieldNames = ['certificate_type', 'purpose', 'preferred_date', 'preferred_time'];
+
+    const updateLinkHref = () => {
+      const params = new URLSearchParams();
+
+      fieldNames.forEach((name) => {
+        const field = form.elements[name];
+        if (!field) {
+          return;
+        }
+
+        let value = '';
+        if (field.type === 'select-multiple') {
+          value = Array.from(field.selectedOptions).map((opt) => opt.value).join(',');
+        } else if (field.type === 'checkbox' || field.type === 'radio') {
+          const checked = form.querySelectorAll(`[name="${name}"]:checked`);
+          if (checked.length) {
+            value = Array.from(checked).map((input) => input.value).join(',');
+          }
+        } else {
+          value = field.value;
+        }
+
+        if (value) {
+          params.set(name, value);
+        }
+      });
+
+      const queryString = params.toString();
+      requirementsLink.href = queryString ? `${baseUrl}?${queryString}` : baseUrl;
+    };
+
+    fieldNames.forEach((name) => {
+      const field = form.elements[name];
+      if (!field) {
+        return;
+      }
+
+      field.addEventListener('change', updateLinkHref);
+
+      if (field.tagName === 'INPUT' || field.tagName === 'TEXTAREA') {
+        field.addEventListener('input', updateLinkHref);
+      }
+    });
+
+    requirementsLink.addEventListener('click', updateLinkHref);
+    updateLinkHref();
+  });
+</script>
 
 {% endblock %}
