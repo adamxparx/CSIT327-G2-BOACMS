@@ -15,6 +15,7 @@
             <div>Appointment Time</div>
             <div>Purpose</div>
             <div>Status</div>
+            <div style="text-align: center;">Actions</div>
         </div>
         {% for appointment in appointments %}
             <div class="appointment_content">
@@ -24,22 +25,29 @@
                 <div>{{ appointment.preferred_time }}</div>
                 <div>{{ appointment.purpose }}</div>
                 <div class="status">
-                    <form method="post">
+                    <span class="status-badge status-badge--{{ appointment.status }}">{{ appointment.get_status_display }}</span>
+                </div>
+                <div class="status-actions">
+                    <form method="post" class="status-actions__form">
                         {% csrf_token %}
                         <input type="hidden" name="appointment_id" value="{{ appointment.id }}">
-
-                        {% if appointment.status == 'pending' %}
-                            <button type="submit" class="pending">Approve</button>
-                        {% elif appointment.status == 'approved' %}
-                            <button type="submit" class="approved">Approved</button>
-                        {% elif appointment.status == 'completed' %}
-                            <a class="completed" disabled>Completed</a>
-                        {% elif appointment.status == 'cancelled' %}
-                            <a class="cancelled" disabled>Cancelled</a>
-                        {% endif %}
+                        <button type="submit"
+                                name="action"
+                                value="approve"
+                                class="status-button status-button--approve"
+                                aria-label="Approve appointment for {{ appointment.resident.resident.first_name }} {{ appointment.resident.resident.last_name }}"
+                                {% if appointment.status == 'approved' or appointment.status == 'completed' or appointment.status == 'cancelled' %}disabled{% endif %}>
+                            Approve
+                        </button>
+                        <button type="submit"
+                                name="action"
+                                value="decline"
+                                class="status-button status-button--decline"
+                                aria-label="Decline appointment for {{ appointment.resident.resident.first_name }} {{ appointment.resident.resident.last_name }}"
+                                {% if appointment.status == 'cancelled' %}disabled{% endif %}>
+                            Decline
+                        </button>
                     </form>
-
-
                 </div>
             </div>
         {% endfor %}
