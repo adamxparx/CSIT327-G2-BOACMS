@@ -1,3 +1,5 @@
+from datetime import datetime, time as datetime_time, timedelta
+
 from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
@@ -8,8 +10,52 @@ from .models import Appointment
 from django.contrib import messages
 from django.db import IntegrityError
 
+
+def find_nearest_available_slot(preferred_date, preferred_time, buffer_minutes=15, max_days=14):
+    """Return the nearest future slot (date, time) that is free."""
+    open_time = datetime_time(9, 0)
+    close_time = datetime_time(16, 30)
+    step = timedelta(minutes=15)
+
+    for day_offset in range(max_days + 1):
+        current_date = preferred_date + timedelta(days=day_offset)
+        if day_offset == 0:
+            candidate_dt = datetime.combine(current_date, preferred_time) + step
+        else:
+            candidate_dt = datetime.combine(current_date, open_time)
+
+        while candidate_dt.time() <= close_time:
+            slot_start_dt = candidate_dt - timedelta(minutes=buffer_minutes)
+            slot_end_dt = candidate_dt + timedelta(minutes=buffer_minutes)
+
+            slot_start_time = slot_start_dt.time()
+            slot_end_time = slot_end_dt.time()
+
+            if slot_start_dt.date() < current_date:
+                slot_start_time = open_time
+            if slot_end_dt.date() > current_date:
+                slot_end_time = close_time
+
+            conflicts = Appointment.objects.filter(
+                preferred_date=current_date,
+                preferred_time__range=(slot_start_time, slot_end_time)
+            ).exclude(status='cancelled')
+
+            if not conflicts.exists():
+                return {
+                    'date': current_date,
+                    'time': candidate_dt.time(),
+                }
+
+            candidate_dt += step
+
+    return None
+
+
 @login_required
 def create_appointment(request):
+    recommended_slot = None
+
     if request.method == 'POST':
         form = AppointmentForm(request.POST)
         if form.is_valid():
@@ -21,6 +67,12 @@ def create_appointment(request):
                 return redirect('confirmation', appointment_id = appointment.id)
             except IntegrityError:
                 form.add_error(None, "This time slot is already taken. Please choose another time.")
+                recommended_slot = find_nearest_available_slot(
+                    form.cleaned_data['preferred_date'],
+                    form.cleaned_data['preferred_time']
+                )
+                if not recommended_slot:
+                    messages.info(request, "All nearby slots are currently full. Please choose another date or time.")
     else:
         initial_data = {}
         for field in ['certificate_type', 'purpose', 'preferred_date', 'preferred_time']:
@@ -31,10 +83,12 @@ def create_appointment(request):
         form = AppointmentForm(initial=initial_data)
 
     context = {
-        'form': form
+        'form': form,
+        'recommended_slot': recommended_slot,
     }
 
     return render(request, 'appointments/certification.html', context)
+
 
 class RequirementsView(TemplateView):
     template_name = 'appointments/requirements.html'

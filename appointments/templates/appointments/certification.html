@@ -23,6 +23,24 @@
             </div>
         {% endif %}
 
+        {% if recommended_slot %}
+            <div class="auth-alert auth-alert--info recommended-slot-alert">
+                <p>
+                    The selected slot is no longer available. Nearest available slot:
+                    <strong>{{ recommended_slot.date|date:"F j, Y" }}</strong>
+                    at
+                    <strong>{{ recommended_slot.time|time:"g:i A" }}</strong>.
+                </p>
+                <button type="button"
+                        id="apply-recommended-slot"
+                        class="btn"
+                        data-slot-date="{{ recommended_slot.date|date:"Y-m-d" }}"
+                        data-slot-time="{{ recommended_slot.time|time:"H:i" }}">
+                    Use this slot
+                </button>
+            </div>
+        {% endif %}
+
         <form method="post" class="auth-form auth-form--grid" id="appointment-form">
           {% csrf_token %}
 
@@ -86,6 +104,7 @@
   document.addEventListener('DOMContentLoaded', function () {
     const form = document.getElementById('appointment-form');
     const requirementsLink = document.getElementById('requirements-link');
+    const applyRecommendedButton = document.getElementById('apply-recommended-slot');
 
     if (!form || !requirementsLink) {
       return;
@@ -139,6 +158,25 @@
 
     requirementsLink.addEventListener('click', updateLinkHref);
     updateLinkHref();
+
+    if (applyRecommendedButton) {
+      applyRecommendedButton.addEventListener('click', () => {
+        const dateField = form.elements['preferred_date'];
+        const timeField = form.elements['preferred_time'];
+
+        if (dateField) {
+          dateField.value = applyRecommendedButton.dataset.slotDate || '';
+          dateField.dispatchEvent(new Event('change'));
+        }
+
+        if (timeField) {
+          timeField.value = applyRecommendedButton.dataset.slotTime || '';
+          timeField.dispatchEvent(new Event('change'));
+        }
+
+        updateLinkHref();
+      });
+    }
   });
 </script>
 
