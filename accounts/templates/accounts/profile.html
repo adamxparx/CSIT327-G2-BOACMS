@@ -4,23 +4,441 @@
 {% block title %}{{ user.last_name }} | Profile{% endblock %}
 
 {% block content %}
+<div class="profile-container">
+    <div class="profile-header">
+        <h2>{{ user.resident.first_name }} {{ user.resident.last_name }}</h2>
+        <p class="text-muted">Member since {{ user.date_joined|date:"F Y" }}</p>
+    </div>
 
-<form class="form-profile" method="post">
-    {% csrf_token %}
-    {% for message in messages %}
-    <div class="message">{{ message }}</div>
-    {% endfor %}
+    <div class="profile-card">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+
+        <form method="post" class="profile-form needs-validation" novalidate>
+            {% csrf_token %}
+            
+            <div class="form-section">
+                <h4><i class="bi bi-person-lines-fill me-2"></i>Personal Information</h4>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="{{ form.first_name.id_for_label }}">First Name</label>
+                            <input type="text" class="form-control" id="{{ form.first_name.id_for_label }}" 
+                                       name="{{ form.first_name.name }}" value="{{ user.resident.first_name }}" required>
+                            <div class="invalid-feedback">Please provide your first name.</div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="{{ form.middle_name.id_for_label }}">Middle Name</label>
+                            <input type="text" class="form-control" id="{{ form.middle_name.id_for_label }}" 
+                                   name="{{ form.middle_name.name }}" value="{{ user.resident.middle_name }}">
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="{{ form.last_name.id_for_label }}">Last Name</label>
+                            <input type="text" class="form-control" id="{{ form.last_name.id_for_label }}" 
+                                       name="{{ form.last_name.name }}" value="{{ user.resident.last_name }}" required>
+                            <div class="invalid-feedback">Please provide your last name.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mt-3">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="{{ form.date_of_birth.id_for_label }}">Date of Birth</label>
+                            <input type="date" class="form-control" id="{{ form.date_of_birth.id_for_label }}" 
+                                       name="{{ form.date_of_birth.name }}" value="{{ user.resident.date_of_birth|date:'Y-m-d' }}" required>
+                            <div class="invalid-feedback">Please provide your date of birth.</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="{{ form.sex.id_for_label }}">Sex</label>
+                            <select class="form-select" id="{{ form.sex.id_for_label }}" name="{{ form.sex.name }}" required>
+                                    <option value="" disabled>Select sex...</option>
+                                    <option value="Male" {% if user.resident.sex == 'Male' %}selected{% endif %}>Male</option>
+                                    <option value="Female" {% if user.resident.sex == 'Female' %}selected{% endif %}>Female</option>
+                                    <option value="Other" {% if user.resident.sex == 'Other' %}selected{% endif %}>Other</option>
+                                </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h4><i class="bi bi-house-door-fill me-2"></i>Contact Information</h4>
+                <div class="form-group">
+                    <label for="{{ form.address.id_for_label }}">Address</label>
+                    <textarea class="form-control" id="{{ form.address.id_for_label }}" 
+                                         name="{{ form.address.name }}" rows="2" required>{{ user.resident.address }}</textarea>
+                    <div class="invalid-feedback">Please provide your address.</div>
+                </div>
+
+                <div class="row mt-3">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="{{ form.phone_number.id_for_label }}">Phone Number</label>
+                            <input type="tel" class="form-control" id="{{ form.phone_number.id_for_label }}" 
+                                       name="{{ form.phone_number.name }}" value="{{ user.resident.phone_number }}" required>
+                            <div class="invalid-feedback">Please provide a valid phone number.</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="{{ form.civil_status.id_for_label }}">Civil Status</label>
+                            <select class="form-select" id="{{ form.civil_status.id_for_label }}" name="{{ form.civil_status.name }}" required>
+                                    <option value="" disabled>Select status...</option>
+                                    <option value="Single" {% if user.resident.civil_status == 'Single' %}selected{% endif %}>Single</option>
+                                    <option value="Married" {% if user.resident.civil_status == 'Married' %}selected{% endif %}>Married</option>
+                                    <option value="Widowed" {% if user.resident.civil_status == 'Widowed' %}selected{% endif %}>Widowed</option>
+                                    <option value="Separated" {% if user.resident.civil_status == 'Separated' %}selected{% endif %}>Separated</option>
+                                    <option value="Divorced" {% if user.resident.civil_status == 'Divorced' %}selected{% endif %}>Divorced</option>
+                                </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group mt-3">
+                    <label for="{{ form.citizenship.id_for_label }}">Citizenship</label>
+                    <input type="text" class="form-control" id="{{ form.citizenship.id_for_label }}" 
+                               name="{{ form.citizenship.name }}" value="{{ user.resident.citizenship }}" 
+                               placeholder="Enter your citizenship" required>
+                    <div class="invalid-feedback">Please provide your citizenship.</div>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary btn-lg">
+                    <i class="bi bi-save me-2"></i>Save Changes
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Google Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<!-- Bootstrap Icons -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+
+<!-- Form validation script -->
+<script>
+// Form validation
+(function () {
+    'use strict';
     
-    <div>First Name: <input name="{{ form.first_name.name }}" value="{{ user.resident.first_name }}" required/></div>
-    <div>Middle Name: <input name="{{ form.middle_name.name }}" value="{{ user.resident.middle_name }}"/></div>
-    <div>Last Name: <input name="{{ form.last_name.name }}" value="{{ user.resident.last_name }}" required/></div>
-    <div>Date of Birth: <input name="{{ form.date_of_birth.name }}" value="{{ user.resident.date_of_birth }}" required/></div>
-    <div>Sex: <input name="{{ form.sex.name }}" value="{{ user.resident.sex }}" required/></div>
-    <div>Address: <input name="{{ form.address.name }}" value="{{ user.resident.address }}" required/></div>
-    <div>Phone Number: <input name="{{ form.phone_number.name }}" value="{{ user.resident.phone_number }}" required/></div>
-    <div>Civil Status: <input name="{{ form.civil_status.name }}" value="{{ user.resident.civil_status }}" required/></div>
-    <div>Citizenship: <input name="{{ form.citizenship.name }}" value="{{ user.resident.citizenship }}" required/></div>
-    <div><button type="submit">Update</button></div>
-</form>
+    // Remove was-validated class on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        var forms = document.querySelectorAll('.needs-validation');
+        forms.forEach(function(form) {
+            form.classList.remove('was-validated');
+            
+            // Add input event listeners to validate on the fly
+            var inputs = form.querySelectorAll('input, select, textarea');
+            inputs.forEach(function(input) {
+                input.addEventListener('input', function() {
+                    if (input.checkValidity()) {
+                        input.classList.remove('is-invalid');
+                        input.classList.add('is-valid');
+                    } else {
+                        input.classList.remove('is-valid');
+                    }
+                });
+                
+                // Add blur event to validate when leaving the field
+                input.addEventListener('blur', function() {
+                    if (input.checkValidity()) {
+                        input.classList.remove('is-invalid');
+                        input.classList.add('is-valid');
+                    } else {
+                        input.classList.remove('is-valid');
+                        input.classList.add('is-invalid');
+                    }
+                });
+            });
+        });
+    });
+    
+    // Form submission handler
+    var forms = document.querySelectorAll('.needs-validation');
+    Array.from(forms).forEach(function(form) {
+        form.addEventListener('submit', function(event) {
+            form.classList.add('was-validated');
+            
+            // Manually check all required fields
+            var isValid = true;
+            var requiredInputs = form.querySelectorAll('[required]');
+            
+            requiredInputs.forEach(function(input) {
+                if (!input.value.trim()) {
+                    input.classList.add('is-invalid');
+                    input.classList.remove('is-valid');
+                    isValid = false;
+                } else {
+                    input.classList.remove('is-invalid');
+                    input.classList.add('is-valid');
+                }
+            });
+            
+            if (!form.checkValidity() || !isValid) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+        }, false);
+    });
+})();
+</script>
 
+<style>
+/* Base Typography */
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    line-height: 1.6;
+    color: #2d3748;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    font-weight: 600;
+    line-height: 1.3;
+    color: #1a202c;
+}
+
+.profile-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+}
+
+.profile-header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+    padding: 2rem;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.profile-header h2 {
+    color: #1a202c;
+    margin-bottom: 0.5rem;
+    font-size: 2rem;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+}
+
+.profile-header p.text-muted {
+    font-size: 1rem;
+    color: #718096;
+    font-weight: 400;
+}
+
+.profile-card {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    padding: 2.5rem;
+    margin-top: 1.5rem;
+    border: 1px solid #edf2f7;
+}
+
+.form-section {
+    margin-bottom: 2.5rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid #eee;
+}
+
+.form-section:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.form-section h4 {
+    color: #495057;
+    margin-bottom: 1.5rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+}
+
+.form-section h4 i {
+    margin-right: 0.5rem;
+    color: #0d6efd;
+}
+
+.form-group {
+    margin-bottom: 1.25rem;
+}
+
+.form-group label {
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    color: #4a5568;
+    display: block;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.form-control, .form-select {
+    padding: 0.8rem 1.25rem;
+    border-radius: 10px;
+    border: 2px solid #e2e8f0;
+    font-size: 1rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    font-family: 'Inter', sans-serif;
+    color: #1a202c;
+    background-color: #ffffff;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: #818cf8;
+    box-shadow: 0 0 0 3px rgba(129, 140, 248, 0.2);
+    outline: none;
+    background-color: #ffffff;
+}
+
+.form-control:hover, .form-select:hover {
+    border-color: #c7d2fe;
+}
+
+textarea.form-control {
+    min-height: 120px;
+    resize: vertical;
+    line-height: 1.6;
+    padding: 1rem 1.25rem;
+}
+
+.form-control::placeholder {
+    color: #94a3b8;
+    font-weight: 400;
+    opacity: 0.8;
+    transition: all 0.2s ease;
+}
+
+.form-control:focus::placeholder {
+    opacity: 0.5;
+}
+
+.form-actions {
+    text-align: center;
+    margin-top: 2.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #eee;
+}
+
+.btn-primary {
+    padding: 0.7rem 2rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    border: none;
+    box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
+    color: #1f2937;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(245, 158, 11, 0.4);
+    background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+    color: #1f2937;
+}
+
+.invalid-feedback {
+    display: none;
+    font-size: 0.85rem;
+    margin-top: 0.25rem;
+    color: #e53e3e;
+    font-weight: 400;
+}
+
+.was-validated .form-control:invalid ~ .invalid-feedback,
+.was-validated .form-control:invalid ~ .invalid-tooltip,
+.form-control.is-invalid ~ .invalid-feedback,
+.form-control.is-invalid ~ .invalid-tooltip {
+    display: block;
+}
+
+.was-validated .form-control:valid ~ .valid-feedback,
+.was-validated .form-control:valid ~ .valid-tooltip,
+.form-control.is-valid ~ .valid-feedback,
+.form-control.is-valid ~ .valid-tooltip {
+    display: block;
+}
+
+.was-validated .form-control:valid,
+.form-control.is-valid {
+    border-color: #10b981;
+    padding-right: calc(1.5em + 0.75rem);
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='%2310b981' d='M2.3 6.73L.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1z'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right calc(0.375em + 0.1875rem) center;
+    background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+}
+
+.was-validated .form-control:invalid,
+.form-control.is-invalid {
+    border-color: #e53e3e;
+    padding-right: calc(1.5em + 0.75rem);
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23e53e3e'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23e53e3e' stroke='none'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right calc(0.375em + 0.1875rem) center;
+    background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+}
+
+/* Improved typography for form elements */
+input, select, textarea, button {
+    font-family: 'Inter', sans-serif;
+}
+
+/* Better form feedback */
+.invalid-feedback {
+    font-size: 0.8rem;
+    margin-top: 0.25rem;
+    color: #e53e3e;
+    font-weight: 400;
+}
+
+/* Card and section styling */
+.profile-card {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    padding: 2.5rem;
+    margin-top: 1.5rem;
+    border: 1px solid #edf2f7;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .profile-card {
+        padding: 1.5rem;
+    }
+    
+    .profile-header {
+        padding: 1.5rem 1rem;
+    }
+    
+    .form-section {
+        padding-bottom: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+}
+</style>
 {% endblock %}
