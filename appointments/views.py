@@ -22,7 +22,13 @@ def create_appointment(request):
             except IntegrityError:
                 form.add_error(None, "This time slot is already taken. Please choose another time.")
     else:
-        form = AppointmentForm()
+        initial_data = {}
+        for field in ['certificate_type', 'purpose', 'preferred_date', 'preferred_time']:
+            value = request.GET.get(field)
+            if value:
+                initial_data[field] = value
+
+        form = AppointmentForm(initial=initial_data)
 
     context = {
         'form': form
@@ -35,6 +41,7 @@ class RequirementsView(TemplateView):
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context['query_params'] = self.request.GET
         return context
 
 @login_required
