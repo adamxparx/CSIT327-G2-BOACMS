@@ -132,15 +132,34 @@ def staff_appointments(request):
 
     if request.method == "POST":
         appointment_id = request.POST.get("appointment_id")
+        action = request.POST.get("action")
         appointment = get_object_or_404(Appointment, id=appointment_id)
 
-        # Toggle between pending and approved
-        if appointment.status == 'pending':
-            appointment.status = 'approved'
-        elif appointment.status == 'approved':
-            appointment.status = 'pending'
+        status_changed = False
 
-        appointment.save()
+        if action == 'approve':
+            if appointment.status == 'cancelled':
+                messages.error(request, "Cancelled appointments cannot be approved.")
+            elif appointment.status != 'approved':
+                appointment.status = 'approved'
+                status_changed = True
+                messages.success(request, "Appointment approved.")
+            else:
+                messages.info(request, "Appointment is already approved.")
+        elif action == 'decline':
+            if appointment.status != 'cancelled':
+                appointment.status = 'cancelled'
+                status_changed = True
+                messages.success(request, "Appointment declined.")
+            else:
+                messages.info(request, "Appointment is already declined.")
+        else:
+            messages.error(request, "Invalid action submitted.")
+            return redirect('staff_appointments')
+
+        if status_changed:
+            appointment.save()
+
         return redirect('staff_appointments')
 
     context = {'appointments': all_appointments}

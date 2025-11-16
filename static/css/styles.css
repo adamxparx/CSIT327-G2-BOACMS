@@ -241,6 +241,81 @@ a:focus {
     margin-top: 0;
 }
 
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.35rem 0.75rem;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    letter-spacing: 0.2px;
+    text-transform: capitalize;
+}
+
+.status-badge--pending {
+    background: rgba(252, 209, 22, 0.16);
+    color: #a26a00;
+}
+
+.status-badge--approved {
+    background: rgba(46, 204, 113, 0.18);
+    color: #1d7a4e;
+}
+
+.status-badge--completed {
+    background: rgba(0, 56, 168, 0.14);
+    color: #0038a8;
+}
+
+.status-badge--cancelled {
+    background: rgba(206, 17, 38, 0.16);
+    color: #9b1228;
+}
+
+.status-actions__form {
+    display: flex;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.status-button {
+    padding: 0.45rem 1.1rem;
+    border-radius: 999px;
+    border: none;
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+    color: #fff;
+}
+
+.status-button--approve {
+    background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+    box-shadow: 0 6px 16px rgba(39, 174, 96, 0.25);
+}
+
+.status-button--decline {
+    background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+    box-shadow: 0 6px 16px rgba(192, 57, 43, 0.25);
+}
+
+.status-button:hover,
+.status-button:focus {
+    transform: translateY(-1px);
+    box-shadow: 0 10px 22px rgba(0, 0, 0, 0.16);
+    filter: brightness(1.05);
+}
+
+.status-button:disabled {
+    cursor: not-allowed;
+    opacity: 0.65;
+    box-shadow: none;
+    transform: none;
+    filter: none;
+}
+
 @media (max-width: 768px) {
     .site-header {
         flex-direction: column;
