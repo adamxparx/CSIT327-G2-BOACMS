@@ -1,5 +1,7 @@
+from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
+from django.urls import reverse
 from django.views.generic import TemplateView
 from .forms import AppointmentForm
 from .models import Appointment
@@ -95,3 +97,56 @@ def cancel_appointment(request, appointment_id):
 
     context = {'appointment': appointment}
     return render(request, 'appointments/confirm_cancel.html', context)
+
+@login_required
+def api_appointments_list(request):
+    appointments = Appointment.objects.all() if request.user.role == 'staff' else Appointment.objects.filter(resident=request.user)
+        
+    data = []
+    for appointment in appointments:
+        data.append({
+            'title': f"{appointment.get_certificate_type_display()} ({appointment.resident.get_full_name()})",
+            'start': f"{appointment.preferred_date}T{appointment.preferred_time}",
+            'status': appointment.status,
+            'url': reverse('appointment_detail', args=[appointment.id]), 
+        })
+    return JsonResponse(data, safe=False)
+
+@login_required
+def appointments_calendar_view(request):
+    role = getattr(request.user, 'role')
+
+    if role == 'resident':
+        dashboard_template = 'accounts/dashboard.html'
+    else:
+        dashboard_template = 'accounts/staff_dashboard.html'
+
+    context = {
+        'dashboard_template': dashboard_template,
+    }
+
+
+    return render(request, 'appointments/appointments_calendar.html', context)
+
+@login_required
+def appointment_detail(request, appointment_id):
+    if request.user.role == 'resident':
+        # Residents can only view their own
+        appointment_qs = Appointment.objects.filter(id=appointment_id, resident=request.user)
+        template_name = 'appointments/appointment_detail.html'
+    elif request.user.role == 'staff' or request.user.is_superuser:
+        # Staff/Admins can view any
+        appointment_qs = Appointment.objects.filter(id=appointment_id)
+        template_name = 'appointments/staff_appointment_detail.html' 
+    else:
+        messages.error(request, "You are not authorized to view this page.")
+        return redirect('appointments')
+
+    appointment = get_object_or_404(appointment_qs)
+    
+    context = {
+        'appointment': appointment,
+        'certificate_name': appointment.get_certificate_type_display(),
+    }
+
+    return render(request, template_name, context)

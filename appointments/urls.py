@@ -9,4 +9,7 @@ urlpatterns = [
     path('confirmation/<int:appointment_id>/', views.confirmation, name='confirmation'),
     path('cancel/<int:appointment_id>/', views.cancel_appointment, name='cancel_appointment'),
     path('requirements/', RequirementsView.as_view(), name='requirements'),
+    path('api/appointments/', views.api_appointments_list, name='api_appointments_list'),
+    path('calendar/', views.appointments_calendar_view, name='appointments_calendar'),
+    path('appointment/<int:appointment_id>/', views.appointment_detail, name='appointment_detail'),
 ]
