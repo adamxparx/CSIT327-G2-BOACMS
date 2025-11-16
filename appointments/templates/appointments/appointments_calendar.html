@@ -1,0 +1,46 @@
+{% extends dashboard_template %}
+
+{% block content %}
+    <h2>Appointments Calendar</h2>
+
+    <link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/main.min.css' rel='stylesheet' />
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js'></script>
+    <script src='https://cdn.jsdelivr.net/npm/@fullcalendar/core/locales-all.global.min.js'></script>
+
+    <div id='calendar'></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var calendarEl = document.getElementById('calendar');
+            var calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                headerToolbar: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                },
+                events: '{% url "api_appointments_list" %}', 
+                eventDidMount: function(info) {
+                    if (info.event.extendedProps.status === 'pending') {
+                        info.el.style.backgroundColor = '#ffc107';
+                    } else if (info.event.extendedProps.status === 'cancelled') {
+                        info.el.style.backgroundColor = '#ff0000';
+                    } else if (info.event.extendedProps.status === 'approved') {
+                        info.el.style.backgroundColor = '#00ff00';
+                    } else {
+                        info.el.style.backgroundColor = '#0000ff';
+                    }
+
+                    info.el.style.height = '40px';
+                },
+                eventClick: function(info) {
+                    info.jsEvent.preventDefault(); 
+                    if (info.event.url) {
+                        window.location.href = info.event.url;
+                    }
+                }
+            });
+            calendar.render();
+        });
+    </script>
+{% endblock %}

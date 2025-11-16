@@ -8,6 +8,7 @@
     <ul>
         <li><a href="{% url 'staff_dashboard' %}" {% if request.resolver_match.url_name == 'staff_dashboard' %}aria-current="page"{% endif %}>HOME</a></li>
         <li><a href="{% url 'staff_appointments' %}" {% if request.resolver_match.url_name == 'staff_appointments' %}aria-current="page"{% endif %}>APPOINTMENTS</a></li>
+        <li><a href="{% url 'appointments_calendar' %}" {% if request.resolver_match.url_name == 'appointments_calendar' %}aria-current="page"{% endif %}>CALENDAR</a></li>
     </ul>
 
 {% endblock %}
