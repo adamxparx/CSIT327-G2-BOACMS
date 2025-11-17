@@ -150,7 +150,7 @@ def staff_appointments(request):
             if appointment.status != 'cancelled':
                 appointment.status = 'cancelled'
                 status_changed = True
-                messages.success(request, "Appointment declined.")
+                messages.error(request, "Appointment declined.")
             else:
                 messages.info(request, "Appointment is already declined.")
         else:
