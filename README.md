@@ -44,7 +44,7 @@
 11. Run the server  
 	`python manage.py runserver`
 
-### 💻 LINK TO THE DEPLOYED APP
+### 💻 LINK TO THE DEPLOYED APP (RENDER)
 https://boacms-portal.onrender.com/
 
 ## 👥 THE TEAM
