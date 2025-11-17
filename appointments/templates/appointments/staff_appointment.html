@@ -6,6 +6,15 @@
 {% block content %}
 
 <div class="appointments_center" style="display: flex; justify-content: center;">
+{% if messages %}
+    <div class="staff-alerts">
+        {% for message in messages %}
+            <div class="staff-alert staff-alert--{{ message.tags }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
 {% if appointments %}
     <div class="user_appointments">
         <div class="appointment_title">
