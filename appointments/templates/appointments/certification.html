@@ -97,6 +97,31 @@
   {% endblock %}
 </div>
 
+<style>
+  .is-hidden {
+    display: none !important;
+  }
+
+  .highlight-success {
+    animation: slot-success-fade 4s ease-out;
+  }
+
+  @keyframes slot-success-fade {
+    0% {
+      background-color: #dff5e1;
+      box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.4);
+    }
+    30% {
+      background-color: #c8f0ce;
+      box-shadow: 0 0 0 8px rgba(46, 204, 113, 0.0);
+    }
+    100% {
+      background-color: inherit;
+      box-shadow: none;
+    }
+  }
+</style>
+
 <script src="{% static 'appointments/js/date_restriction.js' %}"></script>
 <script src="{% static 'appointments/js/time_restriction.js' %}"></script>
 <script src="{% static 'appointments/js/disabled_booking_button.js' %}"></script>
@@ -172,6 +197,25 @@
         if (timeField) {
           timeField.value = applyRecommendedButton.dataset.slotTime || '';
           timeField.dispatchEvent(new Event('change'));
+          timeField.classList.remove('highlight-success');
+          // Force reflow to restart animation if applied multiple times
+          void timeField.offsetWidth;
+          timeField.classList.add('highlight-success');
+        }
+
+        const errorAlert = document.querySelector('.auth-alert--error');
+        if (errorAlert) {
+          errorAlert.classList.add('is-hidden');
+        }
+
+        const fieldErrors = form.querySelectorAll('.field-error');
+        fieldErrors.forEach((error) => {
+          error.classList.add('is-hidden');
+        });
+
+        const recommendedAlert = document.querySelector('.recommended-slot-alert');
+        if (recommendedAlert) {
+          recommendedAlert.classList.add('is-hidden');
         }
 
         updateLinkHref();
