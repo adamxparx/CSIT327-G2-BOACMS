@@ -14,21 +14,21 @@
 
     <form action="{% url 'logout' %}" method="post">
         {% csrf_token %}
-        <details class="profile-dropdown">
-            <summary>
-                {% block user %}{% endblock %}
-                <div>
-                    <img class="dropdown-icon" src="{% static 'images/dropdown.png' %}">
-                </div>
-            </summary>
-            <div class="dropdown-button">
+        <div class="profile-popup">
+            <div class="popup-menu">
                 {% if user.role == 'resident' %}
                 <a href="{% url 'profile' %}"><div>Profile</div></a>
                 {% endif %}
                 <button type="submit">Logout</button>
             </div>
-        </select>
+            <div class="user-name">
+                {% block user %}{% endblock %}
+            </div>
+        </div>
     </form>
+    
+    <script src="{% static 'accounts/js/popup.js' %}"></script>
+
 {% endblock %}
 
 {% block content %}

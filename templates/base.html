@@ -10,8 +10,6 @@
         {% block extra_css %}{% endblock %}
     </head>
     <body>
-        <a class="skip-link" href="#main-content">Skip to content</a>
-
         <header class="site-header">
             <div class="site-branding">
                 <a class="brand" href="{% url 'index' %}">
@@ -30,8 +28,8 @@
                     {% block user_logout %}{% endblock %}
                 {% else %}
                 <div class="auth-links">
-                    <a class="btn btn-text" href="{% url 'login' %}">Login</a>
-                    <a class="btn btn-primary" href="{% url 'register' %}">Register</a>
+                    <div class="primary-nav"><a href="{% url 'login' %}">Login</a></div>
+                    <div class="primary-nav"><a href="{% url 'register' %}">Register</a></div>  
                 </div>
                 {% endif %}
             </div>
