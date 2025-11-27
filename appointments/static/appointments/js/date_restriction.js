@@ -1,7 +1,13 @@
 (function() {
-  function todayStr() {
+  function today() {
     const d = new Date();
-    d.setHours(0,0,0,0);
+    d.setHours(0, 0, 0, 0);
+    return d;
+  }
+
+  function tomorrowStr() {
+    const d = today();
+    d.setDate(d.getDate() + 1);
     const y = d.getFullYear();
     const m = String(d.getMonth() + 1).padStart(2, '0');
     const day = String(d.getDate()).padStart(2, '0');
@@ -9,8 +15,9 @@
   }
 
   function setDateConstraints() {
-    const min = todayStr();
+    const min = tomorrowStr(); // ⬅️ min = tomorrow
     const dateInputs = document.querySelectorAll('input[type="date"], input[name$="appointment_date"]');
+    
     dateInputs.forEach(inp => {
       try { inp.min = min; } catch(e) {}
       inp.addEventListener('change', () => validateDate(inp));
@@ -20,9 +27,9 @@
 
   function validateDate(input) {
     if (!input.value) return true;
-    const min = input.min || todayStr();
+    const min = input.min || tomorrowStr();
     if (input.value < min) {
-      input.setCustomValidity('Please select today or a future date.');
+      input.setCustomValidity('Please select a future date (today is not available).');
       input.reportValidity();
       return false;
     }
