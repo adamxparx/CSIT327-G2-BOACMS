@@ -17,8 +17,8 @@ class AppointmentForm(forms.ModelForm):
     def clean_preferred_date(self):
         preferred_date = self.cleaned_data.get('preferred_date')
 
-        if preferred_date and preferred_date < timezone.now().date():
-            raise ValidationError("You cannot book a date that is in the past.")
+        if preferred_date and preferred_date < timezone.now().date() + timedelta(days=1):
+            raise ValidationError("You cannot book a date today or in the past.")
         
         return preferred_date
     
