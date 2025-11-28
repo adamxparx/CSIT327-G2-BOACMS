@@ -12,20 +12,24 @@
 
 {% block user_logout %}
 
-    <form action="{% url 'logout' %}" method="post">
-        {% csrf_token %}
-        <div class="profile-popup">
-            <div class="popup-menu">
-                {% if user.role == 'resident' %}
-                <a href="{% url 'profile' %}"><div>Profile</div></a>
-                {% endif %}
-                <button type="submit">Logout</button>
-            </div>
-            <div class="user-name">
-                {% block user %}{% endblock %}
-            </div>
+<form action="{% url 'logout' %}" method="post">
+    {% csrf_token %}
+
+    <div class="profile-popup">
+        <div class="user-name" onclick="event.preventDefault()">
+            {{ user.resident.first_name }} {{ user.resident.last_name }}
         </div>
-    </form>
+
+        <!-- dropdown -->
+        <div class="popup-menu" id="profileMenu">
+            {% if user.role == 'resident' %}
+            <a href="{% url 'profile' %}"><div>Profile</div></a>
+            {% endif %}
+            <button type="submit">Logout</button>
+        </div>
+    </div>
+</form>
+
     
     <script src="{% static 'accounts/js/popup.js' %}"></script>
 
