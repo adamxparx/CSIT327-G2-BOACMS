@@ -20,7 +20,8 @@ body {
     height: 100vh;
     display: flex;
     flex-direction: row;
-    overflow: hidden;
+    overflow-x: hidden;
+    overflow-y: auto;
 }
 
 a {

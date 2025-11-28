@@ -2,24 +2,27 @@
     margin-top: 100px;
 }
 
-.messages {
+.messages,
+.message {
     color: var(--color-primary);
-    font-size: 1.15rem;
-    text-align: center;
+    font-size: 0.95rem;
     font-weight: 600;
+    text-align: center;
 }
 
-.form-group-container {
-    display: flex;
-    gap: 20px;
+a {
+    margin: 0;
+    padding: 0;
 }
 
+/* Form / Auth Card */
 .auth-wrapper {
-    flex: 1;
     display: flex;
     justify-content: center;
-    align-items: flex-start;
-    padding: clamp(1.5rem, 4vw, 3rem) clamp(1.25rem, 4vw, 3rem);
+    align-items: center;
+    padding: 2rem;
+    font-size: 0.95rem;
+    flex: 1;
 }
 
 .auth-card {
@@ -55,7 +58,9 @@
     font-size: 1rem;
 }
 
-.auth-form {
+/* Forms */
+.auth-form,
+.form-profile {
     display: flex;
     flex-direction: column;
     gap: 1.25rem;
@@ -67,14 +72,12 @@
     gap: 1.25rem;
 }
 
-.auth-form--grid .form-field:nth-last-child(1) {
-    grid-column: span 2;
-}
-
+.auth-form--grid .form-field:nth-last-child(1),
 .auth-form--grid .form-submit {
     grid-column: span 2;
 }
 
+.form-group,
 .form-field {
     display: flex;
     flex-direction: column;
@@ -83,23 +86,31 @@
     font-size: 0.95rem;
 }
 
+.form-group label,
 .form-field label {
     font-size: 0.95rem;
     font-weight: 600;
 }
 
+.form-group input,
+.form-group select,
+.form-group textarea,
 .form-field input,
 .form-field select,
-.form-field textarea {
+.form-field textarea,
+.form-profile input {
     font-size: 1rem;
     padding: 0.75rem 1rem;
+    width: 100%;
     border-radius: 0.75rem;
     border: 1px solid rgba(0, 56, 168, 0.22);
     background-color: var(--color-neutral);
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
-    width: 100%;
 }
 
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus,
 .form-field input:focus,
 .form-field select:focus,
 .form-field textarea:focus {
@@ -108,17 +119,48 @@
     box-shadow: 0 0 0 4px rgba(252, 209, 22, 0.25);
 }
 
+.form-profile button,
+.form-action button {
+    width: 100%;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 999px;
+    font-weight: 600;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    cursor: pointer;
+}
+
+.form-action button {
+    color: var(--color-text);
+    background-color: var(--color-secondary);
+    height: 48px;
+    letter-spacing: 0.4px;
+    box-shadow: 0 10px 24px rgba(252, 209, 22, 0.35);
+}
+
+.form-action button:hover,
+.form-profile button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 12px 28px rgba(252, 209, 22, 0.45);
+}
+
+.form-profile button {
+    background-color: var(--color-primary);
+    color: var(--color-neutral);
+    margin-top: 20px;
+}
+
+.form-profile button:hover {
+    background-color: #1f57c1;
+}
+
+/* Alerts */
 .auth-alert {
     border-radius: 18px;
     padding: 1rem 1.25rem;
     background-color: rgba(0, 56, 168, 0.08);
     border: 1px solid rgba(0, 56, 168, 0.18);
     color: var(--color-primary);
-}
-
-.auth-alert__list {
-    margin: 0;
-    padding-left: 1.25rem;
 }
 
 .auth-alert--info {
@@ -139,15 +181,17 @@
     color: green;
 }
 
+.auth-alert__list {
+    margin: 0;
+    padding-left: 1.25rem;
+}
+
 .field-error {
     font-size: 0.85rem;
     color: var(--color-accent);
 }
 
-.btn-block {
-    width: 100%;
-}
-
+/* Footer / Links */
 .auth-footer {
     display: flex;
     justify-content: center;
@@ -165,6 +209,76 @@
     text-decoration: underline;
 }
 
+/* Profile popup */
+.profile-popup {
+    position: relative;
+    display: inline-block;
+    z-index: 9999;
+}
+
+.popup-menu {
+    position: absolute;
+    top: auto;   
+    bottom: 120%;  
+    left: 0;
+    display: none;
+    background-color: var(--color-neutral);
+    border-radius: 10px;
+    padding: 10px 0;
+    z-index: 1000;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+    min-width: 180px;
+    max-width: 90vw;
+}
+
+.popup-menu::before {
+    content: "";
+    position: absolute;
+    bottom: -8px; 
+    right: 25%;
+    width: 0;
+    height: 0;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-top: 8px solid var(--color-neutral); 
+}
+
+
+.popup-menu button,
+.popup-menu a div {
+    padding: 10px 20px;
+    background-color: transparent;
+    text-align: left;
+    border: none;
+    width: 100%;
+    font-size: 14px;
+    color: var(--color-text);
+    cursor: pointer;
+}
+
+.popup-menu button:hover,
+.popup-menu a div:hover {
+    background-color: rgba(0, 56, 168, 0.08);
+}
+
+.user-name {
+    color: var(--color-secondary);
+    cursor: pointer;
+    font-weight: 600; 
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.user-name::after {
+    content: '▼';
+    font-size: 0.7em;
+    color: var(--color-secondary);
+}
+
+
+
+/* Responsive */
 @media (max-width: 768px) {
     .auth-card--wide {
         width: 100%;
@@ -179,176 +293,3 @@
         grid-column: span 1;
     }
 }
-
-.auth-wrapper {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 2rem;
-    font-size: 0.95rem;
-}
-
-.form-group {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    text-align: left;
-    font-size: 0.95rem;
-}
-
-.form-group label {
-    font-size: 0.95rem;
-    font-weight: 600;
-}
-
-.form-group input,
-.form-group select,
-.form-group textarea {
-    font-size: 1rem;
-    padding: 0.75rem 1rem;
-    width: 100%;
-    border-radius: 0.75rem;
-    border: 1px solid rgba(0, 56, 168, 0.22);
-    background-color: var(--color-neutral);
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
-}
-
-.form-group input:focus,
-.form-group select:focus,
-.form-group textarea:focus {
-    outline: none;
-    border-color: var(--color-secondary);
-    box-shadow: 0 0 0 4px rgba(252, 209, 22, 0.25);
-}
-
-.form-action {
-    margin-top: 40px;
-    display: flex;
-}
-
-.form-action button {
-    color: var(--color-text);
-    background-color: var(--color-secondary);
-    border: none;
-    width: 100%;
-    height: 48px;
-    border-radius: 999px;
-    font-weight: 600;
-    letter-spacing: 0.4px;
-    box-shadow: 0 10px 24px rgba(252, 209, 22, 0.35);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.form-action button:hover {
-    cursor: pointer;
-    transform: translateY(-1px);
-    box-shadow: 0 14px 28px rgba(252, 209, 22, 0.45);
-}
-
-.form-title {
-    font-size: 50px;
-    font-weight: bold;
-}
-
-.error-message {
-    font-size: 15px;
-    color: red;
-    text-align: left;
-}
-
-/* Dashboard */
-.profile-popup {
-    position: relative;
-}
-
-.user-name {
-    font-weight: 600;
-    color: var(--color-secondary);
-    margin: 10px 0px;
-}
-
-.user-name:hover {
-    cursor: pointer;
-}
-
-a {
-    margin: 0;
-    padding: 0;
-}
-
-.popup-menu {
-    position: relative;
-    display: none;
-    background-color: var(--color-neutral);
-    border: none;
-    border-radius: 10px;
-    padding: 5px;
-}
-
-.popup-menu button,
-.popup-menu a div {
-    padding: 10px 20px;
-    background-color: transparent;
-    text-align: left;
-    border: none;
-    border-radius: 5px;
-    width: 200px;
-    font-size: 14px;
-    color: var(--color-text);
-}
-
-.popup-menu a div {
-    width: 100%;
-}
-
-.popup-menu button:hover,
-.popup-menu a div:hover {
-    cursor: pointer;
-    background-color: rgba(0, 56, 168, 0.08);
-}
-
-.form-profile {
-    display: block;
-    min-width: 200px;
-}
-
-.form-profile input {
-    width: 250px;
-    padding: 10px 20px;
-}
-
-.form-profile button {
-    width: 100%;
-    margin-top: 20px;
-    padding: 10px 20px;
-    background-color: var(--color-primary);
-    color: var(--color-neutral);
-    border: none;
-    border-radius: 999px;
-    font-weight: 600;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.form-profile button:hover {
-    background-color: #1f57c1;
-    cursor: pointer;
-    transform: translateY(-1px);
-    box-shadow: 0 12px 24px rgba(0, 56, 168, 0.25);
-}
-
-.form-profile div {
-    display: flex;
-    width: 400px;
-    justify-content: space-between;
-    margin: 5px;
-}
-
-.message {
-    color: var(--color-primary);
-    font-size: 0.95rem;
-    font-weight: 600;
-}
-
-
-
-
