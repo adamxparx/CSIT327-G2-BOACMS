@@ -167,6 +167,10 @@ def staff_appointments(request):
 
 @login_required
 def approved_appointments(request):
+    if request.user.role != 'staff':
+        messages.error(request, "You are not authorized to view this page.")
+        return redirect('appointments')
+    
     approved_appointments = Appointment.objects.filter(status='approved').order_by('-preferred_date', '-preferred_time')
     
     context = {
@@ -177,10 +181,28 @@ def approved_appointments(request):
     
 @login_required
 def pending_appointments(request):
+    if request.user.role != 'staff':
+        messages.error(request, "You are not authorized to view this page.")
+        return redirect('appointments')
+    
     pending_appointments = Appointment.objects.filter(status='pending').order_by('-preferred_date', '-preferred_time')
     
     context = {
         "appointments": pending_appointments,
+    }
+
+    return render(request, "appointments/pending_appointments.html", context)
+
+@login_required
+def cancelled_appointments(request):
+    if request.user.role != 'staff':
+        messages.error(request, "You are not authorized to view this page.")
+        return redirect('appointments')
+    
+    cancelled_appointments = Appointment.objects.filter(status='cancelled').order_by('-preferred_date', '-preferred_time')
+    
+    context = {
+        "appointments": cancelled_appointments,
     }
 
     return render(request, "appointments/pending_appointments.html", context)

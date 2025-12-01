@@ -7,6 +7,7 @@ urlpatterns = [
     path('staff_appointments/', views.staff_appointments, name='staff_appointments'),
     path('approved_appointments/', views.approved_appointments, name='approved_appointments'),
     path('pending_appointments/', views.pending_appointments, name='pending_appointments'),
+    path('cancelled_appointments/', views.cancelled_appointments, name='cancelled_appointments'),
     path('certification/', views.create_appointment, name='certification'),
     path('confirmation/<int:appointment_id>/', views.confirmation, name='confirmation'),
     path('cancel/<int:appointment_id>/', views.cancel_appointment, name='cancel_appointment'),
