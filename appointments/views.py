@@ -1,4 +1,5 @@
 from datetime import datetime, time as datetime_time, timedelta
+from django.utils import timezone
 
 from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
@@ -177,6 +178,7 @@ def approved_appointments(request):
         appt.refresh_if_expired()
 
     approved_appointments = Appointment.objects.filter(status='approved').order_by('-preferred_date', '-preferred_time')
+    approved_appointments_today = Appointment.objects.filter(status='approved', preferred_date=timezone.localdate()).order_by('-preferred_date', '-preferred_time')
 
     
     if request.method == "POST":
@@ -194,6 +196,7 @@ def approved_appointments(request):
     
     context = {
         "appointments": approved_appointments,
+        "appointments_today": approved_appointments_today,
     }
 
     return render(request, "appointments/approved_appointments.html", context)
@@ -203,6 +206,11 @@ def pending_appointments(request):
     if request.user.role != 'staff':
         messages.error(request, "You are not authorized to view this page.")
         return redirect('appointments')
+    
+    pending_appointments = Appointment.objects.filter(status='pending').order_by('-preferred_date', '-preferred_time')
+
+    for appt in pending_appointments:
+        appt.refresh_if_expired()
     
     pending_appointments = Appointment.objects.filter(status='pending').order_by('-preferred_date', '-preferred_time')
 
@@ -235,7 +243,7 @@ def cancelled_appointments(request):
         "appointments": cancelled_appointments,
     }
 
-    return render(request, "appointments/pending_appointments.html", context)
+    return render(request, "appointments/cancelled_appointments.html", context)
 
 @login_required
 def completed_appointments(request):
@@ -249,7 +257,7 @@ def completed_appointments(request):
         "appointments": completed_appointments,
     }
 
-    return render(request, "appointments/pending_appointments.html", context)
+    return render(request, "appointments/completed_appointments.html", context)
 
 @login_required
 def cancel_appointment(request, appointment_id):
