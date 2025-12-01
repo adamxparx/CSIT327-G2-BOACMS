@@ -208,6 +208,20 @@ def cancelled_appointments(request):
     return render(request, "appointments/pending_appointments.html", context)
 
 @login_required
+def completed_appointments(request):
+    if request.user.role != 'staff':
+        messages.error(request, "You are not authorized to view this page.")
+        return redirect('appointments')
+    
+    completed_appointments = Appointment.objects.filter(status='completed').order_by('-preferred_date', '-preferred_time')
+    
+    context = {
+        "appointments": completed_appointments,
+    }
+
+    return render(request, "appointments/pending_appointments.html", context)
+
+@login_required
 def cancel_appointment(request, appointment_id):
     appointment = get_object_or_404(Appointment, id=appointment_id, resident=request.user)
 

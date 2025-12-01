@@ -18,6 +18,7 @@
                 <li><a href="{% url 'pending_appointments' %}" {% if request.resolver_match.url_name == 'pending_appointments' %}aria-current="page"{% endif %}>Pending</a></li>
                 <li><a href="{% url 'approved_appointments' %}" {% if request.resolver_match.url_name == 'approved_appointments' %}aria-current="page"{% endif %}>Approved</a></li>
                 <li><a href="{% url 'cancelled_appointments' %}" {% if request.resolver_match.url_name == 'cancelled_appointments' %}aria-current="page"{% endif %}>Cancelled</a></li>
+                <li><a href="{% url 'completed_appointments' %}" {% if request.resolver_match.url_name == 'completed_appointments' %}aria-current="page"{% endif %}>Completed</a></li>
             </ul>
         </li>
         <li><a href="{% url 'appointments_calendar' %}" {% if request.resolver_match.url_name == 'appointments_calendar' %}aria-current="page"{% endif %}>CALENDAR</a></li>
