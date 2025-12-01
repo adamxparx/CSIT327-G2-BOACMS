@@ -36,7 +36,7 @@
                         <div class="status cancelled">Cancelled</div>
                     {% endif %}
                 <div>
-                    <a href="{% url 'cancel_appointment' appointment.id %}" class="btn btn--danger {% if appointment.status == 'cancelled' %}disabled-link{% endif %}">Cancel</a>
+                    <a href="{% url 'cancel_appointment' appointment.id %}" class="btn btn--danger {% if appointment.status == 'cancelled' or appointment.status == 'completed' %}disabled-link{% endif %}">Cancel</a>
                 </div>
             </div>
         {% endfor %}
