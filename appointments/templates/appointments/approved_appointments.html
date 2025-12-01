@@ -1,0 +1,37 @@
+{% extends 'accounts/staff_dashboard.html' %}
+{% load static %}
+
+{% block title %}Appointments | Approved{% endblock %}
+
+{% block staff_css %}
+
+<link rel="stylesheet" href="{% static 'appointments/css/table.css' %}">
+
+{% endblock %}
+
+{% block content %}
+
+<table class="table_approved">
+    <tr>
+        <th>Resident Name</th>
+        <th>Certificate Type</th>
+        <th>Appointment Date</th>
+        <th>Appointment Time</th>
+        <th>Purpose</th>
+        <th>Status</th>
+        <th>Actions</th>
+    </tr>
+    {% for appointment in appointments %}
+    <tr>
+        <td>{{ appoointment.resident.resident.first_name }} {{ appointment.resident.resident.last_name }}</td>
+        <td>{{ appointment.get_certificate_type_display }}</td>
+        <td>{{ appointment.preferred_date }}</td>
+        <td>{{ appointment.preferred_time }}</td>
+        <td>{{ appointment.purpose }}</td>
+        <td>{{ appointment.status }}</td>
+        <td>Action Here</td>
+    </tr>
+    {% endfor %}
+</table>
+
+{% endblock %}
