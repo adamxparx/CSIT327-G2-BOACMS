@@ -11,6 +11,8 @@
 
 {% block content %}
 
+<h4 class="appointments_title">Cancelled Appointments</h4>
+
 <table class="table_cancelled">
     <tr>
         <th>Resident Name</th>
@@ -19,7 +21,6 @@
         <th>Appointment Time</th>
         <th>Purpose</th>
         <th>Status</th>
-        <th>Actions</th>
     </tr>
     {% for appointment in appointments %}
     <tr>
@@ -29,7 +30,6 @@
         <td>{{ appointment.preferred_time }}</td>
         <td>{{ appointment.purpose }}</td>
         <td>{{ appointment.status }}</td>
-        <td>Action Here</td>
     </tr>
     {% endfor %}
 </table>

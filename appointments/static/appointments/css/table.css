@@ -1,8 +1,17 @@
-.table_pending, .table_approved, .table_cancelled, .table_approved {
+.table_pending, .table_approved, .table_cancelled, .table_completed {
     width: 100%;
     border-radius: 3px;
 }
 
 table, th, td {
     border: 1px solid black;
+}
+
+.appointments_title {
+    text-align: center;
+}
+
+.appointments_info {
+    text-align: center;
+    padding: 10px;
 }
