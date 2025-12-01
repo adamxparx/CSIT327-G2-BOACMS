@@ -6,10 +6,21 @@
 {% block staff_extra_css %}
 
 <link rel="stylesheet" href="{% static 'appointments/css/table.css' %}">
+<link rel="stylesheet" href="{% static 'appointments/css/alerts.css' %}">
 
 {% endblock %}
 
 {% block content %}
+
+{% if messages %}
+    <div>
+        {% for message in messages %}
+            <div class="message_success">
+                {{ message }}
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
 
 <table class="table_pending">
     <tr>
@@ -30,7 +41,18 @@
         <td>{{ appointment.purpose }}</td>
         <td>{{ appointment.status }}</td>
         <td>
-            <button onclick="alert('You\'re gay')">Click me if you're gay</button>
+            <div class="status-actions">
+                <form method="post" class="status-actions__form">
+                    {% csrf_token %}
+                    <input type="hidden" name="appointment_id" value="{{ appointment.id }}">
+                    <button type="submit"
+                            class="status-button status-button--approve"
+                            aria-label="Approve appointment for {{ appointment.resident.resident.first_name }} {{ appointment.resident.resident.last_name }}"
+                            {% if appointment.status == 'approved' or appointment.status == 'completed' or appointment.status == 'cancelled' %}disabled{% endif %}>
+                        Approve
+                    </button>
+                </form>
+            </div>
         </td>
     </tr>
     {% endfor %}
