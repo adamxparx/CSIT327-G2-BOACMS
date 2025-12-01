@@ -23,7 +23,7 @@
     </tr>
     {% for appointment in appointments %}
     <tr>
-        <td>{{ appointment.resident.resident.first_name }} {{ appointment.resident.resident.last_name }}</td>
+        <td>{{ appointment.resident.resident.last_name }}, {{ appointment.resident.resident.first_name }} {% if appointment.resident.resident.middle_name %}{{ appointment.resident.resident.middle_name|slice:":1" }}.{% endif %}</td>
         <td>{{ appointment.get_certificate_type_display }}</td>
         <td>{{ appointment.preferred_date }}</td>
         <td>{{ appointment.preferred_time }}</td>
