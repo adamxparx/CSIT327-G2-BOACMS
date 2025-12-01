@@ -18,10 +18,13 @@
 
     <div class="profile-popup">
         <div class="user-name" onclick="event.preventDefault()">
-            {{ user.resident.first_name }} {{ user.resident.last_name }}
+            {% if user.role == 'resident' %}
+                {{ user.resident.first_name }} {{ user.resident.last_name }}
+            {% else %}
+                Barangay Office
+            {% endif %}
         </div>
 
-        <!-- dropdown -->
         <div class="popup-menu" id="profileMenu">
             {% if user.role == 'resident' %}
             <a href="{% url 'profile' %}"><div>Profile</div></a>
