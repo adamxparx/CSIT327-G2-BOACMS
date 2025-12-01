@@ -5,13 +5,14 @@
 
 {% block staff_css %}
     <link rel="stylesheet" href="{% static 'accounts/css/dropdown.css' %}">
+    {% block staff_extra_css %}{% endblock %}
 {% endblock %}
 
 {% block appbar %}
 
     <ul>
         <li><a href="{% url 'staff_dashboard' %}" {% if request.resolver_match.url_name == 'staff_dashboard' %}aria-current="page"{% endif %}>HOME</a></li>
-        <li><a href="{% url 'staff_appointments' %}" {% if request.resolver_match.url_name == 'staff_appointments' %}aria-current="page"{% endif %}>APPOINTMENTS</a></li>
+        <li><a href="{% url 'pending_appointments' %}">APPOINTMENTS</a></li>
         <li class="appointment_dropdown">
             <ul class="dropdown_menu">
                 <li><a href="{% url 'pending_appointments' %}" {% if request.resolver_match.url_name == 'pending_appointments' %}aria-current="page"{% endif %}>Pending</a></li>
