@@ -172,6 +172,25 @@ def approved_appointments(request):
         return redirect('appointments')
     
     approved_appointments = Appointment.objects.filter(status='approved').order_by('-preferred_date', '-preferred_time')
+
+    for appt in approved_appointments:
+        appt.refresh_if_expired()
+
+    approved_appointments = Appointment.objects.filter(status='approved').order_by('-preferred_date', '-preferred_time')
+
+    
+    if request.method == "POST":
+        appointment_id = request.POST.get("appointment_id")
+        action = request.POST.get("action")
+        appointment = get_object_or_404(Appointment, id=appointment_id)
+
+        if action == 'complete':
+            if appointment.status == 'approved':
+                appointment.status = 'completed'
+                appointment.save()
+                messages.success(request, "Appointment completed.")
+            else:
+                messages.info(request, "Appointment is already completed.")
     
     context = {
         "appointments": approved_appointments,

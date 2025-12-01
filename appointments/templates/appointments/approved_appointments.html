@@ -6,10 +6,21 @@
 {% block staff_extra_css %}
 
 <link rel="stylesheet" href="{% static 'appointments/css/table.css' %}">
+<link rel="stylesheet" href="{% static 'appointments/css/alerts.css' %}">
 
 {% endblock %}
 
 {% block content %}
+
+{% if messages %}
+    <div>
+        {% for message in messages %}
+            <div class="message_success">
+                {{ message }}
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
 
 <table class="table_approved">
     <tr>
@@ -29,7 +40,28 @@
         <td>{{ appointment.preferred_time }}</td>
         <td>{{ appointment.purpose }}</td>
         <td>{{ appointment.status }}</td>
-        <td>Action Here</td>
+        <td>
+            <div class="status-actions">
+                <form method="post" class="status-actions__form">
+                    {% csrf_token %}
+                    <input type="hidden" name="appointment_id" value="{{ appointment.id }}">
+                    <button type="submit"
+                            name="action"
+                            value="reschedule"
+                            class="status-button status-button--reschedule"
+                            aria-label="Reschedule appointment for {{ appointment.resident.resident.first_name }} {{ appointment.resident.resident.last_name }}">
+                        Reschedule
+                    </button>
+                    <button type="submit"
+                            name="action"
+                            value="complete"
+                            class="status-button status-button--complete"
+                            aria-label="Mark complete appointment for {{ appointment.resident.resident.first_name }} {{ appointment.resident.resident.last_name }}">
+                        Complete
+                    </button>
+                </form>
+            </div>
+        </td>
     </tr>
     {% endfor %}
 </table>

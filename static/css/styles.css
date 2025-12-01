@@ -293,6 +293,16 @@ a:focus {
     color: #fff;
 }
 
+.status-button--reschedule {
+    background: linear-gradient(135deg, #f39c12 0%, #d35400 100%);
+    box-shadow: 0 6px 16px rgba(211, 84, 0, 0.25);
+}
+
+.status-button--complete {
+    background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+    box-shadow: 0 6px 16px rgba(41, 128, 185, 0.25);
+}
+
 .status-button--approve {
     background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
     box-shadow: 0 6px 16px rgba(39, 174, 96, 0.25);
