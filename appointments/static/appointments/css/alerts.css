@@ -1,0 +1,9 @@
+.message_success {
+    background: rgba(46, 204, 113, 0.18);
+    border: 1px solid #17663a;
+    padding: 10px;
+    margin-bottom: 15px;
+    border-radius: 5px;
+    font-weight: 500;
+    color: #17663a;
+}

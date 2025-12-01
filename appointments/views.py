@@ -186,6 +186,17 @@ def pending_appointments(request):
         return redirect('appointments')
     
     pending_appointments = Appointment.objects.filter(status='pending').order_by('-preferred_date', '-preferred_time')
+
+    if request.method == "POST":
+        appointment_id = request.POST.get("appointment_id")
+        appointment = get_object_or_404(Appointment, id=appointment_id)
+
+        if appointment.status == 'pending':
+            appointment.status = 'approved'
+            appointment.save()
+            messages.success(request, "Appointment approved.")
+        else:
+            messages.info(request, "Appointment is already approved.")
     
     context = {
         "appointments": pending_appointments,
