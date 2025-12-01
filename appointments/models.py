@@ -1,3 +1,4 @@
+import datetime
 from django.db import models
 from django.conf import settings
     
@@ -25,6 +26,14 @@ class Appointment(models.Model):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
 
     created_at = models.DateTimeField(auto_now_add=True)
+
+    def refresh_if_expired(self):
+        preferred_date = datetime.datetime.combine(self.preferred_date, self.preferred_time)
+        preferred_date = datetime.timezone.make_aware(preferred_date)
+
+        if preferred_date < datetime.datetime.now() and self.status not in ['completed', 'cancelled']:
+            self.status = 'cancelled'
+            self.save(update_fields=['status'])
 
     def __str__(self):
         return f"{self.user.get_full_name()}'s appointment for {self.get_certificate_type_display()} on {self.preferred_date}"
