@@ -166,6 +166,26 @@ def staff_appointments(request):
     return render(request, 'appointments/staff_appointment.html', context)
 
 @login_required
+def approved_appointments(request):
+    approved_appointments = Appointment.objects.filter(status='approved').order_by('-preferred_date', '-preferred_time')
+    
+    context = {
+        "appointments": approved_appointments,
+    }
+
+    return render(request, "appointments/approved_appointments.html", context)
+    
+@login_required
+def pending_appointments(request):
+    pending_appointments = Appointment.objects.filter(status='pending').order_by('-preferred_date', '-preferred_time')
+    
+    context = {
+        "appointments": pending_appointments,
+    }
+
+    return render(request, "appointments/pending_appointments.html", context)
+
+@login_required
 def cancel_appointment(request, appointment_id):
     appointment = get_object_or_404(Appointment, id=appointment_id, resident=request.user)
 

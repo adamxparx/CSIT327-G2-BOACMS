@@ -6,8 +6,9 @@
 {% block appbar %}{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'accounts/css/styles.css' %}">
-<link rel="stylesheet" href="{% static 'appointments/css/certification.css' %}">
+    <link rel="stylesheet" href="{% static 'accounts/css/styles.css' %}">
+    <link rel="stylesheet" href="{% static 'appointments/css/certification.css' %}">
+    {% block staff_css %}{% endblock %}
 {% endblock %}
 
 {% block user_logout %}
