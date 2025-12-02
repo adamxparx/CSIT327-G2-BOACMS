@@ -4,8 +4,20 @@
   <div class="auth-card auth-card--wide">
 
     <div class="auth-header">
-      <h2 class="auth-title">Appointment Details ({{ appointment.get_status_display }})</h2>
-      <p class="auth-subtitle">Resident: {{ appointment.resident.resident.first_name }} {{ appointment.resident.resident.last_name }}</p>
+      <div style="display: flex; justify-content: space-between;">
+        <h2 class="auth-title">Appointment Details</h2>
+        <h2 class="
+            {% if appointment.status == 'approved' %}
+              auth-status-title--approved
+            {% elif appointment.status == 'pending' %}
+              auth-status-title--pending
+            {% elif appointment.status == 'cancelled' %}
+              auth-status-title--cancelled
+            {% else %}
+              auth-status-title--completed
+            {% endif %}">{{ appointment.get_status_display }}</h2>
+      </div>
+      <p class="auth-subtitle">Resident: <b>{{ appointment.resident.resident.first_name }} {{ appointment.resident.resident.last_name }}</b></p>
       <p class="auth-subtitle">Purpose: {{ appointment.purpose }}</p>
     </div>
 
@@ -25,17 +37,22 @@
         <div>{{ appointment.preferred_time }}</div>
       </div>
 
-       <div class="form-field">
-        <label>Status</label>
-        <div>{{ appointment.get_status_display }}</div>
-      </div>
-
-      <div class="form-submit" style="grid-column: span 2;">
+      <div class="form-submit" style=" grid-column: span 2; margin-top: 20px;">
         <div class="form-action" style="display:flex; gap:8px; flex-wrap:wrap;">
           <a href="{% url 'appointments_calendar' %}" class="button-as-link">
             <button type="button" class="btn btn--secondary">Back to Calendar</button>
           </a>
         </div>
+        <div>
+          <form method="post">
+            {% if appointment.status == 'pending' %}
+              <p>Proceed to <b><a href="{% url 'pending_appointments' %}" style="color: blue;">Pending Appointments</a></b> for more actions.</p>
+            {% elif appointment.status == 'approved' %}
+              <p>Proceed to <b><a href="{% url 'approved_appointments' %}" style="color: blue;">Approved Appointments</a></b> for more actions.</p>
+            {% endif %}
+          </form>
+        </div>
+
       </div>
     </div>
   </div>

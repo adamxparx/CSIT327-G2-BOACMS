@@ -293,6 +293,17 @@ a:focus {
     color: #fff;
 }
 
+.status-button--mod {
+    padding: 1.1rem 2.85rem;
+    border-radius: 999px;
+    border: none;
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+    color: #fff;
+}
+
 .status-button--reschedule {
     background: linear-gradient(135deg, #f39c12 0%, #d35400 100%);
     box-shadow: 0 6px 16px rgba(211, 84, 0, 0.25);
@@ -314,13 +325,15 @@ a:focus {
 }
 
 .status-button:hover,
-.status-button:focus {
+.status-button--mod:hover,
+.status-button:focus,
+.status-button--mod:focus {
     transform: translateY(-1px);
     box-shadow: 0 10px 22px rgba(0, 0, 0, 0.16);
     filter: brightness(1.05);
 }
 
-.status-button:disabled {
+.status-button:disabled, .status-button--mod:disabled {
     cursor: not-allowed;
     opacity: 0.65;
     box-shadow: none;
