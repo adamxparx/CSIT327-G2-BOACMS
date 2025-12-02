@@ -28,14 +28,8 @@ class Appointment(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True)
 
-    def refresh_if_expired(self):
-        preferred_dt = datetime.datetime.combine(self.preferred_date, self.preferred_time)
-        preferred_dt = timezone.make_aware(preferred_dt)
-
-        if timezone.is_naive(preferred_dt):
-            preferred_dt = timezone.make_aware(preferred_dt)        
-
-        if preferred_dt < timezone.now() and self.status not in ['completed', 'cancelled']:
+    def refresh_if_expired(self):    
+        if self.preferred_date < timezone.localdate() and self.status not in ['completed', 'cancelled']:
             self.status = 'cancelled'
             self.save(update_fields=['status'])
 

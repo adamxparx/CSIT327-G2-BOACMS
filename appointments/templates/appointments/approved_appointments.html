@@ -89,6 +89,7 @@
         <th>Actions</th>
     </tr>
     {% for appointment in appointments %}
+    {% if appointment.preferred_date != today %}
     <tr>
         <td>{{ appointment.resident.resident.last_name }}, {{ appointment.resident.resident.first_name }} {% if appointment.resident.resident.middle_name %}{{ appointment.resident.resident.middle_name|slice:":1" }}.{% endif %}</td>
         <td>{{ appointment.get_certificate_type_display }}</td>
@@ -112,6 +113,7 @@
             </div>
         </td>
     </tr>
+    {% endif %}
     {% endfor %}
 </table>
 
