@@ -1,3 +1,19 @@
 .appointment_dropdown {
     margin-left: 20px;
 }
+
+.appointment_count {
+    height: fit-content;
+    font-size: 10px;
+    border: none;
+    border-radius: 10px;
+    color: white;
+}
+
+.pending_count {
+    background-color: orange;
+}
+
+.approved_count {
+    background-color: #27ae60;
+}

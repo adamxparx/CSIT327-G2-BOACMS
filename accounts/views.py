@@ -4,6 +4,8 @@ from django.contrib.auth.views import LoginView
 from django.contrib.auth import logout
 from django.contrib import messages
 from .forms import CustomUserCreationForm, CustomUserUpdateForm, ResidentForm
+from appointments.models import Appointment
+import datetime
 
 def auth_check(user):
     if user.is_authenticated:
@@ -82,7 +84,18 @@ def staff_dashboard(request):
     user = request.user
     if user.role == 'resident':
         return redirect('dashboard')
-    return render(request, 'accounts/staff_dashboard.html')
+    
+    pending_Count = Appointment.objects.filter(status='pending').count()
+    approved_appts_today_Count = Appointment.objects.filter(status='approved', preferred_date=datetime.date.today()).count()
+
+    print(type(pending_Count), pending_Count)
+
+    context = {
+        "pending_count": pending_Count,
+        "approved_count": approved_appts_today_Count,
+    }
+
+    return render(request, 'accounts/staff_dashboard.html', context)
 
 @login_required
 def profile(request):
