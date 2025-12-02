@@ -46,10 +46,34 @@ a {
     gap: 0.5rem;
 }
 
-.auth-title {
-    margin: 0;
+.auth-title,
+.auth-status-title--approved,
+.auth-status-title--pending,
+.auth-status-title--cancelled,
+.auth-status-title--completed {
+    margin-top: 0;
     font-size: clamp(1.75rem, 3vw, 2.25rem);
     color: var(--color-primary);
+}
+
+.auth-status-title--approved {
+    color: #27ae60;
+    text-shadow: 1px 5px 10px rgba(39, 174, 96, 0.4);
+}
+
+.auth-status-title--pending {
+    color: orange;
+    text-shadow: 1px 5px 10px rgba(255, 165, 0, 0.4);
+}
+
+.auth-status-title--cancelled {
+    color: #c0392b;
+    text-shadow: 1px 5px 10px rgba(192, 57, 43, 0.4);
+}
+
+.auth-status-title--completed {
+    color: #2980b9;
+    text-shadow: 1px 5px 10px rgba(41, 128, 185, 0.4);
 }
 
 .auth-subtitle {
