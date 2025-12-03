@@ -156,3 +156,33 @@
         transform: none;
     }
 }
+
+/* Appointment table & card styles extracted from template */
+.appointments-center { display:flex; justify-content:center; }
+.appointments-card { width:100%; max-width:1200px; background:var(--color-neutral); border-radius:12px; padding:22px; box-shadow:0 10px 30px rgba(14,30,45,0.06); border:1px solid rgba(0,56,168,0.06); }
+.appointments-card .header { display:flex; justify-content:space-between; align-items:flex-start; gap:16px; margin-bottom:16px; }
+.appointments-card .header .title { margin:0; font-size:1.6rem; color:var(--color-primary); font-weight:800; }
+.appointments-card .header .subtitle { color:rgba(0,0,0,0.6); margin-top:6px; font-size:0.98rem; }
+.upcoming-pill { display:inline-block; background:#0f4fc7; color:#fff; padding:8px 14px; border-radius:999px; font-weight:700; }
+
+.appts-table { width:100%; border-collapse:separate; border-spacing:0; background:#fff; border-radius:10px; overflow:hidden; border:1px solid rgba(0,0,0,0.06); }
+.appts-table thead th { background:linear-gradient(180deg,#0f4fc7,#0c3fa8); color:#fff; padding:18px 20px; text-align:left; font-weight:700; font-size:1rem; }
+.appts-table thead th:first-child { border-top-left-radius:8px; }
+.appts-table thead th:last-child { border-top-right-radius:8px; text-align:center; }
+.appts-table tbody td { padding:18px 20px; border-bottom:1px solid rgba(0,0,0,0.06); vertical-align:middle; color:var(--color-text); }
+.appts-table tbody tr:last-child td { border-bottom:none; }
+
+.date-cell .date-main { color:#0f4fc7; font-weight:800; font-size:1rem; display:block; }
+.date-cell .date-time { color:rgba(0,0,0,0.55); font-size:0.9rem; margin-top:6px; }
+
+.status-badge { display:inline-block; padding:8px 14px; border-radius:999px; font-weight:700; font-size:0.95rem; }
+.badge-approved { background:#e8f7ec; color:#18794a; border:1px solid rgba(46,204,113,0.18); }
+.badge-cancelled { background:#fdecea; color:#b71c1c; border:1px solid rgba(206,17,38,0.18); }
+.badge-pending { background:#fff7e6; color:#a46b00; border:1px solid rgba(252,209,22,0.18); }
+
+.btn-cancel { display:inline-block; padding:8px 14px; border-radius:8px; border:2px solid #d33; color:#d33; background:transparent; font-weight:700; text-decoration:none; }
+.btn-cancel:hover, .btn-cancel:focus, .btn-cancel:active { text-decoration: none !important; }
+.btn-none { color:rgba(0,0,0,0.35); font-weight:700; }
+
+@media (max-width:900px){ .appts-table thead th:nth-child(3), .appts-table thead th:nth-child(4) { display:none; } .appts-table tbody td:nth-child(3), .appts-table tbody td:nth-child(4) { display:none; } }
+@media (max-width:600px){ .appointments-card { padding:16px; } .appts-table thead { display:none; } .appts-table, .appts-table tbody, .appts-table tr, .appts-table td { display:block; width:100%; } .appts-table tr { margin-bottom:12px; border-radius:8px; border:1px solid rgba(0,0,0,0.04); padding:12px; } .appts-table td { padding:8px 12px; border-bottom:none; } }
