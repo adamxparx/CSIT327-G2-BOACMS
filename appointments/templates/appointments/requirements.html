@@ -95,8 +95,8 @@
 }
 
 .note {
-  background-color: #e8f5e9;
-  border-left: 4px solid #2e7d32;
+  background-color: rgba(0, 56, 168, 0.08);
+  border-left: 4px solid var(--color-primary);
   padding: 0.7rem 1rem;
   margin-bottom: 1rem;
   border-radius: 4px;
@@ -108,7 +108,7 @@
 }
 
 .note i {
-  color: #2e7d32;
+  color: var(--color-primary);
   margin-top: 2px;
 }
 
@@ -124,7 +124,7 @@
 }
 
 .requirement-header {
-  background-color: #2e7d32;
+  background-color: var(--color-primary);
   color: white;
   padding: 0.75rem 1.5rem;
   display: flex;
@@ -160,7 +160,7 @@
 }
 
 .requirement-list i {
-  color: #2e7d32;
+  color: var(--color-primary);
   margin-top: 0.25rem;
   flex-shrink: 0;
 }
@@ -183,8 +183,8 @@
   align-items: center;
   gap: 0.4rem;
   padding: 0.5rem 1rem;
-  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-  color: #1f2937;
+  background: var(--color-secondary);
+  color: var(--color-text);
   text-decoration: none;
   border-radius: 3px;
   font-weight: 500;
@@ -192,15 +192,15 @@
   border: none;
   cursor: pointer;
   font-size: 0.85rem;
-  box-shadow: 0 2px 10px rgba(245, 158, 11, 0.2);
+  box-shadow: 0 2px 10px rgba(252, 209, 22, 0.2);
 }
 
 .back-button:hover {
-  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
-  color: #1f2937;
+  background: #fbbf24;
+  color: var(--color-text);
   text-decoration: none;
   transform: translateY(-1px);
-  box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
+  box-shadow: 0 4px 15px rgba(252, 209, 22, 0.3);
 }
 
 @media (max-width: 992px) {
