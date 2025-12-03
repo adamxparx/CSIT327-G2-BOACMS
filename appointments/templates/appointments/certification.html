@@ -6,121 +6,100 @@
 {% block content %}
 
   <div class="cert_content">
+    <link rel="stylesheet" href="{% static 'appointments/css/certification.css' %}">
     {% block cert_content %}
     <div class="auth-wrapper">
       <div class="auth-card auth-card--wide">
 
-        <div class="auth-header">
-          <h2 class="auth-title">Book a Certificate</h2>
-          <p class="auth-subtitle">Provide your appointment details below.</p>
+        <div class="left-panel">
+          <div class="auth-header">
+            <h2 class="auth-title">Book a Certificate</h2>
+            <p class="auth-subtitle">Provide your appointment details.</p>
+          </div>
         </div>
 
-        {% if form.non_field_errors %}
-            <div class="auth-alert auth-alert--error">
-                {% for error in form.non_field_errors %}
-                    <p>{{ error }}</p>
-                {% endfor %}
+        <div class="form-panel">
+          {% if form.non_field_errors %}
+              <div class="auth-alert auth-alert--error">
+                  {% for error in form.non_field_errors %}
+                      <p>{{ error }}</p>
+                  {% endfor %}
+              </div>
+          {% endif %}
+
+          {% if recommended_slot %}
+              <div class="auth-alert auth-alert--info recommended-slot-alert">
+                  <p>
+                      The selected slot is no longer available. Nearest available slot:
+                      <strong>{{ recommended_slot.date|date:"F j, Y" }}</strong>
+                      at
+                      <strong>{{ recommended_slot.time|time:"g:i A" }}</strong>.
+                  </p>
+                  <button type="button"
+                          id="apply-recommended-slot"
+                          class="btn"
+                          data-slot-date="{{ recommended_slot.date|date:"Y-m-d" }}"
+                          data-slot-time="{{ recommended_slot.time|time:"H:i" }}">
+                      Use this slot
+                  </button>
+              </div>
+          {% endif %}
+
+          <form method="post" class="auth-form auth-form--grid" id="appointment-form">
+            {% csrf_token %}
+
+            <div class="form-field" style="">
+              <label for="{{ form.certificate_type.id_for_label }}">{{ form.certificate_type.label }}</label>
+              {{ form.certificate_type }}
+              {% for error in form.certificate_type.errors %}
+                  <span class="field-error">{{ error }}</span>
+              {% endfor %}
             </div>
-        {% endif %}
 
-        {% if recommended_slot %}
-            <div class="auth-alert auth-alert--info recommended-slot-alert">
-                <p>
-                    The selected slot is no longer available. Nearest available slot:
-                    <strong>{{ recommended_slot.date|date:"F j, Y" }}</strong>
-                    at
-                    <strong>{{ recommended_slot.time|time:"g:i A" }}</strong>.
-                </p>
-                <button type="button"
-                        id="apply-recommended-slot"
-                        class="btn"
-                        data-slot-date="{{ recommended_slot.date|date:"Y-m-d" }}"
-                        data-slot-time="{{ recommended_slot.time|time:"H:i" }}">
-                    Use this slot
-                </button>
+            <div class="form-field form-field--full">
+              <label for="{{ form.purpose.id_for_label }}">{{ form.purpose.label }}</label>
+              {{ form.purpose }}
+              {% for error in form.purpose.errors %}
+                  <span class="field-error">{{ error }}</span>
+              {% endfor %}
             </div>
-        {% endif %}
 
-        <form method="post" class="auth-form auth-form--grid" id="appointment-form">
-          {% csrf_token %}
-
-          <div class="form-field">
-            <label for="{{ form.certificate_type.id_for_label }}">{{ form.certificate_type.label }}</label>
-            {{ form.certificate_type }}
-            {% for error in form.certificate_type.errors %}
-                <span class="field-error">{{ error }}</span>
-            {% endfor %}
-          </div>
-
-          <div class="form-field" style="grid-column: span 2;">
-            <label for="{{ form.purpose.id_for_label }}">{{ form.purpose.label }}</label>
-            {{ form.purpose }}
-            {% for error in form.purpose.errors %}
-                <span class="field-error">{{ error }}</span>
-            {% endfor %}
-          </div>
-
-          <div class="form-field">
-            <label for="{{ form.preferred_date.id_for_label }}">{{ form.preferred_date.label }}</label>
-            {{ form.preferred_date }}
-            {% for error in form.preferred_date.errors %}
-                <span class="field-error">{{ error }}</span>
-            {% endfor %}
-          </div>
-
-          <div class="form-field">
-            <label for="{{ form.preferred_time.id_for_label }}">{{ form.preferred_time.label }}</label>
-            {{ form.preferred_time }}
-            {% for error in form.preferred_time.errors %}
-                <span class="field-error">{{ error }}</span>
-            {% endfor %}
-          </div>
-
-          <div class="form-submit">
-            <div class="requirements-link" style="text-align: center; margin-bottom: 15px;">
-              <a href="{% url 'requirements' %}"
-                 id="requirements-link"
-                 data-base-url="{% url 'requirements' %}"
-                 style="color: #2196F3; text-decoration: none;">
-                <i class="fas fa-list"></i> See list of requirements
-              </a>
+            <div class="form-field">
+              <label for="{{ form.preferred_date.id_for_label }}">{{ form.preferred_date.label }}</label>
+              {{ form.preferred_date }}
+              {% for error in form.preferred_date.errors %}
+                  <span class="field-error">{{ error }}</span>
+              {% endfor %}
             </div>
-            <div class="form-action">
-              <button type="submit" id="submit-button">Book Appointment</button>
+
+            <div class="form-field">
+              <label for="{{ form.preferred_time.id_for_label }}">{{ form.preferred_time.label }}</label>
+              {{ form.preferred_time }}
+              {% for error in form.preferred_time.errors %}
+                  <span class="field-error">{{ error }}</span>
+              {% endfor %}
             </div>
-          </div>
-        </form>
+
+            <div class="form-submit">
+              <div class="requirements-link" id="requirements-link-wrap">
+                <a href="{% url 'requirements' %}"
+                   id="requirements-link"
+                   data-base-url="{% url 'requirements' %}">
+                  <i class="fas fa-list"></i> See list of requirements
+                </a>
+              </div>
+              <div class="form-action">
+                <button type="submit" id="submit-button">Book Appointment</button>
+              </div>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
 
   </div>
   {% endblock %}
 </div>
-
-<style>
-  .is-hidden {
-    display: none !important;
-  }
-
-  .highlight-success {
-    animation: slot-success-fade 4s ease-out;
-  }
-
-  @keyframes slot-success-fade {
-    0% {
-      background-color: #dff5e1;
-      box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.4);
-    }
-    30% {
-      background-color: #c8f0ce;
-      box-shadow: 0 0 0 8px rgba(46, 204, 113, 0.0);
-    }
-    100% {
-      background-color: inherit;
-      box-shadow: none;
-    }
-  }
-</style>
 
 <script src="{% static 'appointments/js/date_restriction.js' %}"></script>
 <script src="{% static 'appointments/js/time_restriction.js' %}"></script>
