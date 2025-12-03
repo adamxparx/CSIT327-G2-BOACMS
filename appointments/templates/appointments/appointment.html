@@ -4,151 +4,62 @@
 {% block title %}Appointments{% endblock %}
 
 {% block content %}
-<style>
-    .btn--danger:hover {
-        text-decoration: none !important;
-    }
-</style>
+<link rel="stylesheet" href="{% static 'appointments/css/appointments.css' %}">
 
-<style>
-    .appointments-grid {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 32px;
-        margin: 40px 0;
-    }
-    .appointment-box {
-        background: var(--color-neutral);
-        border-radius: 12px;
-        box-shadow: 0 8px 26px rgba(0, 56, 168, 0.06);
-        padding: 22px;
-        transition: box-shadow 0.18s, transform 0.18s;
-        display: flex;
-        flex-direction: column;
-        min-height: 200px;
-        border: 1px solid rgba(0,56,168,0.06);
-        position: relative;
-    }
-    .appointment-box:hover {
-        box-shadow: 0 14px 40px rgba(0, 56, 168, 0.10);
-        transform: translateY(-4px);
-        border-color: rgba(0,56,168,0.12);
-    }
-    .appointment-box h4 {
-        margin-bottom: 12px;
-        font-size: 1.15em;
-        color: var(--color-primary);
-        font-weight: 700;
-        letter-spacing: 0.3px;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
-    .appointment-box h4 .icon {
-        font-size: 1.05em;
-        display: inline-block;
-        width: 26px;
-        height: 26px;
-        line-height: 26px;
-        text-align: center;
-        border-radius: 8px;
-        background: rgba(0,56,168,0.06);
-        color: var(--color-primary);
-    }
-    .appointment-details {
-        margin-bottom: 10px;
-        font-size: 0.98em;
-        color: var(--color-text);
-        line-height: 1.6;
-    }
-    .appointment-details strong {
-        color: var(--color-primary);
-        font-weight: 600;
-    }
-    .appointment-box .status {
-        font-weight: 700;
-        margin: 10px 0 6px 0;
-        padding: 6px 12px;
-        border-radius: 999px;
-        display: inline-block;
-        font-size: 0.92em;
-        letter-spacing: 0.2px;
-    }
-    .appointment-box .status.pending { background: rgba(252,209,22,0.14); color: #a26a00; border: 1px solid rgba(252,209,22,0.28); }
-    .appointment-box .status.approved { background: rgba(46,204,113,0.12); color: #1d7a4e; border: 1px solid rgba(46,204,113,0.22); }
-    .appointment-box .status.completed { background: rgba(0,56,168,0.10); color: var(--color-primary); border: 1px solid rgba(0,56,168,0.18); }
-    .appointment-box .status.cancelled { background: rgba(206,17,38,0.12); color: #9b1228; border: 1px solid rgba(206,17,38,0.22); }
-    .appointment-box .btn {
-        margin-top: auto;
-        align-self: flex-end;
-        padding: 8px 18px;
-        border-radius: 8px;
-        font-size: 0.98em;
-        font-weight: 600;
-        background: linear-gradient(90deg, var(--color-accent) 60%, #9b0f1a 100%);
-        color: var(--color-neutral);
-        border: none;
-        box-shadow: 0 6px 18px rgba(0,56,168,0.06);
-        transition: filter 0.15s, box-shadow 0.15s;
-        text-decoration: none;
-        cursor: pointer;
-    }
-    .appointment-box .btn:hover:not(.disabled-link) {
-        filter: brightness(0.98);
-        box-shadow: 0 10px 26px rgba(0,56,168,0.08);
-    }
-    .appointment-box .btn.disabled-link {
-        background: rgba(0,0,0,0.12);
-        color: rgba(255,255,255,0.9);
-        cursor: not-allowed;
-        box-shadow: none;
-    }
-    @media (max-width: 900px) {
-        .appointments-grid {
-            grid-template-columns: repeat(2, 1fr);
-        }
-    }
-    @media (max-width: 600px) {
-        .appointments-grid {
-            grid-template-columns: 1fr;
-        }
-    }
-</style>
-
-<div class="appointments_center" style="display: flex; justify-content: center;">
+<div class="appointments-center">
 {% if appointments %}
-    <div style="width:100%; max-width:1200px;">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;">
+    <div class="appointments-card">
+        <div class="header">
             <div>
-                <h2 style="margin:0;font-size:1.45rem;color:var(--color-primary)">Your Appointments</h2>
-                <div style="color:rgba(0,0,0,0.6);font-size:0.95rem;margin-top:4px;">Manage your upcoming bookings below</div>
+                <h2 class="title">Your Appointments</h2>
+                <div class="subtitle">Manage your upcoming bookings below</div>
             </div>
             <div style="text-align:right;">
-                <div style="display:inline-block;background:var(--color-surface);color:var(--color-primary);padding:8px 12px;border-radius:999px;font-weight:600;border:1px solid rgba(0,56,168,0.06);">{{ appointments|length }} Upcoming</div>
+                <div class="upcoming-pill">{{ appointments|length }} Upcoming</div>
             </div>
         </div>
-    <div class="appointments-grid">
-        {% for appointment in appointments %}
-            <div class="appointment-box">
-                <h4><span class="icon" aria-hidden="true">📅</span><span>{{ appointment.get_certificate_type_display }}</span></h4>
-                <div class="appointment-details">
-                    <div><strong>Date:</strong> {{ appointment.preferred_date }}</div>
-                    <div><strong>Time:</strong> {{ appointment.preferred_time }}</div>
-                    <div><strong>Purpose:</strong> {{ appointment.purpose }}</div>
-                </div>
-                {% if appointment.status == 'pending' %}
-                    <div class="status pending">Pending</div>
-                {% elif appointment.status == 'approved' %}
-                    <div class="status approved">Approved</div>
-                {% elif appointment.status == 'completed' %}
-                    <div class="status completed">Completed</div>
-                {% elif appointment.status == 'cancelled' %}
-                    <div class="status cancelled">Cancelled</div>
-                {% endif %}
-                <a href="{% url 'cancel_appointment' appointment.id %}" role="button" aria-label="Cancel appointment {{ appointment.id }}" data-appointment-id="{{ appointment.id }}" class="btn {% if appointment.status == 'cancelled' or appointment.status == 'completed' %}disabled-link{% endif %}">Cancel</a>
-            </div>
-        {% endfor %}
-    </div>
+
+        <table class="appts-table">
+            <thead>
+                <tr>
+                    <th style="width:22%">Date &amp; Time</th>
+                    <th style="width:28%">Certificate</th>
+                    <th style="width:22%">Purpose</th>
+                    <th style="width:14%">Status</th>
+                    <th style="width:14%;text-align:center;">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for appointment in appointments %}
+                    <tr>
+                        <td class="date-cell">
+                            <span class="date-main">{{ appointment.preferred_date|date:"M. j, Y" }}</span>
+                            <span class="date-time">{{ appointment.preferred_time|time:"g:i a" }}</span>
+                        </td>
+                        <td>{{ appointment.get_certificate_type_display }}</td>
+                        <td>{{ appointment.purpose }}</td>
+                        <td style="vertical-align:middle;">
+                            {% if appointment.status == 'approved' %}
+                                <span class="status-badge badge-approved">Approved</span>
+                            {% elif appointment.status == 'cancelled' %}
+                                <span class="status-badge badge-cancelled">Cancelled</span>
+                            {% elif appointment.status == 'pending' %}
+                                <span class="status-badge badge-pending">Pending</span>
+                            {% else %}
+                                <span class="status-badge">{{ appointment.status|capfirst }}</span>
+                            {% endif %}
+                        </td>
+                        <td style="text-align:center;">
+                            {% if appointment.status == 'approved' or appointment.status == 'pending' %}
+                                <a href="{% url 'cancel_appointment' appointment.id %}" role="button" aria-label="Cancel appointment {{ appointment.id }}" data-appointment-id="{{ appointment.id }}" class="btn-cancel">Cancel</a>
+                            {% else %}
+                                <span class="btn-none">—</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
 {% else %}
     <div style="width:100%;max-width:800px;display:flex;justify-content:center;">
