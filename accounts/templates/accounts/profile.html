@@ -61,12 +61,7 @@
                     <div class="col-md-6">
                         <div class="form-group">
                             <label for="{{ form.sex.id_for_label }}">Sex</label>
-                            <select class="form-select" id="{{ form.sex.id_for_label }}" name="{{ form.sex.name }}" required>
-                                    <option value="" disabled>Select sex...</option>
-                                    <option value="Male" {% if user.resident.sex == 'Male' %}selected{% endif %}>Male</option>
-                                    <option value="Female" {% if user.resident.sex == 'Female' %}selected{% endif %}>Female</option>
-                                    <option value="Other" {% if user.resident.sex == 'Other' %}selected{% endif %}>Other</option>
-                                </select>
+                            {{ form.sex }}
                         </div>
                     </div>
                 </div>
@@ -93,14 +88,7 @@
                     <div class="col-md-6">
                         <div class="form-group">
                             <label for="{{ form.civil_status.id_for_label }}">Civil Status</label>
-                            <select class="form-select" id="{{ form.civil_status.id_for_label }}" name="{{ form.civil_status.name }}" required>
-                                    <option value="" disabled>Select status...</option>
-                                    <option value="Single" {% if user.resident.civil_status == 'Single' %}selected{% endif %}>Single</option>
-                                    <option value="Married" {% if user.resident.civil_status == 'Married' %}selected{% endif %}>Married</option>
-                                    <option value="Widowed" {% if user.resident.civil_status == 'Widowed' %}selected{% endif %}>Widowed</option>
-                                    <option value="Separated" {% if user.resident.civil_status == 'Separated' %}selected{% endif %}>Separated</option>
-                                    <option value="Divorced" {% if user.resident.civil_status == 'Divorced' %}selected{% endif %}>Divorced</option>
-                                </select>
+                            {{ form.civil_status }}
                         </div>
                     </div>
                 </div>
