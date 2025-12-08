@@ -68,8 +68,11 @@ def dashboard(request):
     
     elif user.role == 'resident':
 
+        approved_count = Appointment.objects.filter(resident=request.user, status='approved').count()
+
         context = {
             'user': user,
+            'approved_count': approved_count,
         }
 
         return render(request, 'accounts/dashboard.html', context)
