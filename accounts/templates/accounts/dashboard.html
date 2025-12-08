@@ -3,11 +3,15 @@
 
 {% block title %}{{ user.resident.last_name }} | Dashboard{% endblock %}
 
+{% block resident_css %}
+    <link rel="stylesheet" href="{% static 'accounts/css/dropdown.css' %}">
+{% endblock %}
+
 {% block appbar %}
     <ul>
         <li><a href="{% url 'dashboard' %}" {% if request.resolver_match.url_name == 'dashboard' %}aria-current="page"{% endif %}>HOME</a></li>
         <li><a href="{% url 'certification' %}" {% if request.resolver_match.url_name == 'certification' or request.resolver_match.url_name == 'create_appointment' %}aria-current="page"{% endif %}>CERTIFICATIONS</a></li>
-        <li><a href="{% url 'appointments' %}" {% if request.resolver_match.url_name == 'appointments' or request.resolver_match.url_name == 'appointment_detail' %}aria-current="page"{% endif %}>APPOINTMENTS</a></li>
+        <li><a href="{% url 'appointments' %}" {% if request.resolver_match.url_name == 'appointments' or request.resolver_match.url_name == 'appointment_detail' %}aria-current="page"{% endif %}>APPOINTMENTS {% if approved_count %}<button class="appointment_count approved_count">{{ approved_count }}</button>{% endif %}</a></li>
         <li><a href="{% url 'appointments_calendar' %}" {% if request.resolver_match.url_name == 'appointments_calendar' %}aria-current="page"{% endif %}>CALENDAR</a></li>
     </ul>
 
