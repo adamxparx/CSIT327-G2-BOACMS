@@ -16,7 +16,7 @@ from django.db import IntegrityError
 def find_nearest_available_slot(preferred_date, preferred_time, buffer_minutes=30, max_days=14):
     """Return the nearest future slot (date, time) that is free."""
     open_time = datetime_time(9, 0)
-    close_time = datetime_time(17, 0)  # Changed to 5:00 PM
+    close_time = datetime_time(16, 30)  # Changed to 4:30 PM
     step = timedelta(minutes=30)  # Changed from 15 to 30 minutes
 
     for day_offset in range(max_days + 1):
