@@ -13,7 +13,9 @@
 {% block content %}
 
 <h2 class="appointments_title">Pending Appointments</h2>
-<h4>Pending Appointments: {{ appointments.count }}</h4>
+<div class="appointments-summary">
+    <h4>Pending Appointments: {{ appointments.count }}</h4>
+</div>
 
 {% if messages %}
     <div>
@@ -26,45 +28,51 @@
 {% endif %}
 
 <table class="table_pending">
-    <tr>
-        <th>Resident Name</th>
-        <th>Certificate Type</th>
-        <th>Appointment Date</th>
-        <th>Appointment Time</th>
-        <th>Purpose</th>
-        <th>Status</th>
-        <th>Actions</th>
-    </tr>
-    {% if appointments %}
-        {% for appointment in appointments %}
+    <thead>
         <tr>
-            <td>{{ appointment.resident.resident.last_name }}, {{ appointment.resident.resident.first_name }} {% if appointment.resident.resident.middle_name %}{{ appointment.resident.resident.middle_name|slice:":1" }}.{% endif %}</td>
-            <td>{{ appointment.get_certificate_type_display }}</td>
-            <td>{{ appointment.preferred_date }}</td>
-            <td>{{ appointment.preferred_time }}</td>
-            <td>{{ appointment.purpose }}</td>
-            <td>{{ appointment.status }}</td>
-            <td>
-                <div class="status-actions">
-                    <form method="post" class="status-actions__form">
-                        {% csrf_token %}
-                        <input type="hidden" name="appointment_id" value="{{ appointment.id }}">
-                        <button type="submit"
-                                class="status-button status-button--approve"
-                                aria-label="Approve appointment for {{ appointment.resident.resident.first_name }} {{ appointment.resident.resident.last_name }}"
-                                {% if appointment.status == 'approved' or appointment.status == 'completed' or appointment.status == 'cancelled' %}disabled{% endif %}>
-                            Approve
-                        </button>
-                    </form>
-                </div>
-            </td>
+            <th>Resident Name</th>
+            <th>Certificate Type</th>
+            <th>Appointment Date</th>
+            <th>Appointment Time</th>
+            <th>Purpose</th>
+            <th>Status</th>
+            <th>Actions</th>
         </tr>
-        {% endfor %}
-    {% else %}
-        <tr>
-            <td class="appointments_info" colspan="7">No pending appointments.</td>
-        </tr>
-    {% endif %}
+    </thead>
+    <tbody>
+        {% if appointments %}
+            {% for appointment in appointments %}
+            <tr>
+                <td data-label="Resident Name">{{ appointment.resident.resident.last_name }}, {{ appointment.resident.resident.first_name }} {% if appointment.resident.resident.middle_name %}{{ appointment.resident.resident.middle_name|slice:":1" }}.{% endif %}</td>
+                <td data-label="Certificate Type">{{ appointment.get_certificate_type_display }}</td>
+                <td data-label="Date">{{ appointment.preferred_date }}</td>
+                <td data-label="Time">{{ appointment.preferred_time }}</td>
+                <td data-label="Purpose">{{ appointment.purpose }}</td>
+                <td data-label="Status">
+                    <span class="status-badge status-pending">Pending</span>
+                </td>
+                <td data-label="Actions">
+                    <div class="status-actions">
+                        <form method="post" class="status-actions__form">
+                            {% csrf_token %}
+                            <input type="hidden" name="appointment_id" value="{{ appointment.id }}">
+                            <button type="submit"
+                                    class="status-button status-button--approve"
+                                    aria-label="Approve appointment for {{ appointment.resident.resident.first_name }} {{ appointment.resident.resident.last_name }}"
+                                    {% if appointment.status == 'approved' or appointment.status == 'completed' or appointment.status == 'cancelled' %}disabled{% endif %}>
+                                Approve
+                            </button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        {% else %}
+            <tr>
+                <td class="appointments_info" colspan="7">No pending appointments.</td>
+            </tr>
+        {% endif %}
+    </tbody>
 </table>
 
 {% endblock %}

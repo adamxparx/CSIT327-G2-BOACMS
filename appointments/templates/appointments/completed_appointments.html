@@ -13,25 +13,33 @@
 
 <h2 class="appointments_title">Completed Appointments</h2>
 
-<table class="table_completed">
-    <tr>
-        <th>Resident Name</th>
-        <th>Certificate Type</th>
-        <th>Appointment Date</th>
-        <th>Appointment Time</th>
-        <th>Purpose</th>
-        <th>Status</th>
-    </tr>
-    {% for appointment in appointments %}
-    <tr>
-        <td>{{ appointment.resident.resident.last_name }}, {{ appointment.resident.resident.first_name }} {% if appointment.resident.resident.middle_name %}{{ appointment.resident.resident.middle_name|slice:":1" }}.{% endif %}</td>
-        <td>{{ appointment.get_certificate_type_display }}</td>
-        <td>{{ appointment.preferred_date }}</td>
-        <td>{{ appointment.preferred_time }}</td>
-        <td>{{ appointment.purpose }}</td>
-        <td>{{ appointment.status }}</td>
-    </tr>
-    {% endfor %}
-</table>
+<div class="appointments-section">
+    <table class="table_completed">
+        <thead>
+            <tr>
+                <th>Resident Name</th>
+                <th>Certificate Type</th>
+                <th>Appointment Date</th>
+                <th>Appointment Time</th>
+                <th>Purpose</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for appointment in appointments %}
+            <tr>
+                <td data-label="Resident Name">{{ appointment.resident.resident.last_name }}, {{ appointment.resident.resident.first_name }} {% if appointment.resident.resident.middle_name %}{{ appointment.resident.resident.middle_name|slice:":1" }}.{% endif %}</td>
+                <td data-label="Certificate Type">{{ appointment.get_certificate_type_display }}</td>
+                <td data-label="Date">{{ appointment.preferred_date }}</td>
+                <td data-label="Time">{{ appointment.preferred_time }}</td>
+                <td data-label="Purpose">{{ appointment.purpose }}</td>
+                <td data-label="Status">
+                    <span class="status-badge status-completed">Completed</span>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
 
 {% endblock %}
