@@ -6,12 +6,39 @@ from datetime import time, timedelta
 from django.db import transaction, IntegrityError
 
 class AppointmentForm(forms.ModelForm):
+    # Generate time choices in 30-minute intervals from 9:00 AM to 5:00 PM
+    TIME_CHOICES = []
+    start_time = time(9, 0)  # 9:00 AM
+    end_time = time(17, 0)   # 5:00 PM
+    
+    current_time = start_time
+    while current_time <= end_time:
+        time_str = current_time.strftime('%H:%M')
+        time_display = current_time.strftime('%I:%M %p')
+        TIME_CHOICES.append((time_str, time_display))
+        
+        # Add 30 minutes to current time
+        hour = current_time.hour
+        minute = current_time.minute + 30
+        
+        if minute >= 60:
+            hour += 1
+            minute -= 60
+            
+        current_time = time(hour, minute)
+    
+    preferred_time = forms.ChoiceField(
+        choices=TIME_CHOICES,
+        initial='09:00',
+        widget=forms.Select(attrs={'class': 'form-control'})
+    )
+    
     class Meta:
         model = Appointment
         fields = ['certificate_type', 'preferred_date', 'preferred_time', 'purpose']
         widgets = {
             'preferred_date': forms.DateInput(attrs={'type': 'date'}),
-            'preferred_time': forms.TimeInput(attrs={'type': 'time'}),
+            # 'preferred_time': forms.TimeInput(attrs={'type': 'time'}),  # Removed this line
         }
 
     def clean_preferred_date(self):
@@ -25,11 +52,18 @@ class AppointmentForm(forms.ModelForm):
     def clean_preferred_time(self):
         preferred_time = self.cleaned_data.get('preferred_time')
 
-        open_time = time(9, 0)
-        close_time = time(16, 30)
+        # Convert string time to time object for validation
+        if isinstance(preferred_time, str):
+            hour, minute = map(int, preferred_time.split(':'))
+            preferred_time_obj = time(hour, minute)
+        else:
+            preferred_time_obj = preferred_time
 
-        if preferred_time and not (open_time <= preferred_time <= close_time):
-            raise ValidationError("Appointments are only available between 9:00 AM and 4:30 PM")
+        open_time = time(9, 0)
+        close_time = time(17, 0)
+
+        if preferred_time_obj and not (open_time <= preferred_time_obj <= close_time):
+            raise ValidationError("Appointments are only available between 9:00 AM and 5:00 PM")
         
         return preferred_time
     
@@ -41,10 +75,17 @@ class AppointmentForm(forms.ModelForm):
             preferred_date = self.cleaned_data.get('preferred_date')
             preferred_time = self.cleaned_data.get('preferred_time')
 
-            buffer_minutes =  15
+            # Convert string time to time object
+            if isinstance(preferred_time, str):
+                hour, minute = map(int, preferred_time.split(':'))
+                preferred_time_obj = time(hour, minute)
+            else:
+                preferred_time_obj = preferred_time
+
+            buffer_minutes =  30  # Increased buffer to 30 minutes
 
             start_datetime = timezone.make_aware(
-                timezone.datetime.combine(preferred_date, preferred_time)
+                timezone.datetime.combine(preferred_date, preferred_time_obj)
             )
                 
             slot_start = start_datetime - timedelta(minutes=buffer_minutes)
@@ -58,7 +99,8 @@ class AppointmentForm(forms.ModelForm):
             if self.instance and self.instance.pk:
                 conflicting_appointments = conflicting_appointments.exclude(pk=self.instance.pk)
 
-            if conflicting_appointments.exists():
-                raise IntegrityError("This slot is too close to an existing appointment. Please choose a different time.")
+            # Allow up to 5 appointments per 30-minute interval
+            if conflicting_appointments.count() >= 5:
+                raise IntegrityError("Maximum 5 persons can book per 30-minute interval. Please choose a different time.")
                 
             return instance

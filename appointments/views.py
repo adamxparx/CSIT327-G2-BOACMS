@@ -13,11 +13,11 @@ from django.contrib import messages
 from django.db import IntegrityError
 
 
-def find_nearest_available_slot(preferred_date, preferred_time, buffer_minutes=15, max_days=14):
+def find_nearest_available_slot(preferred_date, preferred_time, buffer_minutes=30, max_days=14):
     """Return the nearest future slot (date, time) that is free."""
     open_time = datetime_time(9, 0)
-    close_time = datetime_time(16, 30)
-    step = timedelta(minutes=15)
+    close_time = datetime_time(17, 0)  # Changed to 5:00 PM
+    step = timedelta(minutes=30)  # Changed from 15 to 30 minutes
 
     for day_offset in range(max_days + 1):
         current_date = preferred_date + timedelta(days=day_offset)
@@ -38,12 +38,14 @@ def find_nearest_available_slot(preferred_date, preferred_time, buffer_minutes=1
             if slot_end_dt.date() > current_date:
                 slot_end_time = close_time
 
+            # Count appointments in this time slot
             conflicts = Appointment.objects.filter(
                 preferred_date=current_date,
                 preferred_time__range=(slot_start_time, slot_end_time)
             ).exclude(status='cancelled')
 
-            if not conflicts.exists():
+            # Allow up to 5 appointments per 30-minute interval
+            if conflicts.count() < 5:
                 return {
                     'date': current_date,
                     'time': candidate_dt.time(),
