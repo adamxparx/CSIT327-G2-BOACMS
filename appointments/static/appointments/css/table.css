@@ -1,18 +1,21 @@
-/* Force override for all appointment tables */
+/* Professional Appointment Tables Redesign */
+
+/* Base table styling */
 #main-content .appointments-card table.appts-table,
 #main-content table.table_pending,
 #main-content table.table_approved,
 #main-content table.table_cancelled,
 #main-content table.table_completed {
-    border: 2px solid #000000 !important;
     width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
     border-radius: 12px;
     background: #ffffff;
-    padding: 24px;
-    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.06);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.05);
     margin: 24px 0;
     overflow: hidden;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    transition: all 0.3s ease;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
 }
 
 #main-content .appointments-card table.appts-table:hover,
@@ -20,72 +23,62 @@
 #main-content table.table_approved:hover,
 #main-content table.table_cancelled:hover,
 #main-content table.table_completed:hover {
+    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.08), 0 4px 6px rgba(0, 0, 0, 0.05);
     transform: translateY(-2px);
-    box-shadow: 0 4px 25px rgba(0, 0, 0, 0.1);
 }
 
-/* Status color accents - now using full border */
-#main-content table.table_pending,
-#main-content .appts-table.pending { 
-    border: 2px solid #FFC107 !important;
-}
-#main-content table.table_approved,
-#main-content .appts-table.approved { 
-    border: 2px solid #4CAF50 !important;
-}
-#main-content table.table_cancelled,
-#main-content .appts-table.cancelled { 
-    border: 2px solid #F44336 !important;
-}
-#main-content table.table_completed,
-#main-content .appts-table.completed { 
-    border: 2px solid #2196F3 !important;
+/* Status-specific borders with improved colors */
+#main-content table.table_pending {
+    border-top: 4px solid #FFC107;
 }
 
-/* Table base styles */
-table {
-    width: 100%;
-    border-collapse: separate;
-    border-spacing: 0;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-    font-size: 14px;
-    line-height: 1.5;
+#main-content table.table_approved {
+    border-top: 4px solid #4CAF50;
 }
 
-/* Table header */
+#main-content table.table_cancelled {
+    border-top: 4px solid #F44336;
+}
+
+#main-content table.table_completed {
+    border-top: 4px solid #2196F3;
+}
+
+/* Table header improvements */
 #main-content .appointments-card table.appts-table thead th,
 #main-content table.table_pending thead th,
 #main-content table.table_approved thead th,
 #main-content table.table_cancelled thead th,
 #main-content table.table_completed thead th {
-    background: #2c3e50 !important;
-    color: #ffffff !important;
-    border: 1px solid #000000 !important;
-    background: #f8f9fa;
-    color: #4a5568;
+    background: #f8fafc;
+    color: #334155;
     font-weight: 600;
-    font-size: 13px;
+    font-size: 14px;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
-    padding: 16px 20px;
-    border-bottom: 2px solid #edf2f7;
+    letter-spacing: 0.02em;
+    padding: 18px 20px;
+    border-bottom: 2px solid #e2e8f0;
     position: sticky;
     top: 0;
     z-index: 10;
 }
 
-/* Table body cells */
+/* Table cell improvements */
 #main-content .appointments-card table.appts-table tbody td,
 #main-content table.table_pending tbody td,
 #main-content table.table_approved tbody td,
 #main-content table.table_cancelled tbody td,
 #main-content table.table_completed tbody td {
-    border: 1px solid #000000 !important;
-    background: #ffffff !important;
     padding: 16px 20px;
-    color: #2d3748;
-    border-bottom: 1px solid #edf2f7;
+    color: #334155;
+    border-bottom: 1px solid #e2e8f0;
     transition: background-color 0.2s ease;
+    vertical-align: middle;
+}
+
+/* Last row border removal */
+tbody tr:last-child td {
+    border-bottom: none;
 }
 
 /* Row hover effect */
@@ -102,34 +95,51 @@ table {
 #main-content table.table_approved tbody tr:hover td,
 #main-content table.table_cancelled tbody tr:hover td,
 #main-content table.table_completed tbody tr:hover td {
-    background-color: #f0f4f8 !important;
-    transition: all 0.3s ease;
+    background-color: #f1f5f9;
 }
 
-tbody tr:last-child td {
-    border-bottom: none;
-}
-
-/* Status badges */
+/* Enhanced status badges */
 #main-content .appointments-card table.appts-table .status-badge,
 #main-content table.table_pending .status-badge,
 #main-content table.table_approved .status-badge,
 #main-content table.table_cancelled .status-badge,
 #main-content table.table_completed .status-badge {
     display: inline-block;
-    padding: 4px 10px;
-    border-radius: 12px;
-    font-size: 12px;
-    font-weight: 600;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 500;
     text-transform: capitalize;
+    letter-spacing: 0.02em;
+    min-width: 90px;
+    text-align: center;
 }
 
-.status-pending { background-color: #FFF3CD; color: #856404; }
-.status-approved { background-color: #D4EDDA; color: #155724; }
-.status-cancelled { background-color: #F8D7DA; color: #721C24; }
-.status-completed { background-color: #D1ECF1; color: #0C5460; }
+.status-pending { 
+    background-color: #fff9db; 
+    color: #8a6d3b; 
+    border: 1px solid #fcf1ce;
+}
 
-/* Action buttons */
+.status-approved { 
+    background-color: #dff0d8; 
+    color: #3c763d; 
+    border: 1px solid #d0e9c6;
+}
+
+.status-cancelled { 
+    background-color: #f2dede; 
+    color: #a94442; 
+    border: 1px solid #ebcccc;
+}
+
+.status-completed { 
+    background-color: #d9edf7; 
+    color: #31708f; 
+    border: 1px solid #bcdff1;
+}
+
+/* Improved action buttons */
 #main-content .appointments-card table.appts-table .status-actions,
 #main-content table.table_pending .status-actions,
 #main-content table.table_approved .status-actions,
@@ -156,46 +166,55 @@ tbody tr:last-child td {
     align-items: center;
     justify-content: center;
     white-space: nowrap;
+    min-width: 90px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
 }
 
-#main-content .appointments-card table.appts-table .status-button--approve,
-#main-content table.table_pending .status-button--approve,
-#main-content table.table_approved .status-button--approve,
-#main-content table.table_cancelled .status-button--approve,
-#main-content table.table_completed .status-button--approve {
+/* Button variations */
+.status-button--approve {
     background: #4CAF50;
     color: white;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 
-#main-content .appointments-card table.appts-table .status-button--approve:hover:not([disabled]),
-#main-content table.table_pending .status-button--approve:hover:not([disabled]),
-#main-content table.table_approved .status-button--approve:hover:not([disabled]),
-#main-content table.table_cancelled .status-button--approve:hover:not([disabled]),
-#main-content table.table_completed .status-button--approve:hover:not([disabled]) {
-    background: #3d8b40;
+.status-button--approve:hover:not([disabled]) {
+    background: #43A047;
     transform: translateY(-1px);
-    box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
-#main-content .appointments-card table.appts-table .status-button--approve:active:not([disabled]),
-#main-content table.table_pending .status-button--approve:active:not([disabled]),
-#main-content table.table_approved .status-button--approve:active:not([disabled]),
-#main-content table.table_cancelled .status-button--approve:active:not([disabled]),
-#main-content table.table_completed .status-button--approve:active:not([disabled]) {
-    transform: translateY(0);
-    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+.status-button--reschedule {
+    background: #FF9800;
+    color: white;
 }
 
-#main-content .appointments-card table.appts-table .status-button--approve[disabled],
-#main-content table.table_pending .status-button--approve[disabled],
-#main-content table.table_approved .status-button--approve[disabled],
-#main-content table.table_cancelled .status-button--approve[disabled],
-#main-content table.table_completed .status-button--approve[disabled] {
+.status-button--reschedule:hover:not([disabled]) {
+    background: #F57C00;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.status-button--complete {
+    background: #2196F3;
+    color: white;
+}
+
+.status-button--complete:hover:not([disabled]) {
+    background: #1E88E5;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Disabled button state */
+#main-content .appointments-card table.appts-table .status-button[disabled],
+#main-content table.table_pending .status-button[disabled],
+#main-content table.table_approved .status-button[disabled],
+#main-content table.table_cancelled .status-button[disabled],
+#main-content table.table_completed .status-button[disabled] {
     background: #e2e8f0;
-    color: #a0aec0;
+    color: #94a3b8;
     cursor: not-allowed;
     box-shadow: none;
+    transform: none;
 }
 
 /* Empty state */
@@ -205,18 +224,18 @@ tbody tr:last-child td {
 #main-content table.table_cancelled .appointments_info,
 #main-content table.table_completed .appointments_info {
     text-align: center;
-    padding: 40px 20px;
-    color: #718096;
+    padding: 48px 20px;
+    color: #64748b;
     font-size: 15px;
     background: #f8fafc;
     border-radius: 8px;
     margin: 20px 0;
 }
 
-/* Title */
+/* Title styling */
 #main-content .appointments_title {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    color: #2c3e50 !important;
+    color: #1e293b !important;
     text-transform: uppercase;
     letter-spacing: 1px;
     position: relative;
@@ -225,7 +244,7 @@ tbody tr:last-child td {
     font-size: 24px;
     font-weight: 700;
     text-align: left;
-    border-bottom: 1px solid #edf2f7;
+    border-bottom: 1px solid #e2e8f0;
 }
 
 #main-content .appointments_title:after {
@@ -235,23 +254,7 @@ tbody tr:last-child td {
     bottom: -1px;
     width: 60px;
     height: 3px;
-    background: #2c3e50;
-}
-
-/* Apply styles to both table classes */
-table.table_pending,
-table.table_approved,
-table.table_cancelled,
-table.table_completed,
-table.appts-table {
-    width: 100%;
-    border-radius: 12px;
-    background: #ffffff;
-    padding: 24px;
-    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.06);
-    margin: 24px 0;
-    overflow: hidden;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    background: #3b82f6;
 }
 
 /* Responsive adjustments */
@@ -280,6 +283,23 @@ table.appts-table {
         background: white;
         border-radius: 8px;
         box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        border-top: 4px solid;
+    }
+    
+    table.table_pending tbody tr {
+        border-top-color: #FFC107;
+    }
+    
+    table.table_approved tbody tr {
+        border-top-color: #4CAF50;
+    }
+    
+    table.table_cancelled tbody tr {
+        border-top-color: #F44336;
+    }
+    
+    table.table_completed tbody tr {
+        border-top-color: #2196F3;
     }
     
     tbody td {
@@ -296,12 +316,13 @@ table.appts-table {
         position: absolute;
         left: 12px;
         font-weight: 600;
-        color: #718096;
+        color: #64748b;
         width: 45%;
         text-align: left;
     }
     
     .status-actions {
         justify-content: flex-end;
+        margin-top: 8px;
     }
 }
