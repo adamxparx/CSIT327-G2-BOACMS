@@ -122,3 +122,27 @@ class ResidentForm(forms.ModelForm):
         if phone_number and Resident.objects.filter(phone_number=phone_number).exists():
             raise forms.ValidationError("This phone number is already in use.")
         return phone_number
+
+    def clean_first_name(self):
+        first_name = self.cleaned_data.get('first_name')
+        if first_name and not first_name[0].isupper():
+            raise forms.ValidationError("First name must start with a capital letter.")
+        return first_name
+
+    def clean_middle_name(self):
+        middle_name = self.cleaned_data.get('middle_name')
+        if middle_name and not middle_name[0].isupper():
+            raise forms.ValidationError("Middle name must start with a capital letter.")
+        return middle_name
+
+    def clean_last_name(self):
+        last_name = self.cleaned_data.get('last_name')
+        if last_name and not last_name[0].isupper():
+            raise forms.ValidationError("Last name must start with a capital letter.")
+        return last_name
+
+    def clean_citizenship(self):
+        citizenship = self.cleaned_data.get('citizenship')
+        if citizenship and not citizenship[0].isupper():
+            raise forms.ValidationError("Citizenship must start with a capital letter.")
+        return citizenship
