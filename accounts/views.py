@@ -68,8 +68,11 @@ def dashboard(request):
     
     elif user.role == 'resident':
 
+        approved_count = Appointment.objects.filter(resident=request.user, status='approved').count()
+
         context = {
             'user': user,
+            'approved_count': approved_count,
         }
 
         return render(request, 'accounts/dashboard.html', context)
@@ -102,13 +105,13 @@ def profile(request):
     user = request.user
     
     if request.method == 'POST':
-        form = CustomUserUpdateForm(request.POST, instance=user)
+        form = CustomUserUpdateForm(request.POST, instance=user.resident)
         if form.is_valid():
             form.save()
             messages.success(request, 'User updated.')
 
     else:
-        form = CustomUserUpdateForm(instance=user)
+        form = CustomUserUpdateForm(instance=user.resident)
 
     context = {
         'form': form,
