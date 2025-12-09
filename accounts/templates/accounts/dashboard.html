@@ -14,18 +14,107 @@
         <li><a href="{% url 'appointments' %}" {% if request.resolver_match.url_name == 'appointments' or request.resolver_match.url_name == 'appointment_detail' %}aria-current="page"{% endif %}>APPOINTMENTS {% if approved_count %}<button class="appointment_count approved_count">{{ approved_count }}</button>{% endif %}</a></li>
         <li><a href="{% url 'appointments_calendar' %}" {% if request.resolver_match.url_name == 'appointments_calendar' %}aria-current="page"{% endif %}>CALENDAR</a></li>
     </ul>
-
 {% endblock %}
 
 {% block user %}
 <div>{{ user.resident.first_name }} {{ user.resident.last_name }}</div>
 {% endblock %}
 
-
 {% block content %}
+<div class="dashboard-container">
+    <div class="welcome-section">
+        <h1>Welcome, {{ user.resident.first_name }}!</h1>
+        <p>Manage your appointments and certifications</p>
+    </div>
 
-<div class="title-welcome">
-    <h1>Welcome, {{ user.resident.first_name }}!</h1>
+    <!-- Quick Stats Section -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon">⏳</div>
+            <div class="stat-info">
+                <h3>{{ pending_appointments }}</h3>
+                <p>Pending</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">✅</div>
+            <div class="stat-info">
+                <h3>{{ approved_appointments }}</h3>
+                <p>Approved</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">❌</div>
+            <div class="stat-info">
+                <h3>{{ cancelled_appointments }}</h3>
+                <p>Cancelled</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">✔️</div>
+            <div class="stat-info">
+                <h3>{{ completed_appointments }}</h3>
+                <p>Completed</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="quick-actions">
+        <h2>Quick Actions</h2>
+        <div class="actions-grid">
+            <a href="{% url 'certification' %}" class="action-card">
+                <div class="action-icon">+</div>
+                <h3>Book Appointment</h3>
+                <p>Schedule a new certification</p>
+            </a>
+            <a href="{% url 'appointments' %}" class="action-card">
+                <div class="action-icon">📋</div>
+                <h3>View All</h3>
+                <p>See all appointments</p>
+            </a>
+            <a href="{% url 'appointments_calendar' %}" class="action-card">
+                <div class="action-icon">📆</div>
+                <h3>Calendar</h3>
+                <p>View appointments</p>
+            </a>
+            <a href="{% url 'profile' %}" class="action-card">
+                <div class="action-icon">👤</div>
+                <h3>Profile</h3>
+                <p>Update information</p>
+            </a>
+        </div>
+    </div>
+
+    <!-- Upcoming Appointments Preview -->
+    {% if next_appointment %}
+    <div class="upcoming-section">
+        <h2>Your Next Appointment</h2>
+        <div class="appointment-preview">
+            <div class="appointment-details">
+                <h3>{{ next_appointment.get_certificate_type_display }}</h3>
+                <p><strong>Date:</strong> {{ next_appointment.preferred_date|date:"F d, Y" }}</p>
+                <p><strong>Time:</strong> {{ next_appointment.preferred_time|time:"h:i A" }}</p>
+                <p><strong>Status:</strong> <span class="status-{{ next_appointment.status }}">{{ next_appointment.get_status_display }}</span></p>
+            </div>
+            <a href="{% url 'appointment_detail' next_appointment.id %}" class="view-details-btn">View Details</a>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Helpful Resources -->
+    <div class="resources-section">
+        <h2>Helpful Resources</h2>
+        <div class="resources-grid">
+            <a href="{% url 'requirements' %}" class="resource-card">
+                <h3>Certificate Requirements</h3>
+                <p>Documents needed for each certification</p>
+            </a>
+            <a href="#" class="resource-card">
+                <h3>Office Hours</h3>
+                <p>Mon-Fri: 9:00 AM - 5:00 PM</p>
+            </a>
+        </div>
+    </div>
 </div>
-
 {% endblock %}

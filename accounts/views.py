@@ -67,12 +67,41 @@ def dashboard(request):
         return redirect('staff_dashboard')
     
     elif user.role == 'resident':
-
-        approved_count = Appointment.objects.filter(resident=request.user, status='approved').count()
+        # Get appointment statistics
+        all_appointments = Appointment.objects.filter(resident=request.user)
+        
+        # Count appointments by status
+        pending_appointments = all_appointments.filter(status='pending').count()
+        approved_appointments = all_appointments.filter(status='approved').count()
+        cancelled_appointments = all_appointments.filter(status='cancelled').count()
+        completed_appointments = all_appointments.filter(status='completed').count()
+        
+        # Total appointments
+        total_appointments = all_appointments.count()
+        
+        # Upcoming appointments (next 7 days)
+        today = datetime.date.today()
+        week_from_now = today + datetime.timedelta(days=7)
+        upcoming_appointments = all_appointments.filter(
+            preferred_date__gte=today,
+            preferred_date__lte=week_from_now
+        ).count()
+        
+        # Next appointment
+        next_appointment = all_appointments.filter(
+            preferred_date__gte=today,
+            status__in=['pending', 'approved']
+        ).order_by('preferred_date', 'preferred_time').first()
 
         context = {
             'user': user,
-            'approved_count': approved_count,
+            'total_appointments': total_appointments,
+            'upcoming_appointments': upcoming_appointments,
+            'pending_appointments': pending_appointments,
+            'approved_appointments': approved_appointments,
+            'cancelled_appointments': cancelled_appointments,
+            'completed_appointments': completed_appointments,
+            'next_appointment': next_appointment,
         }
 
         return render(request, 'accounts/dashboard.html', context)
