@@ -4,16 +4,16 @@
 {% block title %}Login{% endblock %}
 
 {% block content %}
-<section class="auth-wrapper">
-    <div class="auth-card">
-        <header class="auth-header">
-            <h1 class="auth-title">Welcome back</h1>
-            <p class="auth-subtitle">Sign in to manage your barangay appointments and certifications.</p>
-        </header>
+<div class="login-container">
+    <div class="login-card">
+        <div class="login-header">
+            <h1>Welcome Back</h1>
+            <p>Sign in to manage your barangay appointments and certifications</p>
+        </div>
 
         {% if messages %}
-            <div class="auth-alert auth-alert--info">
-                <ul class="auth-alert__list">
+            <div class="alert alert-info">
+                <ul>
                     {% for message in messages %}
                         <li>{{ message }}</li>
                     {% endfor %}
@@ -22,31 +22,30 @@
         {% endif %}
 
         {% if form.errors %}
-            <div class="auth-alert auth-alert--error">
+            <div class="alert alert-error">
                 <p>Your email or password didn't match. Please try again.</p>
             </div>
         {% endif %}
 
-        <form method="post" action="{% url 'login' %}" class="auth-form">
+        <form method="post" class="login-form">
             {% csrf_token %}
-
+            
             <div class="form-group">
-                <label for="id_username">Email</label>
+                <label for="id_username">Email Address</label>
                 {{ form.username }}
             </div>
-
+            
             <div class="form-group">
                 <label for="id_password">Password</label>
                 {{ form.password }}
             </div>
-
-            <button type="submit" class="btn btn-primary btn-block">Login</button>
+            
+            <button type="submit" class="btn btn-primary">Sign In</button>
         </form>
-
-        <div class="auth-footer">
-            <span>Don't have an account yet?</span>
-            <a href="{% url 'register' %}">Register</a>
+        
+        <div class="login-footer">
+            <p>Don't have an account yet? <a href="{% url 'register' %}">Register</a></p>
         </div>
     </div>
-</section>
+</div>
 {% endblock content %}

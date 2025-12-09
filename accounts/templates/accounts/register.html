@@ -4,32 +4,32 @@
 {% block title %}Register{% endblock %}
 
 {% block content %}
-<section class="auth-wrapper">
-    <div class="auth-card auth-card--wide">
-        <header class="auth-header">
-            <h1 class="auth-title">Create your account</h1>
-            <p class="auth-subtitle">Sign up to request certifications and schedule barangay services online.</p>
-        </header>
+<div class="register-container">
+    <div class="register-card">
+        <div class="register-header">
+            <h1>Create Your Account</h1>
+            <p>Sign up to request certifications and schedule barangay services online</p>
+        </div>
 
-        <!-- user form error -->
+        <!-- User form error -->
         {% if user_form.non_field_errors %}
-            <div class="auth-alert auth-alert--error">
+            <div class="alert alert-error">
                 {% for error in user_form.non_field_errors %}
                     <p>{{ error }}</p>
                 {% endfor %}
             </div>
         {% endif %}
 
-        <!-- resident form error -->
+        <!-- Resident form error -->
         {% if resident_form.non_field_errors %}
-            <div class="auth-alert auth-alert--error">
+            <div class="alert alert-error">
                 {% for error in resident_form.non_field_errors %}
                     <p>{{ error }}</p>
                 {% endfor %}
             </div>
         {% endif %}
 
-        <form method="post" class="auth-form auth-form--grid">
+        <form method="post" class="register-form">
             {% csrf_token %}
 
             <div class="form-field">
@@ -80,7 +80,7 @@
                 {% endfor %}
             </div>
 
-            <div class="form-field">
+            <div class="form-field full-width">
                 <label for="{{ resident_form.address.id_for_label }}">{{ resident_form.address.label }}</label>
                 {{ resident_form.address }}
                 {% for error in resident_form.address.errors %}
@@ -128,15 +128,14 @@
                 {% endfor %}
             </div>
 
-            <button type="submit" class="btn btn-primary btn-block form-submit">Register</button>
+            <button type="submit" class="btn btn-register">Create Account</button>
         </form>
 
-        <div class="auth-footer">
-            <span>Already have an account?</span>
-            <a href="{% url 'login' %}">Sign in</a>
+        <div class="register-footer">
+            <p>Already have an account? <a href="{% url 'login' %}">Sign in</a></p>
         </div>
     </div>
-</section>
+</div>
 
 <script>
     // Function to check if first letter is capitalized
