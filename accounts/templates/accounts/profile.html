@@ -6,6 +6,9 @@
 {% block content %}
 <div class="profile-container">
     <div class="profile-header">
+        <div class="profile-avatar">
+            <i class="bi bi-person-circle"></i>
+        </div>
         <h2>{{ user.resident.first_name }} {{ user.resident.last_name }}</h2>
         <p class="text-muted">Member since {{ user.date_joined|date:"F Y" }}</p>
     </div>
@@ -22,25 +25,28 @@
         <form method="post" class="profile-form needs-validation" novalidate>
             {% csrf_token %}
             
-            <div class="form-section">
-                <h4><i class="bi bi-person-lines-fill me-2"></i>Personal Information</h4>
-                <div class="row">
-                    <div class="col-md-4">
+            <div class="form-tabs">
+                <button type="button" class="tab-btn active" data-tab="personal">Personal Info</button>
+                <button type="button" class="tab-btn" data-tab="contact">Contact Info</button>
+            </div>
+            
+            <div class="form-grid">
+                <!-- Personal Information Section -->
+                <div class="form-section tab-content active" id="personal-tab">
+                    <div class="form-row">
                         <div class="form-group">
                             <label for="{{ form.first_name.id_for_label }}">First Name</label>
                             <input type="text" class="form-control" id="{{ form.first_name.id_for_label }}" 
                                        name="{{ form.first_name.name }}" value="{{ user.resident.first_name }}" required>
                             <div class="invalid-feedback">Please provide your first name.</div>
                         </div>
-                    </div>
-                    <div class="col-md-4">
+                        
                         <div class="form-group">
                             <label for="{{ form.middle_name.id_for_label }}">Middle Name</label>
                             <input type="text" class="form-control" id="{{ form.middle_name.id_for_label }}" 
                                    name="{{ form.middle_name.name }}" value="{{ user.resident.middle_name }}">
                         </div>
-                    </div>
-                    <div class="col-md-4">
+                        
                         <div class="form-group">
                             <label for="{{ form.last_name.id_for_label }}">Last Name</label>
                             <input type="text" class="form-control" id="{{ form.last_name.id_for_label }}" 
@@ -48,58 +54,52 @@
                             <div class="invalid-feedback">Please provide your last name.</div>
                         </div>
                     </div>
-                </div>
 
-                <div class="row mt-3">
-                    <div class="col-md-6">
+                    <div class="form-row">
                         <div class="form-group">
                             <label for="{{ form.date_of_birth.id_for_label }}">Date of Birth</label>
                             <input type="date" class="form-control" id="{{ form.date_of_birth.id_for_label }}" 
                                        name="{{ form.date_of_birth.name }}" value="{{ user.resident.date_of_birth|date:'Y-m-d' }}" required>
                             <div class="invalid-feedback">Please provide your date of birth.</div>
                         </div>
-                    </div>
-                    <div class="col-md-6">
+                        
                         <div class="form-group">
                             <label for="{{ form.sex.id_for_label }}">Sex</label>
                             {{ form.sex }}
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="form-section">
-                <h4><i class="bi bi-house-door-fill me-2"></i>Contact Information</h4>
-                <div class="form-group">
-                    <label for="{{ form.address.id_for_label }}">Address</label>
-                    <textarea class="form-control" id="{{ form.address.id_for_label }}" 
-                                         name="{{ form.address.name }}" rows="2" required>{{ user.resident.address }}</textarea>
-                    <div class="invalid-feedback">Please provide your address.</div>
-                </div>
+                <!-- Contact Information Section -->
+                <div class="form-section tab-content" id="contact-tab">
+                    <div class="form-group">
+                        <label for="{{ form.address.id_for_label }}">Address</label>
+                        <textarea class="form-control" id="{{ form.address.id_for_label }}" 
+                                             name="{{ form.address.name }}" rows="2" required>{{ user.resident.address }}</textarea>
+                        <div class="invalid-feedback">Please provide your address.</div>
+                    </div>
 
-                <div class="row mt-3">
-                    <div class="col-md-6">
+                    <div class="form-row">
                         <div class="form-group">
                             <label for="{{ form.phone_number.id_for_label }}">Phone Number</label>
                             <input type="tel" class="form-control" id="{{ form.phone_number.id_for_label }}" 
                                        name="{{ form.phone_number.name }}" value="{{ user.resident.phone_number }}" required>
                             <div class="invalid-feedback">Please provide a valid phone number.</div>
                         </div>
-                    </div>
-                    <div class="col-md-6">
+                        
                         <div class="form-group">
                             <label for="{{ form.civil_status.id_for_label }}">Civil Status</label>
                             {{ form.civil_status }}
                         </div>
                     </div>
-                </div>
 
-                <div class="form-group mt-3">
-                    <label for="{{ form.citizenship.id_for_label }}">Citizenship</label>
-                    <input type="text" class="form-control" id="{{ form.citizenship.id_for_label }}" 
-                               name="{{ form.citizenship.name }}" value="{{ user.resident.citizenship }}" 
-                               placeholder="Enter your citizenship" required>
-                    <div class="invalid-feedback">Please provide your citizenship.</div>
+                    <div class="form-group">
+                        <label for="{{ form.citizenship.id_for_label }}">Citizenship</label>
+                        <input type="text" class="form-control" id="{{ form.citizenship.id_for_label }}" 
+                                   name="{{ form.citizenship.name }}" value="{{ user.resident.citizenship }}" 
+                                   placeholder="Enter your citizenship" required>
+                        <div class="invalid-feedback">Please provide your citizenship.</div>
+                    </div>
                 </div>
             </div>
 
@@ -136,9 +136,33 @@
         }
     }
     
+    // Tab switching functionality
+    function setupTabs() {
+        const tabBtns = document.querySelectorAll('.tab-btn');
+        const tabContents = document.querySelectorAll('.tab-content');
+        
+        tabBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                // Remove active class from all buttons and contents
+                tabBtns.forEach(b => b.classList.remove('active'));
+                tabContents.forEach(c => c.classList.remove('active'));
+                
+                // Add active class to clicked button
+                btn.classList.add('active');
+                
+                // Show corresponding content
+                const tabId = btn.getAttribute('data-tab') + '-tab';
+                document.getElementById(tabId).classList.add('active');
+            });
+        });
+    }
+    
     window.addEventListener('load', function() {
+        // Setup tabs
+        setupTabs();
+        
         // Fetch all the forms we want to apply custom Bootstrap validation styles to
-        var forms = document.getElementsByClassName('form-profile');
+        var forms = document.getElementsByClassName('needs-validation');
         var validation = Array.prototype.filter.call(forms, function(form) {
             form.addEventListener('submit', function(event) {
                 if (form.checkValidity() === false) {
@@ -179,93 +203,143 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .profile-container {
-    max-width: 1000px;
+    max-width: 800px;
     margin: 0 auto;
-    padding: 2rem 1rem;
+    padding: 1rem;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
 }
 
 .profile-header {
     text-align: center;
-    margin-bottom: 2.5rem;
-    padding: 2rem;
+    margin-bottom: 1.5rem;
+    padding: 1.5rem;
     background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
     border-radius: 12px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    position: relative;
+}
+
+.profile-avatar {
+    font-size: 3rem;
+    color: #0d6efd;
+    margin-bottom: 0.5rem;
 }
 
 .profile-header h2 {
     color: #1a202c;
-    margin-bottom: 0.5rem;
-    font-size: 2rem;
+    margin-bottom: 0.25rem;
+    font-size: 1.8rem;
     font-weight: 700;
     letter-spacing: -0.5px;
 }
 
 .profile-header p.text-muted {
-    font-size: 1rem;
+    font-size: 0.9rem;
     color: #718096;
     font-weight: 400;
+    margin: 0;
 }
 
 .profile-card {
     background: #fff;
     border-radius: 12px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-    padding: 2.5rem;
-    margin-top: 1.5rem;
+    padding: 1.5rem;
+    margin-top: 1rem;
     border: 1px solid #edf2f7;
 }
 
-.form-section {
-    margin-bottom: 2.5rem;
-    padding-bottom: 2rem;
-    border-bottom: 1px solid #eee;
-}
-
-.form-section:last-child {
-    border-bottom: none;
-    margin-bottom: 0;
-    padding-bottom: 0;
-}
-
-.form-section h4 {
-    color: #495057;
-    margin-bottom: 1.5rem;
-    font-weight: 600;
+/* Tab Styles */
+.form-tabs {
     display: flex;
-    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    border-bottom: 2px solid #e2e8f0;
+    padding-bottom: 0.5rem;
 }
 
-.form-section h4 i {
-    margin-right: 0.5rem;
+.tab-btn {
+    padding: 0.75rem 1.5rem;
+    background: transparent;
+    border: none;
+    font-weight: 600;
+    color: #718096;
+    cursor: pointer;
+    border-radius: 8px 8px 0 0;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.tab-btn.active {
     color: #0d6efd;
+    background: rgba(13, 110, 253, 0.1);
+}
+
+.tab-btn.active::after {
+    content: '';
+    position: absolute;
+    bottom: -0.5rem;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: #0d6efd;
+}
+
+.tab-btn:hover:not(.active) {
+    background: rgba(113, 128, 150, 0.1);
+    color: #4a5568;
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.form-section {
+    margin-bottom: 1rem;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1rem;
 }
 
 .form-group {
-    margin-bottom: 1.25rem;
+    margin-bottom: 1rem;
 }
 
 .form-group label {
     font-weight: 500;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.4rem;
     color: #4a5568;
     display: block;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
 
 .form-control, .form-select {
-    padding: 0.8rem 1.25rem;
-    border-radius: 10px;
+    padding: 0.7rem 1rem;
+    border-radius: 8px;
     border: 2px solid #e2e8f0;
-    font-size: 1rem;
+    font-size: 0.95rem;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     font-family: 'Inter', sans-serif;
     color: #1a202c;
     background-color: #ffffff;
     box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    width: 100%;
 }
 
 .form-control:focus, .form-select:focus {
@@ -280,10 +354,10 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 textarea.form-control {
-    min-height: 120px;
+    min-height: 80px;
     resize: vertical;
-    line-height: 1.6;
-    padding: 1rem 1.25rem;
+    line-height: 1.5;
+    padding: 0.8rem 1rem;
 }
 
 .form-control::placeholder {
@@ -299,7 +373,7 @@ textarea.form-control {
 
 .form-actions {
     text-align: center;
-    margin-top: 2.5rem;
+    margin-top: 1.5rem;
     padding-top: 1.5rem;
     border-top: 1px solid #eee;
 }
@@ -313,6 +387,8 @@ textarea.form-control {
     border: none;
     box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
     color: #1f2937;
+    border-radius: 8px;
+    font-size: 1rem;
 }
 
 .btn-primary:hover {
@@ -324,7 +400,7 @@ textarea.form-control {
 
 .invalid-feedback {
     display: none;
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     margin-top: 0.25rem;
     color: #e53e3e;
     font-weight: 400;
@@ -371,7 +447,7 @@ input, select, textarea, button {
 
 /* Better form feedback */
 .invalid-feedback {
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     margin-top: 0.25rem;
     color: #e53e3e;
     font-weight: 400;
@@ -382,24 +458,45 @@ input, select, textarea, button {
     background: #fff;
     border-radius: 12px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-    padding: 2.5rem;
-    margin-top: 1.5rem;
+    padding: 1.5rem;
+    margin-top: 1rem;
     border: 1px solid #edf2f7;
 }
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
     .profile-card {
-        padding: 1.5rem;
+        padding: 1rem;
     }
     
     .profile-header {
-        padding: 1.5rem 1rem;
+        padding: 1rem;
     }
     
-    .form-section {
-        padding-bottom: 1.5rem;
-        margin-bottom: 1.5rem;
+    .form-row {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+    }
+    
+    .profile-container {
+        padding: 0.75rem;
+    }
+    
+    .profile-header h2 {
+        font-size: 1.5rem;
+    }
+    
+    .form-tabs {
+        flex-direction: column;
+    }
+    
+    .tab-btn {
+        text-align: center;
+        border-radius: 8px;
+    }
+    
+    .tab-btn.active::after {
+        display: none;
     }
 }
 </style>
