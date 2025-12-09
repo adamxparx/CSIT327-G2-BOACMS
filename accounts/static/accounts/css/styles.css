@@ -19,31 +19,154 @@ a {
 .auth-wrapper {
     display: flex;
     justify-content: center;
-    align-items: center;
-    padding: 2rem;
+    align-items: flex-start;
+    padding: 1.5rem;
     font-size: 0.95rem;
-    flex: 1;
+    min-height: 100%;
+    width: 100%;
+    box-sizing: border-box;
+    overflow: hidden;  /* Prevent any scrolling in the wrapper */
 }
 
 .auth-card {
     background-color: var(--color-neutral);
-    border-radius: 32px;
+    border-radius: 24px;
     box-shadow: 0 22px 40px rgba(0, 56, 168, 0.18);
-    padding: clamp(1.75rem, 4.5vw, 2.75rem);
-    width: min(420px, 100%);
+    padding: 2rem 2.5rem;
+    width: 420px;
     display: flex;
     flex-direction: column;
-    gap: 1.75rem;
+    gap: 1.5rem;
+    margin: 1rem auto;
+    box-sizing: border-box;
+    overflow: visible;  /* Ensure no scrollbar appears */
 }
 
 .auth-card--wide {
-    width: min(780px, 100%);
+    width: 780px;
+    padding: 2rem 2.5rem;
+    margin: 1rem auto;
+    box-sizing: border-box;
+    overflow: visible;  /* Ensure no scrollbar appears */
+}
+
+/* Form grid layout with proper spacing */
+.auth-form--grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+    margin: 0 2rem 0 0;  /* Added right margin and reset top/bottom/left */
+    padding: 1.5rem 2rem 1.5rem 0;  /* Added right padding */
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* Ensure form fields have proper spacing */
+.auth-form--grid .form-field {
+    padding: 0;
+}
+
+/* Add right margin to specific form field containers */
+.auth-form--grid .form-field:nth-child(1),  /* First Name */
+.auth-form--grid .form-field:nth-child(2),  /* Last Name */
+.auth-form--grid .form-field:nth-child(5),  /* Sex */
+.auth-form--grid .form-field:nth-child(8),  /* Phone Number */
+.auth-form--grid .form-field:nth-child(10), /* Citizenship */
+.auth-form--grid .form-field:nth-child(12) { /* Confirm Password */
+    margin-right: 10rem;
+}
+
+/* Form group styling to match login */
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.form-group label {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #333;
+}
+
+/* Input field styling */
+.form-group input,
+.form-group select,
+.form-group textarea {
+    padding: 0.75rem 1rem;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: #4a90e2;
+    box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.2);
+}
+
+/* Submit button */
+.btn-primary {
+    background-color: #4a90e2;
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.btn-primary:hover {
+    background-color: #3a7bc8;
+}
+
+/* Make the submit button full width */
+.btn-block {
+    display: block;
+    width: 100%;
+}
+
+/* Error message styling */
+.field-error {
+    color: #e74c3c;
+    font-size: 0.85rem;
+    margin-top: 0.25rem;
+}
+
+/* Auth footer with sign in link */
+.auth-footer {
+    text-align: center;
+    margin-top: 1rem;
+    margin-bottom: 1.5rem;
+    font-size: 0.9rem;
+    color: #666;
+}
+
+.auth-footer a {
+    color: #4a90e2;
+    text-decoration: none;
+    font-weight: 500;
+    margin-left: 0.25rem;
+}
+
+.auth-footer a:hover {
+    text-decoration: underline;
 }
 
 .auth-header {
     display: flex;
     flex-direction: column;
+    align-items: center;
+    text-align: center;
     gap: 0.5rem;
+    margin-right: 1rem;
+    margin-top: 3rem;
 }
 
 .auth-title,
@@ -87,14 +210,21 @@ a {
 .form-profile {
     display: flex;
     flex-direction: column;
-    gap: 1.25rem;
+    gap: 1rem;
+    width: 100%;
+    padding: 0;
+    box-sizing: border-box;
+    margin-right: 5rem;
+    margin-top: 3rem;
 }
 
 .auth-form--grid {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 1.25rem;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 0.5rem;
 }
+
+/* Grid layout for desktop only */
 
 .auth-form--grid .form-field:nth-last-child(1),
 .auth-form--grid .form-submit {
@@ -105,15 +235,20 @@ a {
 .form-field {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 0.4rem;
     text-align: left;
-    font-size: 0.95rem;
+    font-size: 0.9rem;
+    width: 100%;
+    margin-right: 5rem;
+    padding: 0;
 }
 
 .form-group label,
 .form-field label {
     font-size: 0.95rem;
     font-weight: 600;
+    color: #333;
+    margin-bottom: 0.25rem;
 }
 
 .form-group input,
@@ -123,15 +258,19 @@ a {
 .form-field select,
 .form-field textarea,
 .form-profile input {
-    font-size: 1rem;
-    padding: 0.75rem 1rem;
+    font-size: 0.95rem;
+    padding: 0.7rem 1rem;
     width: 100%;
-    border-radius: 0.75rem;
+    max-width: 100%;
+    border-radius: 0.5rem;
     border: 1px solid rgba(0, 56, 168, 0.22);
-    background-color: var(--color-neutral);
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    background-color: white;
+    transition: all 0.2s ease;
+    box-sizing: border-box;
+    margin-right: 1rem;
 }
 
+/* Focus states */
 .form-group input:focus,
 .form-group select:focus,
 .form-group textarea:focus,
@@ -139,9 +278,12 @@ a {
 .form-field select:focus,
 .form-field textarea:focus {
     outline: none;
-    border-color: var(--color-secondary);
-    box-shadow: 0 0 0 4px rgba(252, 209, 22, 0.25);
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(0, 56, 168, 0.15);
+    background-color: white;
 }
+
+/* Focus states moved up to be with other input styles */
 
 .form-profile button,
 .form-action button {
@@ -303,13 +445,14 @@ a {
 
 
 /* Responsive */
-@media (max-width: 768px) {
+@media (max-width: 800px) {
     .auth-card--wide {
-        width: 100%;
+        width: 95%;
     }
 
     .auth-form--grid {
         grid-template-columns: 1fr;
+        margin-right: 2rem;
     }
 
     .auth-form--grid .form-field:nth-last-child(1),
