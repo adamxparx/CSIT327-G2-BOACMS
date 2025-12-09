@@ -187,17 +187,18 @@
 @media (max-width:900px){ .appts-table thead th:nth-child(3), .appts-table thead th:nth-child(4) { display:none; } .appts-table tbody td:nth-child(3), .appts-table tbody td:nth-child(4) { display:none; } }
 @media (max-width:600px){ .appointments-card { padding:16px; } .appts-table thead { display:none; } .appts-table, .appts-table tbody, .appts-table tr, .appts-table td { display:block; width:100%; } .appts-table tr { margin-bottom:12px; border-radius:8px; border:1px solid rgba(0,0,0,0.04); padding:12px; } .appts-table td { padding:8px 12px; border-bottom:none; } }
 
-/* Appointment Detail Page Styles */
+/* Appointment Detail Styles */
 .appointment-detail {
-  max-width: 800px;
-  margin: 0 auto;
+  max-width: 100%;
+  margin: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .appointment-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
   padding-bottom: 1rem;
   border-bottom: 1px solid rgba(0, 56, 168, 0.1);
 }
@@ -205,8 +206,44 @@
 .appointment-title {
   margin: 0;
   color: var(--color-primary);
-  font-size: 1.75rem;
-  font-weight: 700;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+/* Status Badge Styles */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.4rem 1rem;
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-transform: capitalize;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.status-badge--pending {
+  background: rgba(252, 209, 22, 0.16);
+  color: #a26a00;
+  border: 1px solid rgba(252, 209, 22, 0.18);
+}
+
+.status-badge--approved {
+  background: rgba(46, 204, 113, 0.18);
+  color: #1d7a4e;
+  border: 1px solid rgba(46, 204, 113, 0.18);
+}
+
+.status-badge--completed {
+  background: rgba(0, 56, 168, 0.14);
+  color: #0038a8;
+  border: 1px solid rgba(0, 56, 168, 0.14);
+}
+
+.status-badge--cancelled {
+  background: rgba(206, 17, 38, 0.16);
+  color: #9b1228;
+  border: 1px solid rgba(206, 17, 38, 0.16);
 }
 
 .detail-section {
@@ -214,7 +251,8 @@
   border-radius: 12px;
   padding: 1.5rem;
   margin-bottom: 1.5rem;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+  border: 1px solid rgba(0, 56, 168, 0.05);
 }
 
 .section-title {
@@ -222,6 +260,19 @@
   font-size: 1.1rem;
   margin: 0 0 1.25rem 0;
   font-weight: 600;
+  position: relative;
+  padding-bottom: 0.5rem;
+}
+
+.section-title::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 40px;
+  height: 3px;
+  background: linear-gradient(to right, #0f4fc7, #0c3fa8);
+  border-radius: 3px;
 }
 
 .detail-grid {
@@ -234,18 +285,28 @@
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
+  padding: 0.75rem;
+  border-radius: 8px;
+  transition: background-color 0.2s ease;
+}
+
+.detail-item:hover {
+  background-color: rgba(0, 56, 168, 0.02);
 }
 
 .detail-label {
   font-size: 0.85rem;
   color: #666;
   font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
 }
 
 .detail-value {
   font-size: 1rem;
   font-weight: 500;
   color: #333;
+  word-break: break-word;
 }
 
 .detail-notes {
@@ -255,6 +316,7 @@
   border-left: 3px solid var(--color-primary);
   font-size: 0.95rem;
   line-height: 1.6;
+  margin-top: 0.5rem;
 }
 
 .appointment-actions {
@@ -266,11 +328,54 @@
   border-top: 1px solid rgba(0, 0, 0, 0.08);
 }
 
+.status-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.status-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.status-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.status-button--approve {
+  background-color: #2ecc71;
+  color: white;
+}
+
+.status-button--approve:hover {
+  background-color: #27ae60;
+}
+
+.status-button--decline {
+  background-color: #e74c3c;
+  color: white;
+}
+
+.status-button--decline:hover {
+  background-color: #c0392b;
+}
+
 .btn {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.7rem 1.5rem;
+  padding: 0.75rem 1.5rem;
   border-radius: 8px;
   font-weight: 600;
   font-size: 0.95rem;
@@ -278,6 +383,7 @@
   transition: all 0.2s ease;
   text-decoration: none;
   border: none;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
 
 .btn--secondary {
@@ -287,7 +393,8 @@
 
 .btn--secondary:hover {
   background-color: #e2e8f0;
-  transform: translateY(-1px);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .fas {
@@ -310,9 +417,19 @@
   
   .status-actions {
     width: 100%;
+    flex-direction: column;
+  }
+  
+  .status-button {
+    width: 100%;
+    justify-content: center;
   }
   
   .status-actions__form {
-    justify-content: flex-start !important;
+    width: 100%;
+  }
+  
+  .status-actions__form button {
+    width: 100%;
   }
 }

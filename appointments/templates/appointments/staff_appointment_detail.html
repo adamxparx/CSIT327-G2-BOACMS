@@ -1,59 +1,79 @@
 {% extends 'accounts/staff_dashboard.html' %} 
-{% block content %}
-<div class="auth-wrapper">
-  <div class="auth-card auth-card--wide">
+{% load static %}
 
-    <div class="auth-header">
-      <div style="display: flex; justify-content: space-between;">
-        <h2 class="auth-title">Appointment Details</h2>
-        <h2 class="
-            {% if appointment.status == 'approved' %}
-              auth-status-title--approved
-            {% elif appointment.status == 'pending' %}
-              auth-status-title--pending
-            {% elif appointment.status == 'cancelled' %}
-              auth-status-title--cancelled
-            {% else %}
-              auth-status-title--completed
-            {% endif %}">{{ appointment.get_status_display }}</h2>
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'appointments/css/appointments.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="content">
+  <div class="appointment-detail">
+    <div class="appointment-header">
+      <h1 class="appointment-title">Appointment Details</h1>
+      <div class="appointment-status status-badge 
+        {% if appointment.status == 'approved' %}
+          status-badge--approved
+        {% elif appointment.status == 'pending' %}
+          status-badge--pending
+        {% elif appointment.status == 'cancelled' %}
+          status-badge--cancelled
+        {% else %}
+          status-badge--completed
+        {% endif %}">
+        {{ appointment.get_status_display }}
       </div>
-      <p class="auth-subtitle">Resident: <b>{{ appointment.resident.resident.first_name }} {{ appointment.resident.resident.last_name }}</b></p>
-      <p class="auth-subtitle">Purpose: {{ appointment.purpose }}</p>
     </div>
 
-    <div class="auth-form auth-form--grid">
-      <div class="form-field" style="grid-column: span 2;">
-        <label>Certificate Type</label>
-        <div>{{ certificate_name }}</div>
-      </div>
-
-      <div class="form-field">
-        <label>Appointment Date</label>
-        <div>{{ appointment.preferred_date }}</div>
-      </div>
-
-      <div class="form-field">
-        <label>Appointment Time</label>
-        <div>{{ appointment.preferred_time }}</div>
-      </div>
-
-      <div class="form-submit" style=" grid-column: span 2; margin-top: 20px;">
-        <div class="form-action" style="display:flex; gap:8px; flex-wrap:wrap;">
-          <a href="{% url 'appointments_calendar' %}" class="button-as-link">
-            <button type="button" class="btn btn--secondary">Back to Calendar</button>
-          </a>
+    <div class="appointment-details">
+      <div class="detail-section">
+        <h2 class="section-title">Resident Information</h2>
+        <div class="detail-grid">
+          <div class="detail-item">
+            <span class="detail-label">Name</span>
+            <span class="detail-value">{{ appointment.resident.resident.first_name }} {{ appointment.resident.resident.last_name }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Purpose</span>
+            <span class="detail-value">{{ appointment.purpose }}</span>
+          </div>
         </div>
-        <div>
-          <form method="post">
-            {% if appointment.status == 'pending' %}
-              <p>Proceed to <b><a href="{% url 'pending_appointments' %}" style="color: blue;">Pending Appointments</a></b> for more actions.</p>
-            {% elif appointment.status == 'approved' %}
-              <p>Proceed to <b><a href="{% url 'approved_appointments' %}" style="color: blue;">Approved Appointments</a></b> for more actions.</p>
-            {% endif %}
-          </form>
-        </div>
-
       </div>
+
+      <div class="detail-section">
+        <h2 class="section-title">Appointment Information</h2>
+        <div class="detail-grid">
+          <div class="detail-item">
+            <span class="detail-label">Certificate Type</span>
+            <span class="detail-value">{{ certificate_name }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Date</span>
+            <span class="detail-value">{{ appointment.preferred_date|date:"F d, Y" }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Time</span>
+            <span class="detail-value">{{ appointment.preferred_time|time:"g:i A" }}</span>
+          </div>
+        </div>
+      </div>
+
+      {% if appointment.status == 'pending' %}
+        <div class="detail-section">
+          <h2 class="section-title">Actions</h2>
+          <p>Proceed to <b><a href="{% url 'pending_appointments' %}" style="color: #0f4fc7;">Pending Appointments</a></b> for more actions.</p>
+        </div>
+      {% elif appointment.status == 'approved' %}
+        <div class="detail-section">
+          <h2 class="section-title">Actions</h2>
+          <p>Proceed to <b><a href="{% url 'approved_appointments' %}" style="color: #0f4fc7;">Approved Appointments</a></b> for more actions.</p>
+        </div>
+      {% endif %}
+    </div>
+
+    <div class="appointment-actions">
+      <a href="{% url 'appointments_calendar' %}" class="btn btn--secondary">
+        <i class="fas fa-arrow-left"></i> Back to Calendar
+      </a>
     </div>
   </div>
 </div>
