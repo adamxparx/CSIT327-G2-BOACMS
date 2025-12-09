@@ -31,7 +31,7 @@
             </thead>
             <tbody>
                 {% for appointment in appointments %}
-                    <tr>
+                    <tr data-href="{% url 'appointment_detail' appointment.id %}" style="cursor: pointer;">
                         <td class="date-cell">
                             <span class="date-main">{{ appointment.preferred_date|date:"M. j, Y" }}</span>
                             <span class="date-time">{{ appointment.preferred_time|time:"g:i a" }}</span>
@@ -51,7 +51,7 @@
                         </td>
                         <td style="text-align:center;">
                             {% if appointment.status == 'approved' or appointment.status == 'pending' %}
-                                <a href="{% url 'cancel_appointment' appointment.id %}" role="button" aria-label="Cancel appointment {{ appointment.id }}" data-appointment-id="{{ appointment.id }}" class="btn-cancel">Cancel</a>
+                                <a href="{% url 'cancel_appointment' appointment.id %}" role="button" aria-label="Cancel appointment {{ appointment.id }}" data-appointment-id="{{ appointment.id }}" class="btn-cancel" onclick="event.stopPropagation();">Cancel</a>
                             {% else %}
                                 <span class="btn-none">—</span>
                             {% endif %}
@@ -73,6 +73,16 @@
 </div>
 
 <script>
+    // Make table rows clickable
+    document.addEventListener('DOMContentLoaded', function() {
+        const rows = document.querySelectorAll('tbody tr[data-href]');
+        rows.forEach(row => {
+            row.addEventListener('click', function() {
+                window.location.href = this.dataset.href;
+            });
+        });
+    });
+    
     // Confirmation for cancel links
     (function(){
         document.addEventListener('click', function(e){
