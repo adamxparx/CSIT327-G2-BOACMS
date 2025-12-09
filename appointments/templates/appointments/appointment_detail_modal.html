@@ -1,0 +1,78 @@
+{% load static %}
+
+<div class="appointment-detail">
+  <div class="appointment-header">
+    <h1 class="appointment-title">Appointment Details</h1>
+    <div class="appointment-status status-badge status-badge--{{ appointment.status|lower }}">
+      {{ appointment.get_status_display }}
+    </div>
+  </div>
+
+  <div class="appointment-details">
+    <div class="detail-section">
+      <h2 class="section-title">Resident Information</h2>
+      <div class="detail-grid">
+        <div class="detail-item">
+          <span class="detail-label">Name</span>
+          <span class="detail-value">{{ appointment.resident.resident.first_name }} {{ appointment.resident.resident.last_name }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Contact</span>
+          <span class="detail-value">{{ user.resident.phone_number | default:"Not provided" }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="detail-section">
+      <h2 class="section-title">Appointment Information</h2>
+      <div class="detail-grid">
+        <div class="detail-item">
+          <span class="detail-label">Purpose</span>
+          <span class="detail-value">{{ appointment.purpose }}</span>
+        </div>
+        {% if certificate_name %}
+        <div class="detail-item">
+          <span class="detail-label">Certificate Type</span>
+          <span class="detail-value">{{ certificate_name }}</span>
+        </div>
+        {% endif %}
+        <div class="detail-item">
+          <span class="detail-label">Date</span>
+          <span class="detail-value">{{ appointment.preferred_date|date:"F d, Y" }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Time</span>
+          <span class="detail-value">{{ appointment.preferred_time|time:"g:i A" }}</span>
+        </div>
+      </div>
+    </div>
+
+    {% if appointment.notes %}
+    <div class="detail-section">
+      <h2 class="section-title">Additional Notes</h2>
+      <div class="detail-notes">
+        {{ appointment.notes|linebreaks }}
+      </div>
+    </div>
+    {% endif %}
+  </div>
+
+  {% if appointment.status == 'pending' and user.is_staff %}
+  <div class="appointment-actions">
+    <div class="status-actions">
+      <form method="post" action="{% url 'update_appointment_status' appointment.id 'approved' %}" class="status-actions__form">
+        {% csrf_token %}
+        <button type="submit" class="status-button status-button--approve">
+          <i class="fas fa-check"></i> Approve
+        </button>
+      </form>
+      <form method="post" action="{% url 'update_appointment_status' appointment.id 'declined' %}" class="status-actions__form">
+        {% csrf_token %}
+        <button type="submit" class="status-button status-button--decline">
+          <i class="fas fa-times"></i> Decline
+        </button>
+      </form>
+    </div>
+  </div>
+  {% endif %}
+</div>

@@ -314,10 +314,12 @@ def appointment_detail(request, appointment_id):
         # Residents can only view their own
         appointment_qs = Appointment.objects.filter(id=appointment_id, resident=request.user)
         template_name = 'appointments/appointment_detail.html'
+        modal_template_name = 'appointments/appointment_detail_modal.html'
     elif request.user.role == 'staff' or request.user.is_superuser:
         # Staff/Admins can view any
         appointment_qs = Appointment.objects.filter(id=appointment_id)
-        template_name = 'appointments/staff_appointment_detail.html' 
+        template_name = 'appointments/staff_appointment_detail.html'
+        modal_template_name = 'appointments/staff_appointment_detail_modal.html'
     else:
         messages.error(request, "You are not authorized to view this page.")
         return redirect('appointments')
@@ -328,5 +330,11 @@ def appointment_detail(request, appointment_id):
         'appointment': appointment,
         'certificate_name': appointment.get_certificate_type_display(),
     }
-
+    
+    # Check if this is an AJAX request for modal content
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        # Return only the modal content, not the full page
+        return render(request, modal_template_name, context)
+    
+    # For regular requests, return the full page
     return render(request, template_name, context)

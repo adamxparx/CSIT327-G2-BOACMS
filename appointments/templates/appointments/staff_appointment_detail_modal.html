@@ -1,0 +1,63 @@
+<div class="appointment-detail">
+  <div class="appointment-header">
+    <h1 class="appointment-title">Appointment Details</h1>
+    <div class="appointment-status status-badge 
+        {% if appointment.status == 'approved' %}
+          status-badge--approved
+        {% elif appointment.status == 'pending' %}
+          status-badge--pending
+        {% elif appointment.status == 'cancelled' %}
+          status-badge--cancelled
+        {% else %}
+          status-badge--completed
+        {% endif %}">
+      {{ appointment.get_status_display }}
+    </div>
+  </div>
+
+  <div class="appointment-details">
+    <div class="detail-section">
+      <h2 class="section-title">Resident Information</h2>
+      <div class="detail-grid">
+        <div class="detail-item">
+          <span class="detail-label">Name</span>
+          <span class="detail-value">{{ appointment.resident.resident.first_name }} {{ appointment.resident.resident.last_name }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Purpose</span>
+          <span class="detail-value">{{ appointment.purpose }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="detail-section">
+      <h2 class="section-title">Appointment Information</h2>
+      <div class="detail-grid">
+        <div class="detail-item">
+          <span class="detail-label">Certificate Type</span>
+          <span class="detail-value">{{ certificate_name }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Date</span>
+          <span class="detail-value">{{ appointment.preferred_date|date:"F d, Y" }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Time</span>
+          <span class="detail-value">{{ appointment.preferred_time|time:"g:i A" }}</span>
+        </div>
+      </div>
+    </div>
+
+    {% if appointment.status == 'pending' %}
+      <div class="detail-section">
+        <h2 class="section-title">Actions</h2>
+        <p>Proceed to <b><a href="{% url 'pending_appointments' %}" style="color: #0f4fc7;">Pending Appointments</a></b> for more actions.</p>
+      </div>
+    {% elif appointment.status == 'approved' %}
+      <div class="detail-section">
+        <h2 class="section-title">Actions</h2>
+        <p>Proceed to <b><a href="{% url 'approved_appointments' %}" style="color: #0f4fc7;">Approved Appointments</a></b> for more actions.</p>
+      </div>
+    {% endif %}
+  </div>
+</div>
