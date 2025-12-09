@@ -1,59 +1,86 @@
-{% extends 'appointments/certification.html' %}
+{% extends 'accounts/dashboard.html' %}
 {% load static %}
 
-{% block title %}Certification | Confirmation{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'appointments/css/appointments.css' %}">
+<link rel="stylesheet" href="{% static 'appointments/css/confirmation.css' %}">
+</style>
+{% endblock %}
 
-{% block cert_content %}
-<div class="auth-wrapper">
-  <div class="auth-card auth-card--wide">
+{% block title %}Appointment Confirmed | {{ block.super }}{% endblock %}
 
-    {% if messages %}
-        <div class="auth-alert auth-alert--success">
-            {% for message in messages %}
-                <p>{{ message }}</p>
-            {% endfor %}
-        </div>
-    {% endif %}
-
-    <div class="auth-header">
-      <h2 class="auth-title">{{ certificate_name }}</h2>
-      <p class="auth-subtitle">Full Name: {{ appointment.resident.resident.first_name }} {{ appointment.resident.resident.last_name }}</p>
-      <p class="auth-subtitle">Purpose: {{ appointment.purpose }}</p>
+{% block content %}
+<div class="content">
+  <div class="appointment-detail">
+    <div class="confirmation-icon">
+      <i class="fas fa-check-circle"></i>
+    </div>
+    <h1 class="appointment-title">Appointment Confirmed!</h1>
+    <p class="confirmation-subtitle">Your {{ certificate_name }} appointment has been successfully scheduled.</p>
+    
+    <div class="appointment-status status-badge status-badge--confirmed" style="margin: 0 auto 2rem; display: table;">
+      Confirmed
     </div>
 
-    <div class="auth-form auth-form--grid">
-      <div class="form-field" style="grid-column: span 2;">
-        <label>Certificate Type</label>
-        <div>{{ certificate_name }}</div>
-      </div>
-
-      <div class="form-field">
-        <label>Appointment Date</label>
-        <div>{{ appointment.preferred_date }}</div>
-      </div>
-
-      <div class="form-field">
-        <label>Appointment Time</label>
-        <div>{{ appointment.preferred_time }}</div>
-      </div>
-
-      <div class="form-field" style="grid-column: span 2;">
-        <label>Purpose</label>
-        <div>{{ appointment.purpose }}</div>
-      </div>
-
-      <div class="form-submit" style="grid-column: span 2;">
-        <div class="form-action" style="display:flex; gap:8px; flex-wrap:wrap;">
-          <a href="{% url 'certification' %}" class="button-as-link">
-            <button type="button" class="btn btn--secondary">Back to Booking</button>
-          </a>
-          <a href="{% url 'appointments' %}" class="button-as-link">
-            <button type="submit" class="btn btn--warning">My Appointments</button>
-          </a>
+    <div class="appointment-details">
+      <div class="detail-section">
+        <h2 class="section-title">Appointment Information</h2>
+        <div class="detail-grid">
+          {% if certificate_name %}
+          <div class="detail-item">
+            <span class="detail-label">Certificate Type</span>
+            <span class="detail-value">{{ certificate_name }}</span>
+          </div>
+          {% endif %}
+          <div class="detail-item">
+            <span class="detail-label">Date</span>
+            <span class="detail-value">{{ appointment.preferred_date|date:"F d, Y" }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Time</span>
+            <span class="detail-value">{{ appointment.preferred_time|time:"g:i A" }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Purpose</span>
+            <span class="detail-value">{{ appointment.purpose }}</span>
+          </div>
         </div>
       </div>
+
+      <div class="detail-section">
+        <h2 class="section-title">Resident Information</h2>
+        <div class="detail-grid">
+          <div class="detail-item">
+            <span class="detail-label">Name</span>
+            <span class="detail-value">{{ appointment.resident.resident.first_name }} {{ appointment.resident.resident.last_name }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Contact</span>
+            <span class="detail-value">{{ user.resident.phone_number|default:"Not provided" }}</span>
+          </div>
+        </div>
+      </div>
+
+      {% if messages %}
+      <div class="detail-section">
+        <h2 class="section-title">Important Information</h2>
+        <div class="detail-notes">
+          {% for message in messages %}
+          <p><i class="fas fa-info-circle"></i> {{ message }}</p>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+    </div>
+
+    <div class="appointment-actions">
+      <a href="{% url 'certification' %}" class="btn btn--warning">
+        <i class="fas fa-calendar-plus"></i> Book Another Appointment
+      </a>
+      <a href="{% url 'appointments' %}" class="btn btn--primary">
+        <i class="fas fa-calendar-alt"></i> View My Appointments
+      </a>
     </div>
   </div>
 </div>
-
 {% endblock %}
