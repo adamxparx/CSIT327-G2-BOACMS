@@ -6,8 +6,203 @@
     <link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/main.min.css' rel='stylesheet' />
     <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js'></script>
     <script src='https://cdn.jsdelivr.net/npm/@fullcalendar/core/locales-all.global.min.js'></script>
+    
+    <style>
+        /* Calendar container styling */
+        #calendar-container {
+            background: var(--color-neutral);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(14, 30, 45, 0.06);
+            border: 1px solid rgba(0, 56, 168, 0.06);
+            margin-bottom: 30px;
+        }
+        
+        /* Calendar header toolbar */
+        .fc .fc-toolbar-title {
+            font-size: 1.5rem;
+            color: var(--color-primary);
+            font-weight: 700;
+        }
+        
+        .fc .fc-button {
+            background-color: var(--color-primary);
+            border: 1px solid var(--color-primary);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+        
+        .fc .fc-button:hover {
+            background-color: #1f57c1;
+            border-color: #1f57c1;
+            transform: translateY(-1px);
+        }
+        
+        .fc .fc-button:active, .fc .fc-button:focus {
+            box-shadow: 0 0 0 3px rgba(31, 87, 193, 0.2);
+        }
+        
+        .fc .fc-button-primary:not(:disabled).fc-button-active {
+            background-color: #0c3fa8;
+            border-color: #0c3fa8;
+        }
+        
+        /* Calendar day cells */
+        .fc .fc-daygrid-day-number {
+            font-weight: 600;
+            color: var(--color-text);
+        }
+        
+        .fc .fc-col-header-cell-cushion {
+            color: white;
+            font-weight: 600;
+            padding: 10px 0;
+        }
+        
+        /* Event styling */
+        .fc-event {
+            border-radius: 8px !important;
+            border: none !important;
+            padding: 5px 8px !important;
+            margin-bottom: 2px !important;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+        
+        .fc-event:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
+        }
+        
+        .fc-event-title {
+            font-weight: 500 !important;
+            font-size: 0.85rem !important;
+            color: #333 !important;
+        }
+        
+        /* Status-specific event styling */
+        .event-pending {
+            background-color: rgba(252, 209, 22, 0.85) !important;
+            border-left: 3px solid #a26a00 !important;
+        }
+        
+        .event-approved {
+            background-color: rgba(46, 204, 113, 0.85) !important;
+            border-left: 3px solid #1d7a4e !important;
+        }
+        
+        .event-cancelled {
+            background-color: rgba(206, 17, 38, 0.85) !important;
+            border-left: 3px solid #9b1228 !important;
+        }
+        
+        .event-completed {
+            background-color: rgba(0, 56, 168, 0.85) !important;
+            border-left: 3px solid #0038a8 !important;
+        }
+        
+        /* Legend styling */
+        .calendar-legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: var(--color-neutral);
+            border-radius: 8px;
+            border: 1px solid rgba(0, 56, 168, 0.06);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+            border-left: 3px solid;
+        }
+        
+        .legend-pending {
+            background-color: rgba(252, 209, 22, 0.85);
+            border-left-color: #a26a00;
+        }
+        
+        .legend-approved {
+            background-color: rgba(46, 204, 113, 0.85);
+            border-left-color: #1d7a4e;
+        }
+        
+        .legend-cancelled {
+            background-color: rgba(206, 17, 38, 0.85);
+            border-left-color: #9b1228;
+        }
+        
+        .legend-completed {
+            background-color: rgba(0, 56, 168, 0.85);
+            border-left-color: #0038a8;
+        }
+        
+        .legend-label {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--color-text);
+        }
+        
+        /* Responsive design */
+        @media (max-width: 768px) {
+            #calendar-container {
+                padding: 15px;
+            }
+            
+            .fc .fc-toolbar-title {
+                font-size: 1.2rem;
+            }
+            
+            .fc .fc-button {
+                padding: 4px 8px;
+                font-size: 0.8rem;
+            }
+            
+            .calendar-legend {
+                flex-direction: column;
+                gap: 10px;
+                padding: 12px;
+            }
+        }
+    </style>
 
-    <div id='calendar'></div>
+    <div class="calendar-legend">
+        <div class="legend-item">
+            <div class="legend-color legend-pending"></div>
+            <span class="legend-label">Pending</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color legend-approved"></div>
+            <span class="legend-label">Approved</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color legend-cancelled"></div>
+            <span class="legend-label">Cancelled</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color legend-completed"></div>
+            <span class="legend-label">Completed</span>
+        </div>
+    </div>
+
+    <div id='calendar-container'>
+        <div id='calendar'></div>
+    </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -19,24 +214,55 @@
                     center: 'title',
                     right: 'dayGridMonth,timeGridWeek,timeGridDay'
                 },
+                // Customize button texts to capitalize first letter
+                buttonText: {
+                    today: 'Today',
+                    month: 'Month',
+                    week: 'Week',
+                    day: 'Day'
+                },
+                // Add time formatting options
+                slotLabelFormat: {
+                    hour: 'numeric',
+                    minute: '2-digit',
+                    meridiem: 'short',
+                },
+                eventTimeFormat: {
+                    hour: 'numeric',
+                    minute: '2-digit',
+                    meridiem: 'short',
+                },
                 events: '{% url "api_appointments_list" %}', 
                 eventDidMount: function(info) {
-                    if (info.event.extendedProps.status === 'pending') {
-                        info.el.style.backgroundColor = '#ffc107';
-                    } else if (info.event.extendedProps.status === 'cancelled') {
-                        info.el.style.backgroundColor = '#ff0000';
-                    } else if (info.event.extendedProps.status === 'approved') {
-                        info.el.style.backgroundColor = '#00ff00';
-                    } else {
-                        info.el.style.backgroundColor = '#0000ff';
+                    // Remove inline styles and use CSS classes instead
+                    info.el.style.backgroundColor = '';
+                    info.el.style.borderColor = '';
+                    info.el.style.height = '';
+                    
+                    // Add status-specific CSS classes
+                    const status = info.event.extendedProps.status;
+                    info.el.classList.add('event-' + status);
+                    
+                    // Add title styling
+                    const titleEl = info.el.querySelector('.fc-event-title');
+                    if (titleEl) {
+                        titleEl.style.fontWeight = '500';
                     }
-
-                    info.el.style.height = '40px';
                 },
                 eventClick: function(info) {
                     info.jsEvent.preventDefault(); 
                     if (info.event.url) {
                         window.location.href = info.event.url;
+                    }
+                },
+                // Improve responsive behavior
+                height: 'auto',
+                expandRows: true,
+                windowResize: function(view) {
+                    if (window.innerWidth < 768) {
+                        calendar.changeView('dayGridDay');
+                    } else {
+                        calendar.changeView('dayGridMonth');
                     }
                 }
             });
