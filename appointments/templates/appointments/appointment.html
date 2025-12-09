@@ -4,46 +4,91 @@
 {% block title %}Appointments{% endblock %}
 
 {% block content %}
-<style>
-    .btn--danger:hover {
-        text-decoration: none !important;
-    }
-</style>
-<div class="appointments_center" style="display: flex; justify-content: center;">
+<link rel="stylesheet" href="{% static 'appointments/css/appointments.css' %}">
+
+<div class="appointments-center">
 {% if appointments %}
-    <div class="user_appointments">
-        <div class="appointment_title">
-            <div>Certificate Type</div>
-            <div>Appointment Date</div>
-            <div>Appointment Time</div>
-            <div>Purpose</div>
-            <div>Status</div>
-            <div>Actions</div>
-        </div>
-        {% for appointment in appointments %}
-            <div class="appointment_content">
-                <div>{{ appointment.get_certificate_type_display }}</div>
-                <div>{{ appointment.preferred_date }}</div>
-                <div>{{ appointment.preferred_time }}</div>
-                <div>{{ appointment.purpose }}</div>
-                {% if appointment.status == 'pending' %}
-                <div class="status pending">Pending</div>
-                    {% elif appointment.status == 'approved' %}
-                        <div class="status approved">Approved</div>
-                    {% elif appointment.status == 'completed' %}
-                        <div class="status completed">Completed</div>
-                    {% elif appointment.status == 'cancelled' %}
-                        <div class="status cancelled">Cancelled</div>
-                    {% endif %}
-                <div>
-                    <a href="{% url 'cancel_appointment' appointment.id %}" class="btn btn--danger {% if appointment.status == 'cancelled' or appointment.status == 'completed' %}disabled-link{% endif %}">Cancel</a>
-                </div>
+    <div class="appointments-card">
+        <div class="header">
+            <div>
+                <h2 class="title">Your Appointments</h2>
+                <div class="subtitle">Manage your upcoming bookings below</div>
             </div>
-        {% endfor %}
+            <div style="text-align:right;">
+                <div class="upcoming-pill">{{ appointments|length }} Upcoming</div>
+            </div>
+        </div>
+
+        <table class="appts-table">
+            <thead>
+                <tr>
+                    <th style="width:22%">Date &amp; Time</th>
+                    <th style="width:28%">Certificate</th>
+                    <th style="width:22%">Purpose</th>
+                    <th style="width:14%">Status</th>
+                    <th style="width:14%;text-align:center;">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for appointment in appointments %}
+                    <tr>
+                        <td class="date-cell">
+                            <span class="date-main">{{ appointment.preferred_date|date:"M. j, Y" }}</span>
+                            <span class="date-time">{{ appointment.preferred_time|time:"g:i a" }}</span>
+                        </td>
+                        <td>{{ appointment.get_certificate_type_display }}</td>
+                        <td>{{ appointment.purpose }}</td>
+                        <td style="vertical-align:middle;">
+                            {% if appointment.status == 'approved' %}
+                                <span class="status-badge badge-approved">Approved</span>
+                            {% elif appointment.status == 'cancelled' %}
+                                <span class="status-badge badge-cancelled">Cancelled</span>
+                            {% elif appointment.status == 'pending' %}
+                                <span class="status-badge badge-pending">Pending</span>
+                            {% else %}
+                                <span class="status-badge">{{ appointment.status|capfirst }}</span>
+                            {% endif %}
+                        </td>
+                        <td style="text-align:center;">
+                            {% if appointment.status == 'approved' or appointment.status == 'pending' %}
+                                <a href="{% url 'cancel_appointment' appointment.id %}" role="button" aria-label="Cancel appointment {{ appointment.id }}" data-appointment-id="{{ appointment.id }}" class="btn-cancel">Cancel</a>
+                            {% else %}
+                                <span class="btn-none">—</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
 {% else %}
-    <div>You have no upcoming appointments.</div>
+    <div style="width:100%;max-width:800px;display:flex;justify-content:center;">
+        <div style="text-align:center;background:#fbfdff;border:1px solid #e6eef8;padding:28px;border-radius:12px;box-shadow:0 6px 20px rgba(14,30,45,0.04);width:100%;">
+            <div style="font-size:48px;line-height:1;margin-bottom:12px;">🗓️</div>
+            <h3 style="margin:0 0 8px 0;color:#0f1724">No upcoming appointments</h3>
+            <p style="color:#5b6b77;margin:0 0 14px 0">You currently have no scheduled bookings. When you book an appointment, it will appear here.</p>
+        </div>
+    </div>
 {% endif %}
- </div>
+</div>
+
+<script>
+    // Confirmation for cancel links
+    (function(){
+        document.addEventListener('click', function(e){
+            var el = e.target.closest && e.target.closest('a.btn');
+            if(!el) return;
+            if(el.classList.contains('disabled-link')){
+                e.preventDefault();
+                return;
+            }
+            var id = el.getAttribute('data-appointment-id') || '';
+            var confirmMessage = 'Are you sure you want to cancel this appointment' + (id ? (' (ID: ' + id + ')') : '') + '?';
+            if(!confirm(confirmMessage)){
+                e.preventDefault();
+            }
+        }, false);
+    })();
+</script>
 
 {% endblock %}

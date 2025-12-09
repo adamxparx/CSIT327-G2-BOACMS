@@ -1,3 +1,199 @@
+/* Modernized Certifications page styles */
+:root{
+  /* Local aliases that map to the app's global theme variables */
+  --primary: var(--color-primary, #0038a8);
+  --secondary: var(--color-secondary, #fcd116);
+  --accent: var(--color-accent, #ce1126);
+  --neutral: var(--color-neutral, #ffffff);
+  --text: var(--color-text, #000000);
+  --surface: var(--color-surface, rgba(0,56,168,0.04));
+  --muted:#6b7280;
+  --card-bg:#ffffff;
+  --radius:4px; /* reduce from 10px for a cleaner, professional look */
+}
+
+body .cert_content{
+  padding: 24px;
+}
+
+.auth-wrapper{
+  display:flex;
+  justify-content:center;
+  padding: 12px 16px;
+}
+
+.auth-card{
+  background:transparent;
+  border-radius:16px;
+  box-shadow:0 18px 60px rgba(15,23,36,0.12);
+  overflow:hidden;
+  width:100%;
+  max-width:1100px;
+  display:grid;
+  grid-template-columns: 46% 54%; /* left info panel / right form */
+  gap:0;
+}
+
+.auth-card--wide{padding:0;}
+
+.auth-header{
+  padding:20px 24px 0 24px;
+}
+.auth-title{margin:0; font-size:1.5rem; color:#0f1724}
+.auth-subtitle{margin:6px 0 0; color:var(--muted); font-size:0.95rem}
+
+.auth-body{
+  padding:16px 24px 24px 24px;
+  .auth-card{
+    background:transparent;
+    border-radius:var(--radius);
+    box-shadow:0 4px 14px rgba(18,38,63,0.06);
+    overflow:hidden;
+    width:100%;
+    max-width:1100px;
+    display:grid;
+    grid-template-columns: 420px 1fr; /* left info column + form */
+    gap:0; /* panels meet flush */
+  }
+}
+
+/* Left info column (dark maroon background) */
+
+.left-panel{
+  /* Use the app primary color for the left panel while keeping depth */
+  background: linear-gradient(180deg, var(--primary) 0%, rgba(0,56,168,0.92) 100%);
+  color: var(--neutral);
+  padding:56px 64px;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  box-shadow: inset 0 -40px 80px rgba(0,0,0,0.06);
+}
+
+.left-panel .auth-header{ padding:0; }
+.left-panel .auth-title{ margin:0; font-size:56px; line-height:1.02; font-weight:800; color:var(--neutral) }
+.left-panel .auth-subtitle{ margin:18px 0 0; color:rgba(255,255,255,0.92); font-size:18px }
+
+.info-panel{
+  background:transparent;
+  margin-top:26px;
+  padding:0;
+}
+
+.info-panel h3{ color: var(--secondary); margin:0 0 10px 0; font-size:20px }
+.checklist{ list-style:disc; padding-left:22px; margin:12px 0 0 0 }
+.checklist li{ margin:10px 0; font-size:18px }
+
+.info-panel h3{margin-top:0; font-size:1.05rem}
+.info-list{display:grid; gap:10px;}
+  .left-panel{
+    background:var(--primary);
+    color:var(--color-neutral, #fff);
+    padding:36px 28px;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    gap:18px;
+  }
+  .info-panel{
+    background:var(--surface);
+    border-radius:var(--radius);
+    padding:16px;
+    height:fit-content;
+  }
+  .form-panel{
+    background: var(--card-bg);
+    padding:48px 56px;
+    display:flex;
+    flex-direction:column;
+    justify-content:flex-start;
+  }
+.info-item{background:#fff; padding:10px; border-radius:var(--radius); border:1px solid #eef2f6}
+.info-item small{color:var(--muted)}
+
+.auth-form{display:grid; grid-template-columns:1fr; gap:20px}
+.auth-form--grid{grid-template-columns: 1fr 1fr; gap:20px}
+.form-field{display:flex; flex-direction:column;}
+  button#submit-button{background:var(--secondary); color:var(--color-text, #000); border:none; padding:12px 20px; border-radius:calc(var(--radius) + 2px); font-weight:700; cursor:pointer; width:100%}
+.form-field label{font-weight:600; margin-bottom:6px}
+  .recommended-slot-alert .btn{background:transparent; border:1px solid var(--secondary); color:var(--secondary); padding:6px 10px; border-radius:calc(var(--radius) + 2px); cursor:pointer}
+
+  /* left panel checklist */
+  .checklist{list-style:disc; padding-left:18px; margin:0}
+  .checklist li{margin:6px 0}
+.form-field input,.form-field select,.form-field textarea{padding:12px 16px; border-radius:10px; border:1px solid #e6eef6; background:#fbfdff; font-size:16px}
+.form-field input[type="date"], .form-field input[type="time"]{padding:12px 14px}
+
+.form-field label{font-weight:600; margin-bottom:8px; color:#0f1724}
+
+.form-field--full{grid-column: 1 / -1}
+
+.form-field--full{grid-column: 1 / -1}
+
+.form-submit{display:flex; flex-direction:column; gap:18px; align-items:center; grid-column: 1 / -1}
+.requirements-link{margin-bottom:0}
+.requirements-link a{color:var(--muted); text-decoration:none; font-weight:600}
+
+.form-action{display:flex; justify-content:center; width:100%}
+/* Use app color scheme for primary action: gold button (secondary) with text color from theme */
+/* Book Appointment button: app gold background, centered text */
+button#submit-button{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(180deg, var(--secondary) 0%, rgba(252,209,22,0.92) 100%);
+  color: var(--text);
+  border: none;
+  padding: 14px 28px;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  width: 70%;
+  max-width: 520px;
+  font-size: 18px;
+  letter-spacing: 0.18px;
+  box-shadow: 0 12px 30px rgba(252,209,22,0.12);
+  transition: transform 0.12s ease, box-shadow 0.12s ease, filter 0.12s ease;
+  text-align: center; /* fallback */
+  line-height: 1; /* ensure vertical centering with flex */
+}
+
+button#submit-button:hover{
+  transform: translateY(-2px);
+  filter: brightness(0.98);
+  box-shadow: 0 18px 36px rgba(252,209,22,0.18);
+}
+
+button#submit-button:active{
+  transform: translateY(0);
+  box-shadow: 0 8px 18px rgba(0,0,0,0.08);
+}
+
+@media (max-width: 900px){
+  button#submit-button{ width:100%; max-width:none }
+}
+
+.auth-alert{padding:12px 16px; border-radius:8px; margin:12px 0}
+.auth-alert--error{background:#fff0f0; color:#7a1a1a; border:1px solid #ffdede}
+.auth-alert--info{background:#eef7ff; color:#08335a; border:1px solid #dbeeff}
+
+.recommended-slot-alert p{margin:0 0 10px 0}
+.recommended-slot-alert .btn{background:transparent; border:1px solid var(--primary); color:var(--primary); padding:6px 10px; border-radius:calc(var(--radius) + 2px); cursor:pointer}
+
+.field-error{color:#b91c1c; font-size:0.9rem}
+
+@media (max-width: 900px){
+  .auth-card{grid-template-columns:1fr; padding:0; border-radius:12px}
+  .left-panel{padding:28px}
+  .left-panel .auth-title{font-size:32px}
+  .form-panel{padding:20px}
+  .auth-form--grid{grid-template-columns: 1fr}
+  button#submit-button{width:100%; max-width:none}
+}
+
+/* subtle highlight animation for applying recommended slot */
+.highlight-success{animation:slot-success-fade 4s ease-out}
+@keyframes slot-success-fade{0%{background-color:#dff5e1; box-shadow:0 0 0 0 rgba(46,204,113,0.4)}30%{background-color:#c8f0ce; box-shadow:0 0 0 8px rgba(46,204,113,0)}100%{background-color:transparent; box-shadow:none}}
 .certification-block {
   display: block;
   width: 100%;
