@@ -31,7 +31,105 @@
 {% endblock %}
 
 {% block content %}
-    <div class="title-welcome">
+<div class="dashboard-container">
+    <div class="welcome-section">
         <h1>Office of the Barangay</h1>
+        <p>Welcome to the Barangay Office Management System</p>
     </div>
+
+    <!-- Quick Stats Section -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon">⏳</div>
+            <div class="stat-info">
+                <h3>{{ pending_count }}</h3>
+                <p>Pending Appointments</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">✅</div>
+            <div class="stat-info">
+                <h3>{{ approved_count }}</h3>
+                <p>Approved Appointments</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">📅</div>
+            <div class="stat-info">
+                <h3>{{ total_appointments_today }}</h3>
+                <p>Total Appointments Today</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">👥</div>
+            <div class="stat-info">
+                <h3>{{ residents_count }}</h3>
+                <p>Registered Residents</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="quick-actions">
+        <h2>Quick Actions</h2>
+        <div class="actions-grid">
+            <a href="{% url 'pending_appointments' %}" class="action-card">
+                <div class="action-icon">📋</div>
+                <h3>Review Pending</h3>
+                <p>Approve appointments</p>
+            </a>
+            <a href="{% url 'approved_appointments' %}" class="action-card">
+                <div class="action-icon">✔️</div>
+                <h3>Today's Appointments</h3>
+                <p>View approved today</p>
+            </a>
+            <a href="{% url 'appointments_calendar' %}" class="action-card">
+                <div class="action-icon">📆</div>
+                <h3>Calendar View</h3>
+                <p>All appointments</p>
+            </a>
+        </div>
+    </div>
+
+    <!-- Recent Appointments -->
+    <div class="recent-activity">
+        <h2>Recent Appointments</h2>
+        <div class="activity-list">
+            {% if recent_appointments %}
+                {% for appointment in recent_appointments %}
+                <div class="activity-item">
+                    <div class="activity-icon">📝</div>
+                    <div class="activity-details">
+                        <h3>{{ appointment.get_certificate_type_display }}</h3>
+                        <p><strong>Resident:</strong> {{ appointment.resident.resident.first_name }} {{ appointment.resident.resident.last_name }}</p>
+                        <p><strong>Date:</strong> {{ appointment.created_at|date:"M d, Y" }} at {{ appointment.created_at|time:"h:i A" }}</p>
+                        <p><strong>Status:</strong> <span class="status-{{ appointment.status }}">{{ appointment.get_status_display }}</span></p>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <p>No recent appointments found.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Office Information -->
+    <div class="office-info">
+        <h2>Office Information</h2>
+        <div class="info-grid">
+            <div class="info-card">
+                <h3>Office Hours</h3>
+                <p>Monday - Friday: 9:00 AM - 5:00 PM</p>
+                <p>Saturday: Closed</p>
+                <p>Sunday: Closed</p>
+            </div>
+            <div class="info-card">
+                <h3>Contact Information</h3>
+                <p>Email: barangay.office@boacms.com</p>
+                <p>Phone: (123) 456-7890</p>
+                <p>Address: 123 Barangay Street, City, Province</p>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

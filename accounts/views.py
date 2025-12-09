@@ -5,6 +5,7 @@ from django.contrib.auth import logout
 from django.contrib import messages
 from .forms import CustomUserCreationForm, CustomUserUpdateForm, ResidentForm
 from appointments.models import Appointment
+from django.contrib.auth import get_user_model
 import datetime
 
 def auth_check(user):
@@ -117,14 +118,20 @@ def staff_dashboard(request):
     if user.role == 'resident':
         return redirect('dashboard')
     
-    pending_Count = Appointment.objects.filter(status='pending').count()
-    approved_appts_today_Count = Appointment.objects.filter(status='approved', preferred_date=datetime.date.today()).count()
-
-    print(type(pending_Count), pending_Count)
+    pending_count = Appointment.objects.filter(status='pending').count()
+    approved_count = Appointment.objects.filter(status='approved').count()
+    total_appointments_today = Appointment.objects.filter(preferred_date=datetime.date.today()).count()
+    residents_count = get_user_model().objects.filter(role='resident').count()
+    
+    # Get recent appointments (last 5 created) with prefetched resident data
+    recent_appointments = Appointment.objects.select_related('resident__resident').all().order_by('-created_at')[:5]
 
     context = {
-        "pending_count": pending_Count,
-        "approved_count": approved_appts_today_Count,
+        "pending_count": pending_count,
+        "approved_count": approved_count,
+        "total_appointments_today": total_appointments_today,
+        "residents_count": residents_count,
+        "recent_appointments": recent_appointments,
     }
 
     return render(request, 'accounts/staff_dashboard.html', context)
