@@ -137,4 +137,28 @@
         </div>
     </div>
 </section>
+
+<script>
+    // Function to check if first letter is capitalized
+    function checkCapitalization(input) {
+        const value = input.value;
+        if (value.length > 0 && !value[0].match(/[A-Z]/)) {
+            input.setCustomValidity("This field must start with a capital letter.");
+        } else {
+            input.setCustomValidity("");
+        }
+    }
+
+    // Add event listeners to name fields
+    document.addEventListener('DOMContentLoaded', function() {
+        // Get all input fields with name attributes containing 'name' or 'citizenship'
+        const nameFields = document.querySelectorAll('input[name$="name"], input[name="citizenship"]');
+        
+        nameFields.forEach(function(field) {
+            field.addEventListener('input', function() { 
+                checkCapitalization(this); 
+            });
+        });
+    });
+</script>
 {% endblock content %}
