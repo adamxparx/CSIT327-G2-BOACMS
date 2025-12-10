@@ -7,7 +7,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse
 from django.views.generic import TemplateView
-from .forms import AppointmentForm, CancellationReasonForm
+from .forms import AppointmentForm, CancellationReasonForm, RescheduleForm
 from .models import Appointment
 from django.contrib import messages
 from django.db import IntegrityError
@@ -198,6 +198,49 @@ def approved_appointments(request):
                 messages.success(request, "Appointment completed.")
             else:
                 messages.info(request, "Appointment is already completed.")
+        elif action == 'reschedule':
+            # Handle reschedule action with new date/time and reason
+            reschedule_form = RescheduleForm(request.POST)
+            if reschedule_form.is_valid():
+                new_date = reschedule_form.cleaned_data['new_date']
+                new_time = reschedule_form.cleaned_data['new_time']
+                reason = reschedule_form.cleaned_data['reason']
+                
+                # Convert string time to time object
+                hour, minute = map(int, new_time.split(':'))
+                new_time_obj = datetime_time(hour, minute)
+                
+                # Validate the new date/time
+                if new_date <= timezone.now().date():
+                    messages.error(request, "You cannot reschedule to today or a past date.")
+                elif not (datetime_time(9, 0) <= new_time_obj <= datetime_time(16, 30)):
+                    messages.error(request, "Appointments are only available between 9:00 AM and 4:30 PM.")
+                else:
+                    # Check for conflicts (maximum 5 appointments per 30-minute slot)
+                    buffer_minutes = 30
+                    start_datetime = timezone.make_aware(
+                        dt.datetime.combine(new_date, new_time_obj)
+                    )
+                    slot_start = start_datetime - dt.timedelta(minutes=buffer_minutes)
+                    slot_end = start_datetime + dt.timedelta(minutes=buffer_minutes)
+                    
+                    conflicting_appointments = Appointment.objects.filter(
+                        preferred_date=new_date,
+                        preferred_time__range=(slot_start.time(), slot_end.time())
+                    ).exclude(status='cancelled').exclude(id=appointment.id)
+                    
+                    if conflicting_appointments.count() >= 5:
+                        messages.error(request, "Maximum 5 persons can book per 30-minute interval. Please choose a different time.")
+                    else:
+                        # Update the appointment with new date/time and reason
+                        appointment.preferred_date = new_date
+                        appointment.preferred_time = new_time_obj
+                        appointment.reschedule_reason = reason
+                        appointment.rescheduled_at = timezone.now()
+                        appointment.save()
+                        messages.success(request, "Appointment rescheduled successfully.")
+            else:
+                messages.error(request, "Please correct the errors below.")
     
     context = {
         "appointments": approved_appointments,

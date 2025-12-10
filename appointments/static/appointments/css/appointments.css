@@ -246,6 +246,21 @@
   border: 1px solid rgba(206, 17, 38, 0.16);
 }
 
+.badge-rescheduled {
+  background: rgba(255, 152, 0, 0.16);
+  color: #975a16;
+  border: 1px solid rgba(255, 152, 0, 0.18);
+  display: inline-flex;
+  align-items: center;
+  padding: 0.4rem 1rem;
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-transform: capitalize;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  margin-top: 5px;
+}
+
 .detail-section {
   background: white;
   border-radius: 12px;

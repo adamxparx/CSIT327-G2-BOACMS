@@ -48,6 +48,11 @@
                             {% else %}
                                 <span class="status-badge">{{ appointment.status|capfirst }}</span>
                             {% endif %}
+                            
+                            <!-- Show reschedule indicator -->
+                            {% if appointment.rescheduled_at %}
+                                <br><span class="status-badge badge-rescheduled">Rescheduled</span>
+                            {% endif %}
                         </td>
                         <td style="text-align:center;">
                             {% if appointment.status == 'approved' or appointment.status == 'pending' %}

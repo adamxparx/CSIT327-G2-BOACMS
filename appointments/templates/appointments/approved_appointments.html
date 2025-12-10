@@ -8,6 +8,118 @@
 <link rel="stylesheet" href="{% static 'appointments/css/table.css' %}">
 <link rel="stylesheet" href="{% static 'appointments/css/alerts.css' %}">
 
+<style>
+    /* Modal Styles */
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+    }
+    
+    .modal-content {
+        background-color: #fefefe;
+        margin: 10% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%;
+        max-width: 500px;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #eee;
+    }
+    
+    .modal-header h3 {
+        margin: 0;
+        color: #333;
+    }
+    
+    .close {
+        color: #aaa;
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+    
+    .close:hover {
+        color: #000;
+    }
+    
+    .form-group {
+        margin-bottom: 15px;
+    }
+    
+    .form-group label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+        color: #333;
+    }
+    
+    .form-group input, .form-group select, .form-group textarea {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-family: inherit;
+        resize: vertical;
+    }
+    
+    .form-group .help-text {
+        display: block;
+        margin-top: 5px;
+        font-size: 0.875em;
+        color: #666;
+    }
+    
+    .modal-footer {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        margin-top: 20px;
+    }
+    
+    .btn {
+        padding: 8px 16px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: 500;
+    }
+    
+    .btn-primary {
+        background-color: #007bff;
+        color: white;
+    }
+    
+    .btn-secondary {
+        background-color: #6c757d;
+        color: white;
+    }
+    
+    .btn-danger {
+        background-color: #dc3545;
+        color: white;
+    }
+    
+    .btn-warning {
+        background-color: #ffc107;
+        color: #212529;
+    }
+</style>
+
 {% endblock %}
 
 {% block content %}
@@ -50,24 +162,24 @@
                     <td data-label="Purpose">{{ appointment.purpose }}</td>
                     <td data-label="Status">
                         <span class="status-badge status-approved">Approved</span>
+                        {% if appointment.rescheduled_at %}
+                            <br><span class="status-badge badge-rescheduled">Rescheduled</span>
+                        {% endif %}
                     </td>
                     <td data-label="Actions">
                         <div class="status-actions">
                             <form method="post" class="status-actions__form">
                                 {% csrf_token %}
-                                <input type="hidden" name="appointment_id" value="{{ appointment.id }}">
-                                <button type="submit"
-                                        name="action"
-                                        value="reschedule"
+                                <input type="hidden" name="appointment_id" value="{{ appointment.id }}" id="appointment-id-{{ appointment.id }}">
+                                <button type="button"
                                         class="status-button status-button--reschedule"
-                                        aria-label="Reschedule appointment for {{ appointment.resident.resident.first_name }} {{ appointment.resident.resident.last_name }}">
+                                        data-appointment-id="{{ appointment.id }}">
                                     Reschedule
                                 </button>
                                 <button type="submit"
                                         name="action"
                                         value="complete"
-                                        class="status-button status-button--complete"
-                                        aria-label="Mark complete appointment for {{ appointment.resident.resident.first_name }} {{ appointment.resident.resident.last_name }}">
+                                        class="status-button status-button--complete">
                                     Complete
                                 </button>
                             </form>
@@ -110,17 +222,18 @@
                 <td data-label="Purpose">{{ appointment.purpose }}</td>
                 <td data-label="Status">
                     <span class="status-badge status-approved">Approved</span>
+                    {% if appointment.rescheduled_at %}
+                        <br><span class="status-badge badge-rescheduled">Rescheduled</span>
+                    {% endif %}
                 </td>
                 <td data-label="Actions">
                     <div class="status-actions">
                         <form method="post" class="status-actions__form">
                             {% csrf_token %}
-                            <input type="hidden" name="appointment_id" value="{{ appointment.id }}">
-                            <button type="submit"
-                                    name="action"
-                                    value="reschedule"
+                            <input type="hidden" name="appointment_id" value="{{ appointment.id }}" id="appointment-id-{{ appointment.id }}">
+                            <button type="button"
                                     class="status-button status-button--reschedule"
-                                    aria-label="Reschedule appointment for {{ appointment.resident.resident.first_name }} {{ appointment.resident.resident.last_name }}">
+                                    data-appointment-id="{{ appointment.id }}">
                                 Reschedule
                             </button>
                         </form>
@@ -132,5 +245,108 @@
         </tbody>
     </table>
 </div>
+
+<!-- Reschedule Modal -->
+<div id="rescheduleModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Reschedule Appointment</h3>
+            <span class="close" id="closeRescheduleModal">&times;</span>
+        </div>
+        <form method="post" id="rescheduleForm">
+            {% csrf_token %}
+            <input type="hidden" name="appointment_id" id="rescheduleAppointmentId">
+            <input type="hidden" name="action" value="reschedule">
+            <div class="form-group">
+                <label for="new_date">New Appointment Date:</label>
+                <input type="date" id="new_date" name="new_date" required>
+                <span class="help-text">Select a new date for the appointment.</span>
+            </div>
+            <div class="form-group">
+                <label for="new_time">New Appointment Time:</label>
+                <select id="new_time" name="new_time" class="form-control" required>
+                    <option value="">Select a time</option>
+                    <option value="09:00">09:00 AM</option>
+                    <option value="09:30">09:30 AM</option>
+                    <option value="10:00">10:00 AM</option>
+                    <option value="10:30">10:30 AM</option>
+                    <option value="11:00">11:00 AM</option>
+                    <option value="11:30">11:30 AM</option>
+                    <option value="12:00">12:00 PM</option>
+                    <option value="12:30">12:30 PM</option>
+                    <option value="13:00">01:00 PM</option>
+                    <option value="13:30">01:30 PM</option>
+                    <option value="14:00">02:00 PM</option>
+                    <option value="14:30">02:30 PM</option>
+                    <option value="15:00">03:00 PM</option>
+                    <option value="15:30">03:30 PM</option>
+                    <option value="16:00">04:00 PM</option>
+                    <option value="16:30">04:30 PM</option>
+                </select>
+                <span class="help-text">Select a new time for the appointment.</span>
+            </div>
+            <div class="form-group">
+                <label for="reason">Reason for Rescheduling:</label>
+                <textarea id="reason" name="reason" rows="4" placeholder="Please provide a reason for rescheduling this appointment..." required></textarea>
+                <span class="help-text">Please provide a reason for rescheduling this appointment.</span>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" id="closeRescheduleModalBtn">Close</button>
+                <button type="submit" class="btn btn-warning">Reschedule Appointment</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    // Add event listeners to reschedule buttons
+    document.addEventListener('DOMContentLoaded', function() {
+        const rescheduleButtons = document.querySelectorAll('.status-button--reschedule');
+        rescheduleButtons.forEach(function(button) {
+            button.addEventListener('click', function() {
+                const appointmentId = this.getAttribute('data-appointment-id');
+                openRescheduleModal(appointmentId);
+            });
+        });
+        
+        // Add event listeners for closing the modal
+        document.getElementById('closeRescheduleModal').addEventListener('click', closeRescheduleModal);
+        document.getElementById('closeRescheduleModalBtn').addEventListener('click', closeRescheduleModal);
+        
+        // Set minimum date for the date picker to tomorrow
+        const today = new Date();
+        const tomorrow = new Date(today);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        const minDate = tomorrow.toISOString().split('T')[0];
+        document.getElementById('new_date').setAttribute('min', minDate);
+        
+        // Close modal when clicking outside of it
+        window.addEventListener('click', function(event) {
+            var modal = document.getElementById('rescheduleModal');
+            if (event.target == modal) {
+                closeRescheduleModal();
+            }
+        });
+        
+        // Also close modal with Escape key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeRescheduleModal();
+            }
+        });
+    });
+    
+    // Function to open the reschedule modal
+    function openRescheduleModal(appointmentId) {
+        document.getElementById('rescheduleAppointmentId').value = appointmentId;
+        document.getElementById('rescheduleModal').style.display = 'block';
+    }
+    
+    // Function to close the reschedule modal
+    function closeRescheduleModal() {
+        document.getElementById('rescheduleModal').style.display = 'none';
+        document.getElementById('rescheduleForm').reset(); // Clear the form
+    }
+</script>
 
 {% endblock %}

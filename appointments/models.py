@@ -29,6 +29,12 @@ class Appointment(models.Model):
     # Add cancellation reason field
     cancellation_reason = models.TextField(blank=True, null=True, help_text="Reason for cancellation provided by staff")
 
+    # Add reschedule reason field
+    reschedule_reason = models.TextField(blank=True, null=True, help_text="Reason for rescheduling provided by staff")
+    
+    # Add rescheduled timestamp
+    rescheduled_at = models.DateTimeField(blank=True, null=True, help_text="Timestamp when the appointment was rescheduled")
+
     created_at = models.DateTimeField(auto_now_add=True)
 
     def refresh_if_expired(self):    
