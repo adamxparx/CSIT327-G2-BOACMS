@@ -352,6 +352,8 @@ def cancel_appointment(request, appointment_id):
 
     if request.method == 'POST':
         appointment.status = 'cancelled'
+        # Automatically set cancellation reason for resident cancellations
+        appointment.cancellation_reason = 'Resident cancelled the appointment'
         appointment.save()
         # messages.success(request, 'Appointment has been cancelled successfully.')
         return redirect('appointments')
