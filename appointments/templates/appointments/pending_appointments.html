@@ -8,6 +8,113 @@
 <link rel="stylesheet" href="{% static 'appointments/css/table.css' %}">
 <link rel="stylesheet" href="{% static 'appointments/css/alerts.css' %}">
 
+<style>
+    /* Modal Styles */
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+    }
+    
+    .modal-content {
+        background-color: #fefefe;
+        margin: 10% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%;
+        max-width: 500px;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #eee;
+    }
+    
+    .modal-header h3 {
+        margin: 0;
+        color: #333;
+    }
+    
+    .close {
+        color: #aaa;
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+    
+    .close:hover {
+        color: #000;
+    }
+    
+    .form-group {
+        margin-bottom: 15px;
+    }
+    
+    .form-group label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+        color: #333;
+    }
+    
+    .form-group textarea {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-family: inherit;
+        resize: vertical;
+    }
+    
+    .form-group .help-text {
+        display: block;
+        margin-top: 5px;
+        font-size: 0.875em;
+        color: #666;
+    }
+    
+    .modal-footer {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        margin-top: 20px;
+    }
+    
+    .btn {
+        padding: 8px 16px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: 500;
+    }
+    
+    .btn-primary {
+        background-color: #007bff;
+        color: white;
+    }
+    
+    .btn-secondary {
+        background-color: #6c757d;
+        color: white;
+    }
+    
+    .btn-danger {
+        background-color: #dc3545;
+        color: white;
+    }
+</style>
+
 {% endblock %}
 
 {% block content %}
@@ -57,10 +164,18 @@
                             {% csrf_token %}
                             <input type="hidden" name="appointment_id" value="{{ appointment.id }}">
                             <button type="submit"
+                                    name="action"
+                                    value="approve"
                                     class="status-button status-button--approve"
                                     aria-label="Approve appointment for {{ appointment.resident.resident.first_name }} {{ appointment.resident.resident.last_name }}"
                                     {% if appointment.status == 'approved' or appointment.status == 'completed' or appointment.status == 'cancelled' %}disabled{% endif %}>
                                 Approve
+                            </button>
+                            <button type="button"
+                                    class="status-button status-button--decline"
+                                    onclick="openCancelModal({{ appointment.id }})"
+                                    aria-label="Cancel appointment for {{ appointment.resident.resident.first_name }} {{ appointment.resident.resident.last_name }}">
+                                Cancel
                             </button>
                         </form>
                     </div>
@@ -74,5 +189,58 @@
         {% endif %}
     </tbody>
 </table>
+
+<!-- Cancellation Reason Modal -->
+<div id="cancelModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Cancel Appointment</h3>
+            <span class="close" onclick="closeCancelModal()">&times;</span>
+        </div>
+        <form method="post" id="cancelForm">
+            {% csrf_token %}
+            <input type="hidden" name="appointment_id" id="appointmentId">
+            <input type="hidden" name="action" value="cancel">
+            <div class="form-group">
+                <label for="reason">Reason for Cancellation:</label>
+                <textarea id="reason" name="reason" rows="4" placeholder="Please provide a reason for cancelling this appointment..." required></textarea>
+                <span class="help-text">Please provide a reason for cancelling this appointment.</span>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeCancelModal()">Close</button>
+                <button type="submit" class="btn btn-danger">Cancel Appointment</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    // Function to open the cancellation modal
+    function openCancelModal(appointmentId) {
+        document.getElementById('appointmentId').value = appointmentId;
+        document.getElementById('cancelModal').style.display = 'block';
+    }
+    
+    // Function to close the cancellation modal
+    function closeCancelModal() {
+        document.getElementById('cancelModal').style.display = 'none';
+        document.getElementById('reason').value = ''; // Clear the textarea
+    }
+    
+    // Close modal when clicking outside of it
+    window.onclick = function(event) {
+        var modal = document.getElementById('cancelModal');
+        if (event.target == modal) {
+            closeCancelModal();
+        }
+    }
+    
+    // Also close modal with Escape key
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape') {
+            closeCancelModal();
+        }
+    });
+</script>
 
 {% endblock %}

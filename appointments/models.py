@@ -25,6 +25,9 @@ class Appointment(models.Model):
         ('cancelled', 'Cancelled'),
     ]
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    
+    # Add cancellation reason field
+    cancellation_reason = models.TextField(blank=True, null=True, help_text="Reason for cancellation provided by staff")
 
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -35,6 +38,3 @@ class Appointment(models.Model):
 
     def __str__(self):
         return f"{self.resident.get_full_name()}'s appointment for {self.get_certificate_type_display()} on {self.preferred_date}"
-
-    
-    
