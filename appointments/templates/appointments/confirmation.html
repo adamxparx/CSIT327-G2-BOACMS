@@ -4,31 +4,32 @@
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'appointments/css/appointments.css' %}">
 <link rel="stylesheet" href="{% static 'appointments/css/confirmation.css' %}">
-</style>
 {% endblock %}
 
 {% block title %}Appointment Confirmed | {{ block.super }}{% endblock %}
 
 {% block content %}
-<div class="content">
-  <div class="appointment-detail">
-    <div class="confirmation-icon">
-      <i class="fas fa-check-circle"></i>
-    </div>
-    <h1 class="appointment-title">Appointment Confirmed!</h1>
-    <p class="confirmation-subtitle">Your {{ certificate_name }} appointment has been successfully scheduled.</p>
-    
-    <div class="appointment-status status-badge status-badge--confirmed" style="margin: 0 auto 2rem; display: table;">
-      Confirmed
+<div class="confirmation-container">
+  <div class="confirmation-card">
+    <div class="confirmation-header">
+      <div class="confirmation-icon">
+        <i class="fas fa-check-circle"></i>
+      </div>
+      <h1 class="confirmation-title">Confirmed!</h1>
+      <p class="confirmation-subtitle">{{ certificate_name }} scheduled.</p>
+      
+      <div class="appointment-status status-badge status-badge--confirmed">
+        Confirmed
+      </div>
     </div>
 
-    <div class="appointment-details">
+    <div class="confirmation-details">
       <div class="detail-section">
-        <h2 class="section-title">Appointment Information</h2>
+        <h2 class="section-title">Appointment Info</h2>
         <div class="detail-grid">
           {% if certificate_name %}
           <div class="detail-item">
-            <span class="detail-label">Certificate Type</span>
+            <span class="detail-label">Type</span>
             <span class="detail-value">{{ certificate_name }}</span>
           </div>
           {% endif %}
@@ -48,7 +49,7 @@
       </div>
 
       <div class="detail-section">
-        <h2 class="section-title">Resident Information</h2>
+        <h2 class="section-title">Resident Info</h2>
         <div class="detail-grid">
           <div class="detail-item">
             <span class="detail-label">Name</span>
@@ -63,7 +64,7 @@
 
       {% if messages %}
       <div class="detail-section">
-        <h2 class="section-title">Important Information</h2>
+        <h2 class="section-title">Important Info</h2>
         <div class="detail-notes">
           {% for message in messages %}
           <p><i class="fas fa-info-circle"></i> {{ message }}</p>
@@ -73,12 +74,9 @@
       {% endif %}
     </div>
 
-    <div class="appointment-actions">
-      <a href="{% url 'certification' %}" class="btn btn--warning">
-        <i class="fas fa-calendar-plus"></i> Book Another Appointment
-      </a>
+    <div class="confirmation-actions">
       <a href="{% url 'appointments' %}" class="btn btn--primary">
-        <i class="fas fa-calendar-alt"></i> View My Appointments
+        <i class="fas fa-calendar-alt"></i> View Appointments
       </a>
     </div>
   </div>

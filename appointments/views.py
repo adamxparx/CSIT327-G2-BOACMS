@@ -18,6 +18,11 @@ def find_nearest_available_slot(preferred_date, preferred_time, buffer_minutes=3
     open_time = datetime_time(9, 0)
     close_time = datetime_time(16, 30)  # Changed to 4:30 PM
     step = timedelta(minutes=30)  # Changed from 15 to 30 minutes
+    
+    # Convert string time to time object if needed
+    if isinstance(preferred_time, str):
+        hour, minute = map(int, preferred_time.split(':'))
+        preferred_time = datetime_time(hour, minute)
 
     for day_offset in range(max_days + 1):
         current_date = preferred_date + timedelta(days=day_offset)
@@ -66,6 +71,12 @@ def create_appointment(request):
             try:
                 appointment = form.save(commit=False)
                 appointment.resident = request.user
+                
+                # Convert string time to time object before saving
+                if isinstance(form.cleaned_data['preferred_time'], str):
+                    hour, minute = map(int, form.cleaned_data['preferred_time'].split(':'))
+                    appointment.preferred_time = datetime_time(hour, minute)
+                
                 appointment.save()
                 messages.success(request, "Appointment booked successfully!")
                 return redirect('confirmation', appointment_id = appointment.id)
@@ -207,8 +218,11 @@ def approved_appointments(request):
                 reason = reschedule_form.cleaned_data['reason']
                 
                 # Convert string time to time object
-                hour, minute = map(int, new_time.split(':'))
-                new_time_obj = datetime_time(hour, minute)
+                if isinstance(new_time, str):
+                    hour, minute = map(int, new_time.split(':'))
+                    new_time_obj = datetime_time(hour, minute)
+                else:
+                    new_time_obj = new_time
                 
                 # Validate the new date/time
                 if new_date <= timezone.now().date():
