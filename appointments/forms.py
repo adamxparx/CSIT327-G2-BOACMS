@@ -2,6 +2,7 @@ from django import forms
 from .models import Appointment
 from django.core.exceptions import ValidationError
 from django.utils import timezone
+import datetime
 from datetime import time, timedelta
 from django.db import transaction, IntegrityError
 
@@ -115,4 +116,57 @@ class CancellationReasonForm(forms.Form):
         }),
         label='Cancellation Reason',
         help_text='Please provide a reason for cancelling this appointment.'
+    )
+
+class RescheduleForm(forms.Form):
+    new_date = forms.DateField(
+        widget=forms.DateInput(attrs={
+            'type': 'date',
+            'class': 'form-control',
+            'required': True
+        }),
+        label='New Appointment Date',
+        help_text='Select a new date for the appointment.'
+    )
+    
+    # Generate time choices in 30-minute intervals from 9:00 AM to 4:30 PM
+    TIME_CHOICES = []
+    start_time = datetime.time(9, 0)   # 9:00 AM
+    end_time = datetime.time(16, 30)   # 4:30 PM
+    
+    current_time = start_time
+    while current_time <= end_time:
+        time_str = current_time.strftime('%H:%M')
+        time_display = current_time.strftime('%I:%M %p')
+        TIME_CHOICES.append((time_str, time_display))
+        
+        # Add 30 minutes to current time
+        hour = current_time.hour
+        minute = current_time.minute + 30
+        
+        if minute >= 60:
+            hour += 1
+            minute -= 60
+            
+        current_time = datetime.time(hour, minute)
+    
+    new_time = forms.ChoiceField(
+        choices=TIME_CHOICES,
+        widget=forms.Select(attrs={
+            'class': 'form-control',
+            'required': True
+        }),
+        label='New Appointment Time',
+        help_text='Select a new time for the appointment.'
+    )
+    
+    reason = forms.CharField(
+        widget=forms.Textarea(attrs={
+            'class': 'form-control',
+            'rows': 4,
+            'placeholder': 'Please provide a reason for rescheduling this appointment...',
+            'required': True
+        }),
+        label='Reschedule Reason',
+        help_text='Please provide a reason for rescheduling this appointment.'
     )

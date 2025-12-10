@@ -3,6 +3,18 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'appointments/css/appointments.css' %}">
+<style>
+  .detail-section.reschedule-notice {
+    border-left: 4px solid #ffc107;
+    background-color: #fff8e1;
+    padding: 15px;
+    margin: 15px 0;
+  }
+  
+  .detail-section.reschedule-notice .section-title {
+    color: #e65100;
+  }
+</style>
 {% endblock %}
 
 {% block content %}
@@ -71,6 +83,23 @@
           <div class="detail-item">
             <span class="detail-label">Reason</span>
             <span class="detail-value">{{ appointment.cancellation_reason }}</span>
+          </div>
+        </div>
+      </div>
+      {% endif %}
+      
+      <!-- Show reschedule notice for rescheduled appointments -->
+      {% if appointment.rescheduled_at and appointment.reschedule_reason %}
+      <div class="detail-section reschedule-notice">
+        <h2 class="section-title">Reschedule Notice</h2>
+        <div class="detail-grid">
+          <div class="detail-item">
+            <span class="detail-label">Reason</span>
+            <span class="detail-value">{{ appointment.reschedule_reason }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Rescheduled to</span>
+            <span class="detail-value">{{ appointment.preferred_date|date:"F d, Y" }} at {{ appointment.preferred_time|time:"g:i A" }}</span>
           </div>
         </div>
       </div>
