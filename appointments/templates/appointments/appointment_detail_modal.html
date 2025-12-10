@@ -55,6 +55,19 @@
       </div>
     </div>
     {% endif %}
+    
+    <!-- Show cancellation reason for cancelled appointments -->
+    {% if appointment.status == 'cancelled' and appointment.cancellation_reason %}
+    <div class="detail-section">
+      <h2 class="section-title">Cancellation Details</h2>
+      <div class="detail-grid">
+        <div class="detail-item">
+          <span class="detail-label">Reason</span>
+          <span class="detail-value">{{ appointment.cancellation_reason }}</span>
+        </div>
+      </div>
+    </div>
+    {% endif %}
   </div>
 
   {% if appointment.status == 'pending' and user.is_staff %}

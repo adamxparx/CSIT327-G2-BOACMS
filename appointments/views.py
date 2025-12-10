@@ -7,7 +7,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse
 from django.views.generic import TemplateView
-from .forms import AppointmentForm
+from .forms import AppointmentForm, CancellationReasonForm
 from .models import Appointment
 from django.contrib import messages
 from django.db import IntegrityError
@@ -222,15 +222,39 @@ def pending_appointments(request):
 
     if request.method == "POST":
         appointment_id = request.POST.get("appointment_id")
+        action = request.POST.get("action")  # Get the action (approve or cancel)
         appointment = get_object_or_404(Appointment, id=appointment_id)
 
-        if appointment.status == 'pending':
-            appointment.status = 'approved'
-            appointment.save()
-            messages.success(request, "Appointment approved.")
-        else:
-            messages.info(request, "Appointment is already approved.")
-    
+        if action == "approve":
+            if appointment.status == 'pending':
+                appointment.status = 'approved'
+                appointment.save()
+                messages.success(request, "Appointment approved.")
+            else:
+                messages.info(request, "Appointment is already approved.")
+        elif action == "cancel":
+            # Handle cancel action with reason
+            if appointment.status == 'pending':
+                # Get the cancellation reason from the form
+                reason_form = CancellationReasonForm(request.POST)
+                if reason_form.is_valid():
+                    reason = reason_form.cleaned_data['reason']
+                    appointment.status = 'cancelled'
+                    appointment.cancellation_reason = reason
+                    appointment.save()
+                    messages.success(request, "Appointment cancelled successfully.")
+                else:
+                    # If form is not valid, show error and redisplay the page
+                    messages.error(request, "Please provide a valid cancellation reason.")
+                    context = {
+                        "appointments": pending_appointments,
+                        "show_cancel_modal": True,
+                        "appointment_to_cancel": appointment.id,
+                    }
+                    return render(request, "appointments/pending_appointments.html", context)
+            else:
+                messages.info(request, "Appointment is already cancelled.")
+
     context = {
         "appointments": pending_appointments,
     }

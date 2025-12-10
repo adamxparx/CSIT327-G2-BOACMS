@@ -257,6 +257,12 @@ tbody tr:last-child td {
     background: #3b82f6;
 }
 
+/* No reason provided styling */
+.no-reason {
+    color: #94a3b8;
+    font-style: italic;
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
     #main-content .appointments-card table.appts-table,

@@ -23,6 +23,7 @@
                 <th>Appointment Time</th>
                 <th>Purpose</th>
                 <th>Status</th>
+                <th>Cancellation Reason</th>
             </tr>
         </thead>
         <tbody>
@@ -35,6 +36,13 @@
                 <td data-label="Purpose">{{ appointment.purpose }}</td>
                 <td data-label="Status">
                     <span class="status-badge status-cancelled">Cancelled</span>
+                </td>
+                <td data-label="Cancellation Reason">
+                    {% if appointment.cancellation_reason %}
+                        {{ appointment.cancellation_reason }}
+                    {% else %}
+                        <span class="no-reason">No reason provided</span>
+                    {% endif %}
                 </td>
             </tr>
             {% endfor %}

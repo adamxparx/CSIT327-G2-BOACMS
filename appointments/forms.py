@@ -104,3 +104,15 @@ class AppointmentForm(forms.ModelForm):
                 raise IntegrityError("Maximum 5 persons can book per 30-minute interval. Please choose a different time.")
                 
             return instance
+
+class CancellationReasonForm(forms.Form):
+    reason = forms.CharField(
+        widget=forms.Textarea(attrs={
+            'class': 'form-control',
+            'rows': 4,
+            'placeholder': 'Please provide a reason for cancelling this appointment...',
+            'required': True
+        }),
+        label='Cancellation Reason',
+        help_text='Please provide a reason for cancelling this appointment.'
+    )
