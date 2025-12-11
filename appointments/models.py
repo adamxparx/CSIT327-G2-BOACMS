@@ -28,7 +28,7 @@ class Appointment(models.Model):
     preferred_date = models.DateField()
     preferred_time = models.TimeField()
     purpose = models.CharField(max_length=50, choices=PURPOSE_CHOICES, default='')
-    custom_purpose = models.CharField(max_length=200, blank=True, null=True, verbose_name="Please specify your purpose", help_text="Custom purpose when 'Others' is selected")
+    specify_purpose = models.CharField(max_length=200, blank=True, null=True, verbose_name="Please specify your purpose", help_text="Specify purpose when 'Others' is selected")
 
     STATUS_CHOICES = [
         ('pending', 'Pending'),
