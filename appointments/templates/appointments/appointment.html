@@ -48,7 +48,13 @@
                             <span class="date-time">{{ appointment.preferred_time|time:"g:i a" }}</span>
                         </td>
                         <td>{{ appointment.get_certificate_type_display }}</td>
-                        <td>{{ appointment.purpose }}</td>
+                        <td>
+                          {% if appointment.purpose == 'others' %}
+                            {{ appointment.get_purpose_display }}: {{ appointment.specify_purpose }}
+                          {% else %}
+                            {{ appointment.get_purpose_display }}
+                          {% endif %}
+                        </td>
                         <td style="vertical-align:middle;">
                             {% if appointment.status == 'approved' %}
                                 <span class="status-badge badge-approved">Approved</span>
