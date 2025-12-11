@@ -48,7 +48,7 @@
           <form method="post" class="auth-form auth-form--grid" id="appointment-form">
             {% csrf_token %}
 
-            <div class="form-field" style="">
+            <div class="form-field">
               <label for="{{ form.certificate_type.id_for_label }}">{{ form.certificate_type.label }}</label>
               {{ form.certificate_type }}
               {% for error in form.certificate_type.errors %}
@@ -60,6 +60,14 @@
               <label for="{{ form.purpose.id_for_label }}">{{ form.purpose.label }}</label>
               {{ form.purpose }}
               {% for error in form.purpose.errors %}
+                  <span class="field-error">{{ error }}</span>
+              {% endfor %}
+            </div>
+
+            <div class="form-field form-field--full" id="custom_purpose_field" style="display: none;">
+              <label for="{{ form.custom_purpose.id_for_label }}">{{ form.custom_purpose.label }}</label>
+              {{ form.custom_purpose }}
+              {% for error in form.custom_purpose.errors %}
                   <span class="field-error">{{ error }}</span>
               {% endfor %}
             </div>
@@ -109,9 +117,30 @@
     const form = document.getElementById('appointment-form');
     const requirementsLink = document.getElementById('requirements-link');
     const applyRecommendedButton = document.getElementById('apply-recommended-slot');
+    const purposeSelect = document.getElementById('purpose_select');
+    const customPurposeField = document.getElementById('custom_purpose_field');
 
     if (!form || !requirementsLink) {
       return;
+    }
+
+    // Function to toggle custom purpose field visibility
+    const toggleCustomPurposeField = () => {
+      if (purposeSelect && purposeSelect.value === 'others') {
+        customPurposeField.style.display = 'block';
+        const customPurposeInput = document.getElementById('id_custom_purpose');
+        if (customPurposeInput) {
+          customPurposeInput.focus();
+        }
+      } else {
+        customPurposeField.style.display = 'none';
+      }
+    };
+
+    // Handle purpose select change
+    if (purposeSelect) {
+      purposeSelect.addEventListener('change', toggleCustomPurposeField);
+      toggleCustomPurposeField();
     }
 
     const baseUrl = requirementsLink.dataset.baseUrl || requirementsLink.href;
