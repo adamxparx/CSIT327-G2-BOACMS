@@ -76,6 +76,7 @@ def dashboard(request):
         approved_appointments = all_appointments.filter(status='approved').count()
         cancelled_appointments = all_appointments.filter(status='cancelled').count()
         completed_appointments = all_appointments.filter(status='completed').count()
+        claimed_appointments = all_appointments.filter(status='claimed').count()
         
         # Total appointments
         total_appointments = all_appointments.count()
@@ -102,6 +103,7 @@ def dashboard(request):
             'approved_appointments': approved_appointments,
             'cancelled_appointments': cancelled_appointments,
             'completed_appointments': completed_appointments,
+            'claimed_appointments': claimed_appointments,
             'next_appointment': next_appointment,
         }
 

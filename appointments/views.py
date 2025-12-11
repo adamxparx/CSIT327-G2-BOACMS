@@ -117,11 +117,36 @@ class RequirementsView(TemplateView):
 def appointments(request):
     user_appointments = Appointment.objects.filter(resident=request.user).order_by('-preferred_date', '-preferred_time')
 
+    claimed_count = user_appointments.filter(status='claimed').count()
+
     context = {
-        'appointments': user_appointments
+        'appointments': user_appointments,
+        'claimed_count': claimed_count,
     }
 
     return render(request, 'appointments/appointment.html', context)
+
+
+@login_required
+def claimed_appointments(request):
+    appointments = Appointment.objects.filter(resident=request.user).order_by('-preferred_date', '-preferred_time')
+
+    if request.method == 'POST':
+        appointment_id = request.POST.get('appointment_id')
+        action = request.POST.get('action')
+        appointment = get_object_or_404(Appointment, id=appointment_id)
+        if action == 'claimed':
+            appointment.status = 'completed'
+            appointment.save()
+            messages.success(request, "Successfully confirmed claimed appointment.")
+        else: 
+            messages.info(request, "Appointment is already completed")
+
+    context = {
+        'appointments': appointments,
+    }
+
+    return render(request, 'appointments/claimed_appointments.html', context)
 
 @login_required
 def confirmation(request, appointment_id):
@@ -136,57 +161,13 @@ def confirmation(request, appointment_id):
 
     return render(request, 'appointments/confirmation.html', context)
 
-
-@login_required
-def staff_appointments(request):
-    if request.user.role != 'staff':
-        messages.error(request, "You are not authorized to view this page.")
-        return redirect('appointments')
-    
-    all_appointments = Appointment.objects.all().order_by('-preferred_date', '-preferred_time')
-
-    if request.method == "POST":
-        appointment_id = request.POST.get("appointment_id")
-        action = request.POST.get("action")
-        appointment = get_object_or_404(Appointment, id=appointment_id)
-
-        status_changed = False
-
-        if action == 'approve':
-            if appointment.status == 'cancelled':
-                messages.error(request, "Cancelled appointments cannot be approved.")
-            elif appointment.status != 'approved':
-                appointment.status = 'approved'
-                status_changed = True
-                messages.success(request, "Appointment approved.")
-            else:
-                messages.info(request, "Appointment is already approved.")
-        elif action == 'decline':
-            if appointment.status != 'cancelled':
-                appointment.status = 'cancelled'
-                status_changed = True
-                messages.error(request, "Appointment declined.")
-            else:
-                messages.info(request, "Appointment is already declined.")
-        else:
-            messages.error(request, "Invalid action submitted.")
-            return redirect('staff_appointments')
-
-        if status_changed:
-            appointment.save()
-
-        return redirect('staff_appointments')
-
-    context = {'appointments': all_appointments}
-    return render(request, 'appointments/staff_appointment.html', context)
-
 @login_required
 def approved_appointments(request):
     if request.user.role != 'staff':
         messages.error(request, "You are not authorized to view this page.")
         return redirect('appointments')
     
-    approved_appointments = Appointment.objects.filter(status='approved')
+    approved_appointments = Appointment.objects.filter(status__in=['approved', 'claimed'])
 
     for appt in approved_appointments:
         appt.refresh_if_expired()
@@ -202,13 +183,13 @@ def approved_appointments(request):
         action = request.POST.get("action")
         appointment = get_object_or_404(Appointment, id=appointment_id)
 
-        if action == 'complete':
+        if action == 'claimed':
             if appointment.status == 'approved':
-                appointment.status = 'completed'
+                appointment.status = 'claimed'
                 appointment.save()
-                messages.success(request, "Appointment completed.")
+                messages.success(request, "Appointment marked as claimed.")
             else:
-                messages.info(request, "Appointment is already completed.")
+                messages.info(request, "Appointment is already marked as claimed.")
         elif action == 'reschedule':
             # Handle reschedule action with new date/time and reason
             reschedule_form = RescheduleForm(request.POST)

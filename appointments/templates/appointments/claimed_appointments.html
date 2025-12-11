@@ -1,7 +1,7 @@
 {% extends 'accounts/dashboard.html' %}
 {% load static %}
 
-{% block title %}Appointments{% endblock %}
+{% block title %}Claimed Appointments{% endblock %}
 
 {% block content %}
 <link rel="stylesheet" href="{% static 'appointments/css/appointments.css' %}">
@@ -10,22 +10,24 @@
 <div class="appointments-center">
 {% if appointments %}
     <div class="appointments-card">
-        {% if claimed_count %}
-        <div class="message_success">You have {{ claimed_count }} claimed appointments. Click <b style="color: blue; text-decoration: underline;"><a href="{% url 'claimed_appointments' %}">here</a></b> to confirm your claimed appointments.</div>
+        {% if messages %}
+            <div>
+                {% for message in messages %}
+                    <div class="message_success">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
         {% endif %}
         <div class="header">
             <div>
-                <h2 class="title">Your Appointments</h2>
-                <div class="subtitle">Manage your upcoming bookings below</div>
+                <h2 class="title">Completed Appointments</h2>
+                <div class="subtitle">Manage your completed appointments below</div>
             </div>
             <div>
-                <div>
-                    <a href="{% url 'claimed_appointments' %}">
-                        <button class="status-button status-button--complete">
-                            Completed Appointments
-                        </button>
-                    </a>
-                </div>
+                <a href="{% url 'appointments' %}">
+                    <button class="status-button status-button--complete">Upcoming Appointments</button>
+                </a>
             </div>
         </div>
 
@@ -41,7 +43,7 @@
             </thead>
             <tbody>
                 {% for appointment in appointments %}
-                {% if appointment.status != 'completed' and appointment.status != 'claimed' %}
+                    {% if appointment.status == 'claimed' or appointment.status == 'completed' %}
                     <tr data-href="{% url 'appointment_detail' appointment.id %}" style="cursor: pointer;">
                         <td class="date-cell">
                             <span class="date-main">{{ appointment.preferred_date|date:"M. j, Y" }}</span>
@@ -50,22 +52,26 @@
                         <td>{{ appointment.get_certificate_type_display }}</td>
                         <td>{{ appointment.purpose }}</td>
                         <td style="vertical-align:middle;">
-                            {% if appointment.status == 'approved' %}
-                                <span class="status-badge badge-approved">Approved</span>
-                            {% elif appointment.status == 'cancelled' %}
-                                <span class="status-badge badge-cancelled">Cancelled</span>
-                            {% elif appointment.status == 'pending' %}
-                                <span class="status-badge badge-pending">Pending</span>
-                            {% endif %}
-                            
-                            <!-- Show reschedule indicator -->
-                            {% if appointment.rescheduled_at %}
-                                <br><span class="status-badge badge-rescheduled">Rescheduled</span>
+                            {% if appointment.status == 'completed' %}
+                            <span class="status-badge badge-approved">Completed</span>
+                            {% else %}
+                            <span class="status-badge badge-approved">Claimed</span>
                             {% endif %}
                         </td>
                         <td style="text-align:center;">
-                            {% if appointment.status == 'approved' or appointment.status == 'pending' %}
-                                <a href="{% url 'cancel_appointment' appointment.id %}" role="button" aria-label="Cancel appointment {{ appointment.id }}" data-appointment-id="{{ appointment.id }}" class="btn-cancel" onclick="event.stopPropagation();">Cancel</a>
+                            {% if appointment.status == 'claimed' %}
+                            <div class="status-actions">
+                                <form method="post" class="status-actions__form">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="appointment_id" value="{{ appointment.id }}" id="appointment-id-{{ appointment.id }}">
+                                    <button type="submit"
+                                            name="action"
+                                            value="claimed"
+                                            class="status-button status-button--complete">
+                                        Confirm Claimed
+                                    </button>
+                                </form>
+                            </div>
                             {% else %}
                                 <span class="btn-none">—</span>
                             {% endif %}
@@ -80,8 +86,8 @@
     <div style="width:100%;max-width:800px;display:flex;justify-content:center;">
         <div style="text-align:center;background:#fbfdff;border:1px solid #e6eef8;padding:28px;border-radius:12px;box-shadow:0 6px 20px rgba(14,30,45,0.04);width:100%;">
             <div style="font-size:48px;line-height:1;margin-bottom:12px;">🗓️</div>
-            <h3 style="margin:0 0 8px 0;color:#0f1724">No upcoming appointments</h3>
-            <p style="color:#5b6b77;margin:0 0 14px 0">You currently have no scheduled bookings. When you book an appointment, it will appear here.</p>
+            <h3 style="margin:0 0 8px 0;color:#0f1724">No claimed appointments</h3>
+            <p style="color:#5b6b77;margin:0 0 14px 0">You currently have no claimed bookings. When an appointment is marked as claimed, it will appear here.</p>
         </div>
     </div>
 {% endif %}

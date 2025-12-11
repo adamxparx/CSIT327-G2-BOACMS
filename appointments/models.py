@@ -22,6 +22,7 @@ class Appointment(models.Model):
         ('pending', 'Pending'),
         ('approved', 'Approved'),
         ('completed', 'Completed'),
+        ('claimed', 'Claimed'),
         ('cancelled', 'Cancelled'),
     ]
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
@@ -38,7 +39,7 @@ class Appointment(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def refresh_if_expired(self):    
-        if self.preferred_date < timezone.localdate() and self.status not in ['completed', 'cancelled']:
+        if self.preferred_date < timezone.localdate() and self.status not in ['completed', 'cancelled', 'claimed']:
             self.status = 'cancelled'
             self.save(update_fields=['status'])
 
