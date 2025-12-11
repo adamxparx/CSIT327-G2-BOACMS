@@ -65,9 +65,9 @@
             </div>
 
             <div class="form-field form-field--full" id="custom_purpose_field" style="display: none;">
-              <label for="{{ form.custom_purpose.id_for_label }}">{{ form.custom_purpose.label }}</label>
-              {{ form.custom_purpose }}
-              {% for error in form.custom_purpose.errors %}
+              <label for="{{ form.specify_purpose.id_for_label }}">{{ form.specify_purpose.label }}</label>
+              {{ form.specify_purpose }}
+              {% for error in form.specify_purpose.errors %}
                   <span class="field-error">{{ error }}</span>
               {% endfor %}
             </div>
@@ -128,9 +128,9 @@
     const toggleCustomPurposeField = () => {
       if (purposeSelect && purposeSelect.value === 'others') {
         customPurposeField.style.display = 'block';
-        const customPurposeInput = document.getElementById('id_custom_purpose');
-        if (customPurposeInput) {
-          customPurposeInput.focus();
+        const specifyPurposeInput = document.getElementById('id_specify_purpose');
+        if (specifyPurposeInput) {
+          specifyPurposeInput.focus();
         }
       } else {
         customPurposeField.style.display = 'none';

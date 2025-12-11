@@ -34,19 +34,19 @@ class AppointmentForm(forms.ModelForm):
         widget=forms.Select(attrs={'class': 'form-control'})
     )
     
-    custom_purpose = forms.CharField(
+    specify_purpose = forms.CharField(
         max_length=200,
         required=False,
         widget=forms.TextInput(attrs={
             'class': 'form-control',
             'placeholder': 'Please specify your purpose',
-            'id': 'custom_purpose_input'
+            'id': 'specify_purpose_input'
         })
     )
     
     class Meta:
         model = Appointment
-        fields = ['certificate_type', 'preferred_date', 'preferred_time', 'purpose', 'custom_purpose']
+        fields = ['certificate_type', 'preferred_date', 'preferred_time', 'purpose', 'specify_purpose']
         widgets = {
             'preferred_date': forms.DateInput(attrs={'type': 'date'}),
             'purpose': forms.Select(attrs={'class': 'form-control', 'id': 'purpose_select'}),
@@ -87,15 +87,15 @@ class AppointmentForm(forms.ModelForm):
     def clean(self):
         cleaned_data = super().clean()
         purpose = cleaned_data.get('purpose')
-        custom_purpose = cleaned_data.get('custom_purpose')
+        specify_purpose = cleaned_data.get('specify_purpose')
         
         # If user hasn't selected a purpose (placeholder is still selected)
         if not purpose:
             raise ValidationError({'purpose': 'Please select a purpose.'})
         
-        # If user selects 'Others', custom_purpose is required
-        if purpose == 'others' and not custom_purpose:
-            raise ValidationError({'custom_purpose': 'Please specify your purpose.'})
+        # If user selects 'Others', specify_purpose is required
+        if purpose == 'others' and not specify_purpose:
+            raise ValidationError({'specify_purpose': 'Please specify your purpose.'})
         
         return cleaned_data
     
@@ -135,10 +135,10 @@ class AppointmentForm(forms.ModelForm):
             if conflicting_appointments.count() >= 5:
                 raise IntegrityError("Maximum 5 persons can book per 30-minute interval. Please choose a different time.")
             
-            # Save custom_purpose if 'Others' is selected
-            custom_purpose = self.cleaned_data.get('custom_purpose')
-            if custom_purpose:
-                instance.custom_purpose = custom_purpose
+            # Save specify_purpose if 'Others' is selected
+            specify_purpose = self.cleaned_data.get('specify_purpose')
+            if specify_purpose:
+                instance.specify_purpose = specify_purpose
                 
             if commit:
                 instance.save()

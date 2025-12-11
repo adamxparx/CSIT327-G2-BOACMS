@@ -243,7 +243,6 @@
     margin-bottom: 0.5rem;
   }
   
-  /* Specifically reduce space after resident info section on mobile */
   .detail-section:nth-child(2) {
     margin-bottom: 0.3rem;
   }
