@@ -43,7 +43,13 @@
           </div>
           <div class="detail-item">
             <span class="detail-label">Purpose</span>
-            <span class="detail-value">{{ appointment.purpose }}</span>
+            <span class="detail-value">
+              {% if appointment.purpose == 'others' %}
+                {{ appointment.get_purpose_display }}: {{ appointment.specify_purpose }}
+              {% else %}
+                {{ appointment.get_purpose_display }}
+              {% endif %}
+            </span>
           </div>
         </div>
       </div>

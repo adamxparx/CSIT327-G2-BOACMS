@@ -220,6 +220,7 @@
   font-size: 0.9rem;
   text-transform: capitalize;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  margin-bottom: 1rem;
 }
 
 .status-badge--pending {

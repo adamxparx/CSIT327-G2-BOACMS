@@ -16,9 +16,10 @@
 <div class="appointment-detail">
   <div class="appointment-header">
     <h1 class="appointment-title">Appointment Details</h1>
-    <div class="appointment-status status-badge status-badge--{{ appointment.status|lower }}">
-      {{ appointment.get_status_display }}
-    </div>
+  </div>
+  
+  <div class="appointment-status status-badge status-badge--{{ appointment.status|lower }}">
+    {{ appointment.get_status_display }}
   </div>
 
   <div class="appointment-details">
@@ -26,11 +27,11 @@
       <h2 class="section-title">Resident Information</h2>
       <div class="detail-grid">
         <div class="detail-item">
-          <span class="detail-label">Name</span>
+          <span class="detail-label">Name: </span>
           <span class="detail-value">{{ appointment.resident.resident.first_name }} {{ appointment.resident.resident.last_name }}</span>
         </div>
         <div class="detail-item">
-          <span class="detail-label">Contact</span>
+          <span class="detail-label">Contact: </span>
           <span class="detail-value">{{ user.resident.phone_number | default:"Not provided" }}</span>
         </div>
       </div>
@@ -40,21 +41,27 @@
       <h2 class="section-title">Appointment Information</h2>
       <div class="detail-grid">
         <div class="detail-item">
-          <span class="detail-label">Purpose</span>
-          <span class="detail-value">{{ appointment.purpose }}</span>
+          <span class="detail-label">Purpose: </span>
+          <span class="detail-value">
+            {% if appointment.purpose == 'others' %}
+              {{ appointment.get_purpose_display }}: {{ appointment.specify_purpose }}
+            {% else %}
+              {{ appointment.get_purpose_display }}
+            {% endif %}
+          </span>
         </div>
         {% if certificate_name %}
         <div class="detail-item">
-          <span class="detail-label">Certificate Type</span>
+          <span class="detail-label">Certificate Type: </span>
           <span class="detail-value">{{ certificate_name }}</span>
         </div>
         {% endif %}
         <div class="detail-item">
-          <span class="detail-label">Date</span>
+          <span class="detail-label">Date: </span>
           <span class="detail-value">{{ appointment.preferred_date|date:"F d, Y" }}</span>
         </div>
         <div class="detail-item">
-          <span class="detail-label">Time</span>
+          <span class="detail-label">Time: </span>
           <span class="detail-value">{{ appointment.preferred_time|time:"g:i A" }}</span>
         </div>
       </div>
