@@ -14,9 +14,21 @@ class Appointment(models.Model):
     ]
     certificate_type = models.CharField(max_length=50, choices=CERTIFICATE_TYPE_CHOICES)
 
+    PURPOSE_CHOICES = [
+        ('', '---------'),
+        ('employment', 'Employment'),
+        ('business_permit', 'Business Permit'),
+        ('government_benefits', 'Government Benefits'),
+        ('loan_application', 'Loan Application'),
+        ('travel', 'Travel'),
+        ('education', 'Education'),
+        ('others', 'Others (Please Specify)'),
+    ]
+
     preferred_date = models.DateField()
     preferred_time = models.TimeField()
-    purpose = models.CharField(max_length=200, help_text="e.g. Employment, Business Permit, Government Benefits")
+    purpose = models.CharField(max_length=50, choices=PURPOSE_CHOICES, default='')
+    custom_purpose = models.CharField(max_length=200, blank=True, null=True, verbose_name="Please specify your purpose", help_text="Custom purpose when 'Others' is selected")
 
     STATUS_CHOICES = [
         ('pending', 'Pending'),
