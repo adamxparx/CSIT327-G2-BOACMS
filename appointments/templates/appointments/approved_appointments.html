@@ -161,9 +161,13 @@
                     <td data-label="Time">{{ appointment.preferred_time }}</td>
                     <td data-label="Purpose">{{ appointment.purpose }}</td>
                     <td data-label="Status">
-                        <span class="status-badge status-approved">Approved</span>
-                        {% if appointment.rescheduled_at %}
-                            <br><span class="status-badge badge-rescheduled">Rescheduled</span>
+                        {% if appointment.status == 'claimed' %}
+                            <h5>Claimed. Waiting for resident confirmation.</h5>
+                        {% else %}
+                            <span class="status-badge status-approved">Approved</span>
+                            {% if appointment.rescheduled_at %}
+                                <br><span class="status-badge badge-rescheduled">Rescheduled</span>
+                            {% endif %}
                         {% endif %}
                     </td>
                     <td data-label="Actions">
@@ -173,14 +177,24 @@
                                 <input type="hidden" name="appointment_id" value="{{ appointment.id }}" id="appointment-id-{{ appointment.id }}">
                                 <button type="button"
                                         class="status-button status-button--reschedule"
-                                        data-appointment-id="{{ appointment.id }}">
+                                        data-appointment-id="{{ appointment.id }}"
+                                        {% if appointment.status == 'claimed' %}
+                                        disabled
+                                        {% endif %}>
                                     Reschedule
                                 </button>
                                 <button type="submit"
                                         name="action"
-                                        value="complete"
-                                        class="status-button status-button--complete">
-                                    Complete
+                                        value="claimed"
+                                        class="status-button status-button--complete"
+                                        {% if appointment.status == 'claimed' %}
+                                        disabled
+                                        {% endif %}>
+                                    {% if appointment.status == 'claimed' %}
+                                        Marked as claimed
+                                    {% else %}
+                                        Mark as Claimed
+                                    {% endif %}
                                 </button>
                             </form>
                         </div>

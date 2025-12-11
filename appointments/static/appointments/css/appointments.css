@@ -448,3 +448,10 @@
     width: 100%;
   }
 }
+
+.claimed_count {
+  font-size: small;
+  text-align: center;
+  font-weight: bold;
+  color: var(--color-primary);
+}
