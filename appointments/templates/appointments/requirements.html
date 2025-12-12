@@ -80,6 +80,7 @@
             <input type="hidden" name="{{ key }}" value="{{ value }}">
           {% endif %}
         {% endfor %}
+        <input type="hidden" id="certificate-type-input" name="certificate_type" value="">
         <div class="form-submit">
           <button type="submit" class="proceed-button">
             <i class="fas fa-arrow-right"></i> Proceed to Booking
@@ -94,6 +95,16 @@
 document.addEventListener('DOMContentLoaded', function() {
   const tabs = document.querySelectorAll('.tab');
   const tabContents = document.querySelectorAll('.tab-content');
+  const proceedForm = document.getElementById('proceed-form');
+  const certificateTypeInput = document.getElementById('certificate-type-input');
+  
+  // Map tab data attributes to certificate type values
+  const tabToCertificateType = {
+    'clearance': 'barangay_clearance',
+    'indigency': 'certificate_of_indigency',
+    'cedula': 'community_tax_certificate',
+    'soloparent': 'solo_parent_certificate'
+  };
   
   tabs.forEach(tab => {
     tab.addEventListener('click', () => {
@@ -111,6 +122,15 @@ document.addEventListener('DOMContentLoaded', function() {
         content.classList.add('active');
       }
     });
+  });
+  
+  // Set certificate type when form is submitted
+  proceedForm.addEventListener('submit', function(e) {
+    const activeTab = document.querySelector('.tab.active');
+    if (activeTab) {
+      const tabId = activeTab.getAttribute('data-tab');
+      certificateTypeInput.value = tabToCertificateType[tabId] || '';
+    }
   });
 });
 </script>
