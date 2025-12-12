@@ -70,7 +70,7 @@
                             {% endif %}
                         </td>
                         <td style="text-align:center;">
-                            {% if appointment.status == 'approved' or appointment.status == 'pending' %}
+                            {% if appointment.status == 'pending' %}
                                 <a href="{% url 'cancel_appointment' appointment.id %}" role="button" aria-label="Cancel appointment {{ appointment.id }}" data-appointment-id="{{ appointment.id }}" class="btn-cancel" onclick="event.stopPropagation();">Cancel</a>
                             {% else %}
                                 <span class="btn-none">—</span>
