@@ -102,7 +102,7 @@
                     <div class="activity-details">
                         <h3>{{ appointment.get_certificate_type_display }}</h3>
                         <p><strong>Resident:</strong> {{ appointment.resident.resident.first_name }} {{ appointment.resident.resident.last_name }}</p>
-                        <p><strong>Date:</strong> {{ appointment.created_at|date:"M d, Y" }} at {{ appointment.created_at|time:"h:i A" }}</p>
+                        <p><strong>Date:</strong> {{ appointment.created_at|date:"M d, Y" }} at {{ appointment.created_at|time:"g:i A" }}</p>
                         <p><strong>Status:</strong> <span class="status-{{ appointment.status }}">{{ appointment.get_status_display }}</span></p>
                     </div>
                 </div>
