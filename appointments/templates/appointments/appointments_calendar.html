@@ -367,12 +367,12 @@
                 slotLabelFormat: {
                     hour: 'numeric',
                     minute: '2-digit',
-                    meridiem: 'short',
+                    meridiem: 'uppercase',
                 },
                 eventTimeFormat: {
                     hour: 'numeric',
                     minute: '2-digit',
-                    meridiem: 'short',
+                    meridiem: 'uppercase',
                 },
                 events: '{% url "api_appointments_list" %}', 
                 eventDidMount: function(info) {

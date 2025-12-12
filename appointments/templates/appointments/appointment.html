@@ -45,7 +45,7 @@
                     <tr data-href="{% url 'appointment_detail' appointment.id %}" style="cursor: pointer;">
                         <td class="date-cell">
                             <span class="date-main">{{ appointment.preferred_date|date:"M. j, Y" }}</span>
-                            <span class="date-time">{{ appointment.preferred_time|time:"g:i a" }}</span>
+                            <span class="date-time">{{ appointment.preferred_time|time:"g:i A" }}</span>
                         </td>
                         <td>{{ appointment.get_certificate_type_display }}</td>
                         <td>
