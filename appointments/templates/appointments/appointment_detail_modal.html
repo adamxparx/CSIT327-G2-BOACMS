@@ -58,7 +58,7 @@
         {% endif %}
         <div class="detail-item">
           <span class="detail-label">Date: </span>
-          <span class="detail-value">{{ appointment.preferred_date|date:"F d, Y" }}</span>
+          <span class="detail-value">{{ appointment.preferred_date|date:"F j, Y" }}</span>
         </div>
         <div class="detail-item">
           <span class="detail-label">Time: </span>
@@ -100,7 +100,7 @@
         </div>
         <div class="detail-item">
           <span class="detail-label">Rescheduled to</span>
-          <span class="detail-value">{{ appointment.preferred_date|date:"F d, Y" }} at {{ appointment.preferred_time|time:"g:i A" }}</span>
+          <span class="detail-value">{{ appointment.preferred_date|date:"F j, Y" }} at {{ appointment.preferred_time|time:"g:i A" }}</span>
         </div>
       </div>
     </div>
