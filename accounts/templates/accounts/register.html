@@ -1,219 +1,276 @@
-{% extends "accounts/index.html" %}
 {% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - BOACMS</title>
+    <link rel="icon" type="image/png" href="{% static 'images/logo.png' %}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'accounts/css/auth.css' %}">
+</head>
+<body>
+    <div class="auth-wrapper">
+        <!-- Left Sidebar -->
+        <div class="auth-sidebar">
+            <a href="{% url 'index' %}" class="back-link">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="19" y1="12" x2="5" y2="12"/>
+                    <polyline points="12 19 5 12 12 5"/>
+                </svg>
+                Back to Home
+            </a>
+            
+            <div class="sidebar-brand">
+                <div class="brand-icon">
+                    <img src="{% static 'images/logo.png' %}" alt="BOACMS Logo" />
+                </div>
+                <div class="brand-text">
+                    <h2>BOACMS</h2>
+                    <p>Barangay Services Portal</p>
+                </div>
+            </div>
 
-{% block title %}Register{% endblock %}
-
-{% block content %}
-<div class="register-container">
-    <div class="register-card">
-        <div class="register-header">
-            <h1>Create Your Account</h1>
-            <p>Sign up to request certifications and schedule barangay services online</p>
+            <div class="sidebar-content">
+                <h3>Create Your Account</h3>
+                <p>Register now to access convenient online appointment booking for essential barangay certifications and services.</p>
+                
+                <div class="sidebar-features">
+                    <div class="feature-item">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                            <line x1="16" y1="2" x2="16" y2="6"/>
+                            <line x1="8" y1="2" x2="8" y2="6"/>
+                            <line x1="3" y1="10" x2="21" y2="10"/>
+                        </svg>
+                        <div>
+                            <h4>Book Appointments Online</h4>
+                            <p>Schedule your visit at your preferred date and time</p>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                            <polyline points="14 2 14 8 20 8"/>
+                        </svg>
+                        <div>
+                            <h4>Request Certifications</h4>
+                            <p>Easy access to all barangay certification services</p>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                        </svg>
+                        <div>
+                            <h4>Get SMS Notifications</h4>
+                            <p>Receive appointment reminders and updates</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <!-- User form error -->
-        {% if user_form.non_field_errors %}
-            <div class="alert alert-error">
-                {% for error in user_form.non_field_errors %}
-                    <p>{{ error }}</p>
-                {% endfor %}
-            </div>
-        {% endif %}
-
-        <!-- Resident form error -->
-        {% if resident_form.non_field_errors %}
-            <div class="alert alert-error">
-                {% for error in resident_form.non_field_errors %}
-                    <p>{{ error }}</p>
-                {% endfor %}
-            </div>
-        {% endif %}
-
-        <!-- Messages -->
-        {% if messages %}
-            {% for message in messages %}
-                <div class="alert alert-{{ message.tags }}">
-                    {{ message }}
+        <!-- Right Form Container -->
+        <div class="auth-form-container">
+            <div class="auth-card">
+                <div class="form-header">
+                    <h1>Register as Resident</h1>
+                    <p>Fill in your details to create your BOACMS account</p>
                 </div>
-            {% endfor %}
-        {% endif %}
 
-        <form method="post" class="register-form" enctype="multipart/form-data">
-            {% csrf_token %}
+                {% if user_form.non_field_errors %}
+                    <div class="alert alert-error">
+                        {% for error in user_form.non_field_errors %}
+                            <p>{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
 
-            <div class="form-field">
-                <label for="{{ user_form.email.id_for_label }}">{{ user_form.email.label }}</label>
-                {{ user_form.email }}
-                {% for error in user_form.email.errors %}
-                    <span class="field-error">{{ error }}</span>
-                {% endfor %}
+                {% if resident_form.non_field_errors %}
+                    <div class="alert alert-error">
+                        {% for error in resident_form.non_field_errors %}
+                            <p>{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+
+                <form method="post" class="auth-form" enctype="multipart/form-data">
+                    {% csrf_token %}
+
+                    <!-- Email Address -->
+                    <div class="form-group">
+                        <label for="{{ user_form.email.id_for_label }}">Email Address *</label>
+                        {{ user_form.email }}
+                        {% for error in user_form.email.errors %}
+                            <span class="field-error">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Name Fields Row -->
+                    <div class="form-row-2">
+                        <div class="form-group">
+                            <label for="{{ resident_form.first_name.id_for_label }}">First Name *</label>
+                            {{ resident_form.first_name }}
+                            {% for error in resident_form.first_name.errors %}
+                                <span class="field-error">{{ error }}</span>
+                            {% endfor %}
+                        </div>
+
+                        <div class="form-group">
+                            <label for="{{ resident_form.last_name.id_for_label }}">Last Name *</label>
+                            {{ resident_form.last_name }}
+                            {% for error in resident_form.last_name.errors %}
+                                <span class="field-error">{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="{{ resident_form.middle_name.id_for_label }}">Middle Name</label>
+                        {{ resident_form.middle_name }}
+                        {% for error in resident_form.middle_name.errors %}
+                            <span class="field-error">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+
+                    <!-- DOB and Sex Row -->
+                    <div class="form-row-2">
+                        <div class="form-group">
+                            <label for="{{ resident_form.date_of_birth.id_for_label }}">Date of Birth *</label>
+                            {{ resident_form.date_of_birth }}
+                            {% for error in resident_form.date_of_birth.errors %}
+                                <span class="field-error">{{ error }}</span>
+                            {% endfor %}
+                        </div>
+
+                        <div class="form-group">
+                            <label for="{{ resident_form.sex.id_for_label }}">Sex *</label>
+                            {{ resident_form.sex }}
+                            {% for error in resident_form.sex.errors %}
+                                <span class="field-error">{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Address (Full Width) -->
+                    <div class="form-group">
+                        <label for="{{ resident_form.address.id_for_label }}">House No. / Street *</label>
+                        {{ resident_form.address }}
+                        {% for error in resident_form.address.errors %}
+                            <span class="field-error">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Barangay and City Row (Pre-filled) -->
+                    <div class="form-row-2">
+                        <div class="form-group">
+                            <label for="barangay">Barangay</label>
+                            <input type="text" id="barangay" value="Labangon" readonly 
+                                style="background-color: #f1f5f9; cursor: not-allowed;">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="city">City / Municipality</label>
+                            <input type="text" id="city" value="Cebu City" readonly 
+                                style="background-color: #f1f5f9; cursor: not-allowed;">
+                        </div>
+                    </div>
+
+                    <!-- ZIP Code -->
+                    <div class="form-group">
+                        <label for="zip_code">ZIP Code</label>
+                        <input type="text" id="zip_code" value="6000" readonly 
+                            style="background-color: #f1f5f9; cursor: not-allowed;">
+                    </div>
+
+                    <!-- Phone and Civil Status Row -->
+                    <div class="form-row-2">
+                        <div class="form-group">
+                            <label for="{{ resident_form.phone_number.id_for_label }}">Phone Number *</label>
+                            {{ resident_form.phone_number }}
+                            {% for error in resident_form.phone_number.errors %}
+                                <span class="field-error">{{ error }}</span>
+                            {% endfor %}
+                        </div>
+
+                        <div class="form-group">
+                            <label for="{{ resident_form.civil_status.id_for_label }}">Civil Status *</label>
+                            {{ resident_form.civil_status }}
+                            {% for error in resident_form.civil_status.errors %}
+                                <span class="field-error">{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Citizenship -->
+                    <div class="form-group">
+                        <label for="{{ resident_form.citizenship.id_for_label }}">Citizenship *</label>
+                        {{ resident_form.citizenship }}
+                        {% for error in resident_form.citizenship.errors %}
+                            <span class="field-error">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Document Upload -->
+                    <div class="form-group">
+                        <label for="{{ resident_form.address_document_file.id_for_label }}">Upload Document (must show address) *</label>
+                        <div class="upload-area" id="uploadArea">
+                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                <polyline points="17 8 12 3 7 8"/>
+                                <line x1="12" y1="3" x2="12" y2="15"/>
+                            </svg>
+                            <p class="upload-text"><strong>Click to upload</strong> or drag and drop</p>
+                            <p class="upload-subtext">JPG, PNG, PDF (max. 5MB)</p>
+                            {{ resident_form.address_document_file }}
+                            <p class="file-name" id="fileName"></p>
+                        </div>
+                        <small class="help-text">Upload valid ID or document showing your address</small>
+                        {% for error in resident_form.address_document_file.errors %}
+                            <span class="field-error">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Password Fields Row -->
+                    <div class="form-row-2">
+                        <div class="form-group">
+                            <label for="{{ user_form.password1.id_for_label }}">Password *</label>
+                            {{ user_form.password1 }}
+                            {% for error in user_form.password1.errors %}
+                                <span class="field-error">{{ error }}</span>
+                            {% endfor %}
+                        </div>
+
+                        <div class="form-group">
+                            <label for="{{ user_form.password2.id_for_label }}">Confirm Password *</label>
+                            {{ user_form.password2 }}
+                            {% for error in user_form.password2.errors %}
+                                <span class="field-error">{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-submit">Create Account</button>
+                </form>
+
+                <div class="form-footer">
+                    <p>Already have an account? <a href="{% url 'login' %}">Sign in</a></p>
+                </div>
             </div>
-
-            <div class="form-field">
-                <label for="{{ resident_form.first_name.id_for_label }}">{{ resident_form.first_name.label }}</label>
-                {{ resident_form.first_name }}
-                {% for error in resident_form.first_name.errors %}
-                    <span class="field-error">{{ error }}</span>
-                {% endfor %}
-            </div>
-
-            <div class="form-field">
-                <label for="{{ resident_form.middle_name.id_for_label }}">{{ resident_form.middle_name.label }}</label>
-                {{ resident_form.middle_name }}
-                {% for error in resident_form.middle_name.errors %}
-                    <span class="field-error">{{ error }}</span>
-                {% endfor %}
-            </div>
-
-            <div class="form-field">
-                <label for="{{ resident_form.last_name.id_for_label }}">{{ resident_form.last_name.label }}</label>
-                {{ resident_form.last_name }}
-                {% for error in resident_form.last_name.errors %}
-                    <span class="field-error">{{ error }}</span>
-                {% endfor %}
-            </div>
-
-            <div class="form-field">
-                <label for="{{ resident_form.date_of_birth.id_for_label }}">{{ resident_form.date_of_birth.label }}</label>
-                {{ resident_form.date_of_birth }}
-                {% for error in resident_form.date_of_birth.errors %}
-                    <span class="field-error">{{ error }}</span>
-                {% endfor %}
-            </div>
-
-            <div class="form-field">
-                <label for="{{ resident_form.sex.id_for_label }}">{{ resident_form.sex.label }}</label>
-                {{ resident_form.sex }}
-                {% for error in resident_form.sex.errors %}
-                    <span class="field-error">{{ error }}</span>
-                {% endfor %}
-            </div>
-
-            <div class="form-field full-width">
-                <label for="{{ resident_form.address.id_for_label }}">{{ resident_form.address.label }}</label>
-                {{ resident_form.address }}
-                {% for error in resident_form.address.errors %}
-                    <span class="field-error">{{ error }}</span>
-                {% endfor %}
-            </div>
-
-            <div class="form-field">
-                <label for="{{ resident_form.phone_number.id_for_label }}">{{ resident_form.phone_number.label }}</label>
-                {{ resident_form.phone_number }}
-                {% for error in resident_form.phone_number.errors %}
-                    <span class="field-error">{{ error }}</span>
-                {% endfor %}
-            </div>
-
-            <div class="form-field">
-                <label for="{{ resident_form.civil_status.id_for_label }}">{{ resident_form.civil_status.label }}</label>
-                {{ resident_form.civil_status }}
-                {% for error in resident_form.civil_status.errors %}
-                    <span class="field-error">{{ error }}</span>
-                {% endfor %}
-            </div>
-
-            <div class="form-field">
-                <label for="{{ resident_form.citizenship.id_for_label }}">{{ resident_form.citizenship.label }}</label>
-                {{ resident_form.citizenship }}
-                {% for error in resident_form.citizenship.errors %}
-                    <span class="field-error">{{ error }}</span>
-                {% endfor %}
-            </div>
-
-            <!-- Document Upload Field -->
-            <div class="form-field full-width">
-                <label for="{{ resident_form.address_document_file.id_for_label }}">{{ resident_form.address_document_file.label }}</label>
-                {{ resident_form.address_document_file }}
-                <small class="help-text">{{ resident_form.address_document_file.help_text }}</small>
-                {% for error in resident_form.address_document_file.errors %}
-                    <span class="field-error">{{ error }}</span>
-                {% endfor %}
-            </div>
-
-            <div class="form-field">
-                <label for="{{ user_form.password1.id_for_label }}">{{ user_form.password1.label }}</label>
-                {{ user_form.password1 }}
-                {% for error in user_form.password1.errors %}
-                    <span class="field-error">{{ error }}</span>
-                {% endfor %}
-            </div>
-
-            <div class="form-field">
-                <label for="{{ user_form.password2.id_for_label }}">{{ user_form.password2.label }}</label>
-                {{ user_form.password2 }}
-                {% for error in user_form.password2.errors %}
-                    <span class="field-error">{{ error }}</span>
-                {% endfor %}
-            </div>
-
-            <button type="submit" class="btn btn-register">Create Account</button>
-        </form>
-
-        <div class="register-footer">
-            <p>Already have an account? <a href="{% url 'login' %}">Sign in</a></p>
         </div>
     </div>
-</div>
 
-<script>
-    // Function to check if first letter is capitalized
-    function checkCapitalization(input) {
-        const value = input.value;
-        if (value.length > 0 && !value[0].match(/[A-Z]/)) {
-            input.setCustomValidity("This field must start with a capital letter.");
-        } else {
-            input.setCustomValidity("");
-        }
-    }
-
-    // Function to allow only numeric input for phone number
-    function validatePhoneNumber(input) {
-        // Remove any non-digit characters
-        input.value = input.value.replace(/\D/g, '');
-        
-        // Limit to 11 digits
-        if (input.value.length > 11) {
-            input.value = input.value.slice(0, 11);
-        }
-    }
-
-    // Add event listeners to name fields
-    document.addEventListener('DOMContentLoaded', function() {
-        // Get all input fields with name attributes containing 'name' or 'citizenship'
-        const nameFields = document.querySelectorAll('input[name$="name"], input[name="citizenship"]');
-        
-        nameFields.forEach(function(field) {
-            field.addEventListener('input', function() { 
-                checkCapitalization(this); 
-            });
-        });
-
-        // Add event listener for phone number field
-        const phoneField = document.querySelector('input[name="phone_number"]');
-        if (phoneField) {
-            phoneField.addEventListener('input', function() {
-                validatePhoneNumber(this);
-            });
-            
-            // Also prevent non-numeric keystrokes
-            phoneField.addEventListener('keypress', function(e) {
-                // Allow only digits (0-9)
-                if (e.which < 48 || e.which > 57) {
-                    // Allow control keys (backspace, delete, tab, etc.)
-                    if (e.which !== 8 && e.which !== 9 && e.which !== 46 && 
-                        e.which !== 37 && e.which !== 38 && e.which !== 39 && e.which !== 40 &&
-                        (e.which < 127 || e.which > 127)) {
-                        e.preventDefault();
-                    }
-                }
-                
-                // Prevent entering more than 11 digits
-                if (this.value.length >= 11 && (e.which >= 48 && e.which <= 57)) {
-                    e.preventDefault();
-                }
-            });
-        }
-    });
-</script>
-{% endblock content %}
+    <script src="{% static 'accounts/js/register.js' %}"></script>
+</body>
+</html>

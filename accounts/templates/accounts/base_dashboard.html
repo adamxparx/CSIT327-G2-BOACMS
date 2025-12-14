@@ -1,0 +1,67 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}BOACMS Dashboard{% endblock %}</title>
+    <link rel="icon" type="image/png" href="{% static 'images/logo.png' %}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'accounts/css/dashboard.css' %}">
+    {% block resident_css %}{% endblock %}
+    {% block staff_css %}{% endblock %}
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="dashboard-navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <img src="{% static 'images/logo.png' %}" alt="BOACMS Logo" class="nav-logo">
+                <div class="brand-text">
+                    <span class="brand-title">BOACMS</span>
+                    <span class="brand-subtitle">Dashboard</span>
+                </div>
+            </div>
+            
+            <!-- App Bar Navigation -->
+            <div class="nav-menu">
+                {% block appbar %}{% endblock %}
+            </div>
+            
+            <!-- User Menu -->
+            <div class="user-menu">
+                <div class="user-info">
+                    {% block user %}{% endblock %}
+                </div>
+                <form method="post" action="{% url 'logout' %}" style="margin: 0;">
+                    {% csrf_token %}
+                    <button type="submit" class="logout-btn">Logout</button>
+                </form>
+                
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        {% if messages %}
+            <div class="messages-container">
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+        
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="dashboard-footer">
+        <p>&copy; 2025 BOACMS - Barangay Labangon. All rights reserved.</p>
+    </footer>
+</body>
+</html>
