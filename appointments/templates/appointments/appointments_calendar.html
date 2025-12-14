@@ -1,456 +1,109 @@
 {% extends dashboard_template %}
-
 {% block content %}
-    <h2>Appointments Calendar</h2>
 
-    <link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/main.min.css' rel='stylesheet' />
-    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js'></script>
-    <script src='https://cdn.jsdelivr.net/npm/@fullcalendar/core/locales-all.global.min.js'></script>
-    
-    <style>
-        /* Calendar container styling */
-        #calendar-container {
-            background: var(--color-neutral);
-            border-radius: 12px;
-            padding: 20px;
-            box-shadow: 0 10px 30px rgba(14, 30, 45, 0.06);
-            border: 1px solid rgba(0, 56, 168, 0.06);
-            margin-bottom: 30px;
-        }
-        
-        /* Calendar header toolbar */
-        .fc .fc-toolbar-title {
-            font-size: 1.5rem;
-            color: var(--color-primary);
-            font-weight: 700;
-        }
-        
-        .fc .fc-button {
-            background-color: var(--color-primary);
-            border: 1px solid var(--color-primary);
-            color: white;
-            padding: 6px 12px;
-            border-radius: 6px;
-            font-size: 0.9rem;
-            font-weight: 500;
-            transition: all 0.2s ease;
-        }
-        
-        .fc .fc-button:hover {
-            background-color: #1f57c1;
-            border-color: #1f57c1;
-            transform: translateY(-1px);
-        }
-        
-        .fc .fc-button:active, .fc .fc-button:focus {
-            box-shadow: 0 0 0 3px rgba(31, 87, 193, 0.2);
-        }
-        
-        .fc .fc-button-primary:not(:disabled).fc-button-active {
-            background-color: #0c3fa8;
-            border-color: #0c3fa8;
-        }
-        
-        /* Calendar day cells */
-        .fc .fc-daygrid-day-number {
-            font-weight: 600;
-            color: var(--color-text);
-        }
-        
-        .fc .fc-col-header-cell-cushion {
-            color: #0c3fa8; /* Changed from white to blue */
-            font-weight: 600;
-            padding: 10px 0;
-        }
-        
-        /* Event styling */
-        .fc-event {
-            border-radius: 8px !important;
-            border: none !important;
-            padding: 5px 8px !important;
-            margin-bottom: 2px !important;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
-            transition: all 0.2s ease;
-            cursor: pointer;
-        }
-        
-        .fc-event:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
-        }
-        
-        .fc-event-title {
-            font-weight: 500 !important;
-            font-size: 0.85rem !important;
-            color: #333 !important;
-        }
-        
-        /* Status-specific event styling */
-        .event-pending {
-            background-color: rgba(252, 209, 22, 0.85) !important;
-            border-left: 3px solid #a26a00 !important;
-        }
-        
-        .event-approved {
-            background-color: rgba(46, 204, 113, 0.85) !important;
-            border-left: 3px solid #1d7a4e !important;
-        }
-        
-        .event-cancelled {
-            background-color: rgba(206, 17, 38, 0.85) !important;
-            border-left: 3px solid #9b1228 !important;
-        }
-        
-        .event-completed {
-            background-color: rgba(0, 56, 168, 0.85) !important;
-            border-left: 3px solid #0038a8 !important;
-        }
-        
-        /* Legend styling */
-        .calendar-legend {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
-            margin-bottom: 20px;
-            padding: 15px;
-            background: var(--color-neutral);
-            border-radius: 8px;
-            border: 1px solid rgba(0, 56, 168, 0.06);
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-        }
-        
-        .legend-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .legend-color {
-            width: 20px;
-            height: 20px;
-            border-radius: 4px;
-            border-left: 3px solid;
-        }
-        
-        .legend-pending {
-            background-color: rgba(252, 209, 22, 0.85);
-            border-left-color: #a26a00;
-        }
-        
-        .legend-approved {
-            background-color: rgba(46, 204, 113, 0.85);
-            border-left-color: #1d7a4e;
-        }
-        
-        .legend-cancelled {
-            background-color: rgba(206, 17, 38, 0.85);
-            border-left-color: #9b1228;
-        }
-        
-        .legend-completed {
-            background-color: rgba(0, 56, 168, 0.85);
-            border-left-color: #0038a8;
-        }
-        
-        .legend-label {
-            font-size: 0.9rem;
-            font-weight: 500;
-            color: var(--color-text);
-        }
-        
-        /* Modal Styles */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(2px);
-            animation: fadeIn 0.3s ease-out;
-        }
+<h2>Appointments Calendar</h2>
 
-        .modal-content {
-            background: linear-gradient(to bottom right, #ffffff, #f8f9ff);
-            margin: 5% auto;
-            padding: 0;
-            border-radius: 16px;
-            width: 90%;
-            max-width: 850px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
-            position: relative;
-            border: 1px solid rgba(0, 56, 168, 0.1);
-            animation: slideIn 0.3s ease-out;
-        }
+<link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/main.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
 
-        .close {
-            color: #718096;
-            float: right;
-            font-size: 28px;
-            font-weight: normal;
-            position: absolute;
-            right: 20px;
-            top: 15px;
-            cursor: pointer;
-            width: 36px;
-            height: 36px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-            transition: all 0.2s ease;
-            z-index: 10;
-        }
+<style>
+#calendar-container {
+    background: #fff;
+    padding: 20px;
+    border-radius: 12px;
+}
 
-        .close:hover,
-        .close:focus {
-            color: #e53e3e;
-            background-color: rgba(229, 62, 62, 0.1);
-            text-decoration: none;
-        }
+.nbi-slot-box {
+    margin-top: 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
 
-        /* Modal Header */
-        .modal-header {
-            padding: 20px 30px;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-            background: linear-gradient(to right, #0f4fc7, #0c3fa8);
-            border-radius: 16px 16px 0 0;
-            color: white;
-            position: relative;
-        }
+.nbi-slot {
+    background: #1da1d8;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 6px 4px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+}
 
-        .modal-title {
-            margin: 0;
-            font-size: 1.5rem;
-            font-weight: 600;
-        }
+.nbi-slot small {
+    font-size: 0.65rem;
+    font-weight: normal;
+}
 
-        /* Modal Body */
-        .modal-body {
-            padding: 25px 30px;
-            max-height: 70vh;
-            overflow-y: auto;
-        }
+.nbi-slot:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+}
 
-        /* Modal Footer */
-        .modal-footer {
-            padding: 20px 30px;
-            border-top: 1px solid rgba(0, 0, 0, 0.05);
-            display: flex;
-            justify-content: flex-end;
-            gap: 12px;
-        }
+.fc-daygrid-day-number {
+    font-weight: bold;
+}
+</style>
 
-        /* Animations */
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
+<div id="calendar-container">
+    <div id="calendar"></div>
+</div>
 
-        @keyframes slideIn {
-            from { 
-                transform: translateY(-40px);
-                opacity: 0;
-            }
-            to { 
-                transform: translateY(0);
-                opacity: 1;
-            }
-        }
+<script>
+document.addEventListener("DOMContentLoaded", function () {
 
-        @media (max-width: 768px) {
-            #calendar-container {
-                padding: 15px;
-            }
-            
-            .fc .fc-toolbar-title {
-                font-size: 1.2rem;
-            }
-            
-            .fc .fc-button {
-                padding: 4px 8px;
-                font-size: 0.8rem;
-            }
-            
-            .calendar-legend {
-                flex-direction: column;
-                gap: 10px;
-                padding: 12px;
-            }
-            
-            .modal-content {
-                width: 95%;
-                margin: 10% auto;
-                max-width: none;
-            }
-            
-            .modal-header {
-                padding: 15px 20px;
-            }
-            
-            .modal-body {
-                padding: 20px;
-            }
-            
-            .modal-footer {
-                padding: 15px 20px;
-                flex-direction: column;
-            }
-            
-            .modal-footer .btn {
-                width: 100%;
-                justify-content: center;
-            }
-        }
-    </style>
+    const calendarEl = document.getElementById("calendar");
+    let availability = {};
 
-    <div class="calendar-legend">
-        <div class="legend-item">
-            <div class="legend-color legend-pending"></div>
-            <span class="legend-label">Pending</span>
-        </div>
-        <div class="legend-item">
-            <div class="legend-color legend-approved"></div>
-            <span class="legend-label">Approved</span>
-        </div>
-        <div class="legend-item">
-            <div class="legend-color legend-cancelled"></div>
-            <span class="legend-label">Cancelled</span>
-        </div>
-        <div class="legend-item">
-            <div class="legend-color legend-completed"></div>
-            <span class="legend-label">Completed</span>
-        </div>
-    </div>
-
-    <div id='calendar-container'>
-        <div id='calendar'></div>
-    </div>
-    
-    <!-- Modal for appointment details -->
-    <div id="appointmentModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 class="modal-title">Appointment Details</h2>
-                <span class="close">&times;</span>
-            </div>
-            <div class="modal-body">
-                <div id="modalBody"></div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn--secondary" id="modalCloseBtn">Close</button>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            var calendarEl = document.getElementById('calendar');
-            var calendar = new FullCalendar.Calendar(calendarEl, {
-                initialView: 'dayGridMonth',
-                headerToolbar: {
-                    left: 'prev,next today',
-                    center: 'title',
-                    right: 'dayGridMonth,timeGridWeek,timeGridDay'
-                },
-                // Customize button texts to capitalize first letter
-                buttonText: {
-                    today: 'Today',
-                    month: 'Month',
-                    week: 'Week',
-                    day: 'Day'
-                },
-                // Add time formatting options
-                slotLabelFormat: {
-                    hour: 'numeric',
-                    minute: '2-digit',
-                    meridiem: 'uppercase',
-                },
-                eventTimeFormat: {
-                    hour: 'numeric',
-                    minute: '2-digit',
-                    meridiem: 'uppercase',
-                },
-                events: '{% url "api_appointments_list" %}', 
-                eventDidMount: function(info) {
-                    // Remove inline styles and use CSS classes instead
-                    info.el.style.backgroundColor = '';
-                    info.el.style.borderColor = '';
-                    info.el.style.height = '';
-                    
-                    // Add status-specific CSS classes
-                    const status = info.event.extendedProps.status;
-                    info.el.classList.add('event-' + status);
-                    
-                    // Add title styling
-                    const titleEl = info.el.querySelector('.fc-event-title');
-                    if (titleEl) {
-                        titleEl.style.fontWeight = '500';
-                    }
-                },
-                eventClick: function(info) {
-                    info.jsEvent.preventDefault(); 
-                    // Fetch appointment details and show in modal
-                    fetchAppointmentDetails(info.event.url);
-                },
-                // Improve responsive behavior
-                height: 'auto',
-                expandRows: true,
-                windowResize: function(view) {
-                    if (window.innerWidth < 768) {
-                        calendar.changeView('dayGridDay');
-                    } else {
-                        calendar.changeView('dayGridMonth');
-                    }
-                }
-            });
-            calendar.render();
-            
-            // Modal functionality
-            const modal = document.getElementById("appointmentModal");
-            const span = document.getElementsByClassName("close")[0];
-            const modalCloseBtn = document.getElementById("modalCloseBtn");
-            const modalBody = document.getElementById("modalBody");
-            
-            // Function to close the modal
-            function closeModal() {
-                modal.style.display = "none";
-                modalBody.innerHTML = "";
-            }
-            
-            // Close the modal when the user clicks on X
-            span.onclick = closeModal;
-            
-            // Close the modal when the user clicks on the Close button
-            modalCloseBtn.onclick = closeModal;
-            
-            // Close the modal when the user clicks anywhere outside of the modal content
-            window.onclick = function(event) {
-                if (event.target == modal) {
-                    closeModal();
-                }
-            }
-            
-            // Function to fetch appointment details and populate modal
-            function fetchAppointmentDetails(url) {
-                fetch(url, {
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest'
-                    }
-                })
-                    .then(response => response.text())
-                    .then(html => {
-                        modalBody.innerHTML = html;
-                        modal.style.display = "block";
-                    })
-                    .catch(error => {
-                        console.error('Error fetching appointment details:', error);
-                        modalBody.innerHTML = '<div style="text-align: center; padding: 20px; color: #e74c3c;"><p>Error loading appointment details. Please try again.</p></div>';
-                    });
-            }
+    fetch("{% url 'api_month_availability' %}")
+        .then(res => res.json())
+        .then(data => {
+            data.forEach(d => availability[d.date] = d);
+            initCalendar();
         });
-    </script>
+
+    function initCalendar() {
+        const calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: "dayGridMonth",
+            height: "auto",
+
+            hiddenDays: [0], // hide Sunday
+
+            dayCellDidMount(info) {
+                const dateStr = info.date.toISOString().split("T")[0];
+                const data = availability[dateStr] || { am: 0, pm: 0 };
+
+                const frame = info.el.querySelector(".fc-daygrid-day-frame");
+
+                frame.insertAdjacentHTML("beforeend", `
+                    <div class="nbi-slot-box">
+                        <button class="nbi-slot"
+                            ${data.am === 0 ? "disabled" : ""}
+                            onclick="selectSlot('${dateStr}','AM')">
+                            AM<br><small>${data.am} Slots</small>
+                        </button>
+
+                        <button class="nbi-slot"
+                            ${data.pm === 0 ? "disabled" : ""}
+                            onclick="selectSlot('${dateStr}','PM')">
+                            PM<br><small>${data.pm} Slots</small>
+                        </button>
+                    </div>
+                `);
+            }
+
+        });
+
+
+        calendar.render();
+    }
+
+    window.selectSlot = function(date, period) {
+        alert(`Selected ${period} on ${date}`);
+        // redirect to booking form here
+    };
+});
+</script>
+
 {% endblock %}

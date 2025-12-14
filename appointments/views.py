@@ -1,4 +1,4 @@
-from datetime import datetime, time as datetime_time, timedelta
+from datetime import datetime, date, time as datetime_time, timedelta
 from django.utils import timezone
 import datetime as dt
 
@@ -11,6 +11,12 @@ from .forms import AppointmentForm, CancellationReasonForm, RescheduleForm
 from .models import Appointment
 from django.contrib import messages
 from django.db import IntegrityError
+
+from collections import defaultdict
+
+TOTAL_AM_SLOTS = 20
+TOTAL_PM_SLOTS = 20
+
 
 
 def find_nearest_available_slot(preferred_date, preferred_time, buffer_minutes=30, max_days=14):
@@ -402,3 +408,33 @@ def appointment_detail(request, appointment_id):
     
     # For regular requests, return the full page
     return render(request, template_name, context)
+
+@login_required
+def api_month_availability(request):
+    booked = defaultdict(lambda: {"am": 0, "pm": 0})
+
+    for appt in Appointment.objects.all():
+        period = "am" if appt.preferred_time.hour < 12 else "pm"
+        booked[str(appt.preferred_date)]["am" if period=="am" else "pm"] += 1
+
+    # Current month
+    today = date.today()
+    first_day = today.replace(day=1)
+    if first_day.month == 12:
+        next_month = first_day.replace(year=first_day.year+1, month=1, day=1)
+    else:
+        next_month = first_day.replace(month=first_day.month+1, day=1)
+
+    days_in_month = (next_month - first_day).days
+
+    response = []
+    for i in range(days_in_month):
+        d = first_day + timedelta(days=i)
+        counts = booked.get(str(d), {"am": 0, "pm": 0})
+        response.append({
+            "date": str(d),
+            "am": max(TOTAL_AM_SLOTS - counts["am"], 0),
+            "pm": max(TOTAL_PM_SLOTS - counts["pm"], 0),
+        })
+
+    return JsonResponse(response, safe=False)
