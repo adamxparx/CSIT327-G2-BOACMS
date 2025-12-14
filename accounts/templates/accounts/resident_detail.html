@@ -1,0 +1,210 @@
+{% extends "accounts/base_dashboard.html" %}
+{% load static %}
+
+{% block title %}Resident Details | BOACMS{% endblock %}
+
+{% block admin_css %}
+<link rel="stylesheet" href="{% static 'accounts/css/admin_dashboard.css' %}">
+<link rel="stylesheet" href="{% static 'accounts/css/resident_detail.css' %}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+{% endblock %}
+
+{% block content %}
+<div class="admin-layout">
+    <!-- Sidebar -->
+    <aside class="admin-sidebar">
+        <div class="sidebar-header">
+            <img src="{% static 'images/logo.png' %}" alt="BOACMS Logo" class="sidebar-logo">
+            <div class="sidebar-brand">
+                <h2>BOACMS</h2>
+                <p>Admin Portal</p>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <a href="{% url 'admin_dashboard' %}" class="nav-item">
+                <i class="fas fa-chart-line"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="{% url 'resident_verification' %}" class="nav-item active">
+                <i class="fas fa-user-check"></i>
+                <span>Resident Verification</span>
+            </a>
+            <a href="{% url 'staff_accounts' %}" class="nav-item">
+                <i class="fas fa-users-cog"></i>
+                <span>Staff Accounts</span>
+            </a>
+            <a href="#" class="nav-item">
+                <i class="fas fa-file-alt"></i>
+                <span>Reports</span>
+            </a>
+            <a href="#" class="nav-item">
+                <i class="fas fa-cog"></i>
+                <span>Settings</span>
+            </a>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="admin-main">
+        <!-- Header -->
+        <header class="admin-header">
+            <div class="header-left">
+                <a href="{% url 'resident_verification' %}" class="back-btn" title="Back to Verification">
+                    <i class="fas fa-arrow-left"></i>
+                </a>
+                <i class="fas fa-user-circle header-icon"></i>
+                <h1>Resident Details</h1>
+            </div>
+            <div class="header-right">
+                <div class="user-info">
+                    <div class="user-avatar">A</div>
+                    <span class="user-name">Admin User</span>
+                </div>
+                <form method="POST" action="{% url 'logout' %}" class="logout-form">
+                    {% csrf_token %}
+                    <button type="submit" class="logout-btn">Logout</button>
+                </form>
+            </div>
+        </header>
+
+        <!-- Detail Content -->
+        <div class="detail-content">
+            <!-- Profile Header Card -->
+            <div class="profile-header-card">
+                <div class="profile-avatar-large">
+                    {{ resident.first_name|first|upper }}{{ resident.last_name|first|upper }}
+                </div>
+                <div class="profile-header-info">
+                    <h2>{{ resident.first_name }} {{ resident.middle_name }} {{ resident.last_name }}</h2>
+                    <p class="profile-id">Resident ID: {{ resident.id|stringformat:"06d" }}</p>
+                    <div class="profile-meta">
+                        <div class="meta-item">
+                            <i class="fas fa-calendar"></i>
+                            <span>Registered {{ resident.user.date_joined|date:"M d, Y" }}</span>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-envelope"></i>
+                            <span>{{ resident.user.email }}</span>
+                        </div>
+                    </div>
+                    <span class="status-badge-large pending">
+                        <i class="fas fa-clock"></i> Pending Verification
+                    </span>
+                </div>
+            </div>
+
+            <!-- Info Sections Grid -->
+            <div class="info-sections-grid">
+                <!-- Personal Information -->
+                <div class="info-card">
+                    <div class="info-card-header">
+                        <i class="fas fa-user"></i>
+                        <h3>Personal Information</h3>
+                    </div>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <label><i class="fas fa-id-card"></i> Full Name</label>
+                            <p>{{ resident.first_name }} {{ resident.middle_name }} {{ resident.last_name }}</p>
+                        </div>
+                        <div class="info-item">
+                            <label><i class="fas fa-calendar-day"></i> Date of Birth</label>
+                            <p>{{ resident.date_of_birth|date:"F d, Y" }}</p>
+                        </div>
+                        <div class="info-item">
+                            <label><i class="fas fa-flag"></i> Citizenship</label>
+                            <p>{{ resident.citizenship }}</p>
+                        </div>
+                        <div class="info-item">
+                            <label><i class="fas fa-venus-mars"></i> Sex</label>
+                            <p>{{ resident.get_sex_display }}</p>
+                        </div>
+                        <div class="info-item">
+                            <label><i class="fas fa-heart"></i> Civil Status</label>
+                            <p>{{ resident.get_civil_status_display }}</p>
+                        </div>
+                        <div class="info-item">
+                            <label><i class="fas fa-phone"></i> Mobile Number</label>
+                            <p>{{ resident.phone_number }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Contact & Address -->
+                <div class="info-card">
+                    <div class="info-card-header">
+                        <i class="fas fa-address-book"></i>
+                        <h3>Contact & Address</h3>
+                    </div>
+                    <div class="info-grid">
+                        <div class="info-item full-width">
+                            <label><i class="fas fa-envelope"></i> Email Address</label>
+                            <p>{{ resident.user.email }}</p>
+                        </div>
+                        <div class="info-item full-width">
+                            <label><i class="fas fa-map-marker-alt"></i> Residential Address</label>
+                            <p>{{ resident.address }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Documents -->
+                <div class="info-card full-width">
+                    <div class="info-card-header">
+                        <i class="fas fa-file-alt"></i>
+                        <h3>Uploaded Documents</h3>
+                    </div>
+                    <div class="documents-grid">
+                        {% if resident.address_document %}
+                        <div class="document-card">
+                            <div class="document-icon">
+                                {% if ".pdf" in resident.address_document|lower %}
+                                    <i class="fas fa-file-pdf"></i>
+                                {% else %}
+                                    <i class="fas fa-file-image"></i>
+                                {% endif %}
+                            </div>
+                            <div class="document-details">
+                                <h4>Proof of Residency</h4>
+                                <p>Uploaded Document</p>
+                            </div>
+                            <div class="document-actions">
+                                <a href="{{ resident.address_document }}" target="_blank" class="btn-doc-action view">
+                                    <i class="fas fa-eye"></i> View
+                                </a>
+                                <a href="{{ resident.address_document }}" download class="btn-doc-action download">
+                                    <i class="fas fa-download"></i> Download
+                                </a>
+                            </div>
+                        </div>
+                        {% else %}
+                        <div class="no-documents">
+                            <i class="fas fa-inbox"></i>
+                            <p>No documents uploaded</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+
+            <!-- Action Buttons -->
+            <div class="action-card">
+                <form method="post" class="verification-form">
+                    {% csrf_token %}
+                    <input type="hidden" name="resident_id" value="{{ resident.id }}">
+                    <div class="action-buttons">
+                        <button type="submit" name="action" value="reject" class="btn-action-large btn-reject-large">
+                            <i class="fas fa-times-circle"></i>
+                            Reject Application
+                        </button>
+                        <button type="submit" name="action" value="approve" class="btn-action-large btn-approve-large">
+                            <i class="fas fa-check-circle"></i>
+                            Approve Application
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+</div>
+{% endblock %}

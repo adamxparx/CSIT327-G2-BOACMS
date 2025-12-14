@@ -270,7 +270,50 @@
             </div>
         </div>
     </div>
+    
+    <!-- Success Modal -->
+<div class="modal-overlay" id="successModal">
+    <div class="modal-content">
+        <div class="modal-icon success">
+            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                <polyline points="22 4 12 14.01 9 11.01"/>
+            </svg>
+        </div>
+        <h2>Account Under Review</h2>
+        <p>Your account registration is currently under review by our staff. You will receive an email notification once your account has been approved.</p>
+        <p style="margin-top: 0.5rem; color: #64748b; font-size: 0.95rem;">Please check your email regularly for updates.</p>
+        
+        <button class="btn-modal-close" onclick="closeSuccessModal()">
+            OK
+        </button>
+    </div>
+</div>
 
-    <script src="{% static 'accounts/js/register.js' %}"></script>
+<script>
+    function closeSuccessModal() {
+        const modal = document.getElementById('successModal');
+        if (modal) {
+            modal.classList.remove('show');
+            document.body.style.overflow = '';
+            // Redirect to login
+            window.location.href = "{% url 'login' %}";
+        }
+    }
+
+    // Auto-show modal on success
+    document.addEventListener('DOMContentLoaded', function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('success') === 'true') {
+            const modal = document.getElementById('successModal');
+            if (modal) {
+                modal.classList.add('show');
+                document.body.style.overflow = 'hidden';
+            }
+        }
+    });
+</script>
+
+<script src="{% static 'accounts/js/register.js' %}"></script>
 </body>
 </html>

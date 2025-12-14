@@ -1,0 +1,295 @@
+{% extends "accounts/base_dashboard.html" %}
+{% load static %}
+
+{% block title %}Resident Verification | BOACMS{% endblock %}
+
+{% block admin_css %}
+<link rel="stylesheet" href="{% static 'accounts/css/admin_dashboard.css' %}">
+<link rel="stylesheet" href="{% static 'accounts/css/resident_verification.css' %}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+{% endblock %}
+
+{% block content %}
+<div class="admin-layout">
+    <!-- Sidebar -->
+    <aside class="admin-sidebar">
+        <div class="sidebar-header">
+            <img src="{% static 'images/logo.png' %}" alt="BOACMS Logo" class="sidebar-logo">
+            <div class="sidebar-brand">
+                <h2>BOACMS</h2>
+                <p>Admin Portal</p>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <a href="{% url 'admin_dashboard' %}" class="nav-item">
+                <i class="fas fa-chart-line"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="{% url 'resident_verification' %}" class="nav-item active">
+                <i class="fas fa-user-check"></i>
+                <span>Resident Verification</span>
+            </a>
+            <a href="{% url 'staff_accounts' %}" class="nav-item">
+                <i class="fas fa-users-cog"></i>
+                <span>Staff Accounts</span>
+            </a>
+            </a>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="admin-main">
+        <!-- Header -->
+        <header class="admin-header">
+            <div class="header-left">
+                <i class="fas fa-user-check header-icon"></i>
+                <h1>Resident Verification</h1>
+            </div>
+            <div class="header-right">
+                <div class="user-info">
+                    <div class="user-avatar">A</div>
+                    <span class="user-name">Admin User</span>
+                </div>
+                <form method="POST" action="{% url 'logout' %}" class="logout-form">
+                    {% csrf_token %}
+                    <button type="submit" class="logout-btn">Logout</button>
+                </form>
+            </div>
+        </header>
+
+        <!-- Verification Content -->
+        <div class="verification-content">
+            <!-- Page Header -->
+            <div class="page-header">
+                <div>
+                    <h2>Check Resident Applications</h2>
+                    <p>Review and manage resident account registrations</p>
+                </div>
+                <div class="header-stats">
+                    <div class="stat-chip pending">
+                        <i class="fas fa-clock"></i>
+                        <span>{{ pending_count }} Pending</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filter Section -->
+            <div class="filter-section">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Search by name, email, or ID..." id="search-residents">
+                </div>
+                <div class="filter-options">
+                    <select id="status-filter" class="filter-select">
+                        <option value="all">All Status</option>
+                        <option value="pending" selected>Pending</option>
+                        <option value="approved">Approved</option>
+                        <option value="rejected">Rejected</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Residents Table -->
+            <div class="table-card">
+                <div class="table-wrapper">
+                    <table class="residents-table">
+                        <thead>
+                            <tr>
+                                <th class="checkbox-col">
+                                    <input type="checkbox" id="select-all">
+                                </th>
+                                <th>Resident</th>
+                                <th>Contact Info</th>
+                                <th>Date Registered</th>
+                                <th>Status</th>
+                                <th class="actions-col">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for resident in pending_residents %}
+                            <tr class="table-row">
+                                <td class="checkbox-col">
+                                    <input type="checkbox" name="resident_ids" value="{{ resident.id }}" class="resident-checkbox">
+                                </td>
+                                <td>
+                                    <div class="resident-info">
+                                        <div class="resident-avatar">
+                                            {{ resident.first_name|first|upper }}{{ resident.last_name|first|upper }}
+                                        </div>
+                                        <div class="resident-details">
+                                            <div class="resident-name">{{ resident.first_name }} {{ resident.last_name }}</div>
+                                            <div class="resident-id">ID: {{ resident.id|stringformat:"06d" }}</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="contact-info">
+                                        <div class="contact-email">
+                                            <i class="fas fa-envelope"></i>
+                                            {{ resident.user.email }}
+                                        </div>
+                                        {% if resident.phone_number %}
+                                        <div class="contact-phone">
+                                            <i class="fas fa-phone"></i>
+                                            {{ resident.phone_number }}
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="date-info">
+                                        <div>{{ resident.user.date_joined|date:"M d, Y" }}</div>
+                                        <div class="date-time">{{ resident.user.date_joined|date:"h:i A" }}</div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="status-badge pending">
+                                        <i class="fas fa-clock"></i> Pending
+                                    </span>
+                                </td>
+                                <td class="actions-col">
+                                    <div class="action-buttons">
+                                        <a href="{% url 'resident_detail' resident.id %}" class="btn-action btn-review" title="Review Details">
+                                            <i class="fas fa-eye"></i> Review
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="6" class="no-data">
+                                    <div class="empty-state">
+                                        <i class="fas fa-check-circle"></i>
+                                        <h3>All Caught Up!</h3>
+                                        <p>All residents have been verified</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Bulk Actions Bar -->
+            <div class="bulk-actions-bar" id="bulk-actions-bar">
+                <div class="bulk-info">
+                    <i class="fas fa-check-square"></i>
+                    <span id="selected-count">0</span> selected
+                </div>
+                <div class="bulk-buttons">
+                    <button class="btn-bulk btn-bulk-approve" id="bulk-approve">
+                        <i class="fas fa-check"></i> Approve Selected
+                    </button>
+                    <button class="btn-bulk btn-bulk-reject" id="bulk-reject">
+                        <i class="fas fa-times"></i> Reject Selected
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('search-residents');
+    const statusFilter = document.getElementById('status-filter');
+    const selectAllCheckbox = document.getElementById('select-all');
+    const residentCheckboxes = document.querySelectorAll('.resident-checkbox');
+    const bulkActionsBar = document.getElementById('bulk-actions-bar');
+    const selectedCountSpan = document.getElementById('selected-count');
+    
+    // Search functionality
+    searchInput.addEventListener('input', function() {
+        const searchTerm = this.value.toLowerCase();
+        const rows = document.querySelectorAll('.table-row');
+        
+        rows.forEach(row => {
+            const text = row.textContent.toLowerCase();
+            row.style.display = text.includes(searchTerm) ? '' : 'none';
+        });
+    });
+    
+    // Status filter
+    statusFilter.addEventListener('change', function() {
+        const status = this.value;
+        window.location.href = `?status=${status}`;
+    });
+    
+    // Select all functionality
+    selectAllCheckbox.addEventListener('change', function() {
+        residentCheckboxes.forEach(checkbox => {
+            checkbox.checked = this.checked;
+        });
+        updateBulkActions();
+    });
+    
+    // Individual checkbox change
+    residentCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', updateBulkActions);
+    });
+    
+    // Update bulk actions bar
+    function updateBulkActions() {
+        const checkedBoxes = document.querySelectorAll('.resident-checkbox:checked');
+        const count = checkedBoxes.length;
+        
+        selectedCountSpan.textContent = count;
+        
+        if (count > 0) {
+            bulkActionsBar.classList.add('active');
+        } else {
+            bulkActionsBar.classList.remove('active');
+        }
+    }
+    
+    // Quick approve/reject buttons
+    document.querySelectorAll('.btn-approve').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const residentId = this.dataset.id;
+            if (confirm('Are you sure you want to approve this resident?')) {
+                // Make AJAX request to approve
+                console.log('Approving resident:', residentId);
+                // window.location.href = `/admin/approve/${residentId}/`;
+            }
+        });
+    });
+    
+    document.querySelectorAll('.btn-reject').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const residentId = this.dataset.id;
+            if (confirm('Are you sure you want to reject this resident?')) {
+                // Make AJAX request to reject
+                console.log('Rejecting resident:', residentId);
+                // window.location.href = `/admin/reject/${residentId}/`;
+            }
+        });
+    });
+    
+    // Bulk approve
+    document.getElementById('bulk-approve').addEventListener('click', function() {
+        const checkedBoxes = document.querySelectorAll('.resident-checkbox:checked');
+        const ids = Array.from(checkedBoxes).map(cb => cb.value);
+        
+        if (confirm(`Approve ${ids.length} resident(s)?`)) {
+            console.log('Bulk approving:', ids);
+            // Implement bulk approve logic
+        }
+    });
+    
+    // Bulk reject
+    document.getElementById('bulk-reject').addEventListener('click', function() {
+        const checkedBoxes = document.querySelectorAll('.resident-checkbox:checked');
+        const ids = Array.from(checkedBoxes).map(cb => cb.value);
+        
+        if (confirm(`Reject ${ids.length} resident(s)?`)) {
+            console.log('Bulk rejecting:', ids);
+            // Implement bulk reject logic
+        }
+    });
+});
+</script>
+{% endblock %}
