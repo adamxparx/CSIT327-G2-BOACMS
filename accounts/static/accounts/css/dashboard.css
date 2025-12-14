@@ -322,3 +322,147 @@ body {
         grid-template-columns: 1fr;
     }
 }
+
+/* Appointment Preview Section */
+.appointment-preview {
+    background: var(--color-white);
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    display: flex;
+    gap: 1.5rem;
+    align-items: center;
+}
+
+.appointment-info-grid {
+    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+}
+
+.info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.info-label {
+    font-size: 0.75rem;
+    color: var(--color-gray-600);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.info-value {
+    font-size: 1rem;
+    color: var(--color-gray-900);
+    font-weight: 600;
+}
+
+.info-value.status-pending {
+    color: #d97706;
+}
+
+.info-value.status-approved {
+    color: #059669;
+}
+
+.info-value.status-cancelled {
+    color: #dc2626;
+}
+
+.info-value.status-completed {
+    color: #2563eb;
+}
+
+.view-details-btn {
+    padding: 0.75rem 1.5rem;
+    background: var(--color-primary);
+    color: var(--color-white);
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.875rem;
+    transition: all 0.3s;
+    white-space: nowrap;
+}
+
+.view-details-btn:hover {
+    background: var(--color-primary-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 61, 165, 0.3);
+}
+
+/* Resources Section */
+.resources-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+}
+
+.resource-card {
+    background: var(--color-white);
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    text-decoration: none;
+    transition: all 0.3s;
+}
+
+.resource-card h3 {
+    font-size: 1.125rem;
+    color: var(--color-gray-900);
+    margin-bottom: 0.75rem;
+}
+
+.resource-card p {
+    color: var(--color-gray-600);
+    font-size: 0.875rem;
+    margin-bottom: 0.5rem;
+    line-height: 1.5;
+}
+
+.resource-card p:last-child {
+    margin-bottom: 0;
+}
+
+/* Clickable resource card */
+a.resource-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    background: #fffbeb;
+}
+
+/* Non-clickable resource card */
+.resource-card.no-highlight {
+    cursor: default;
+}
+
+.resource-card.no-highlight:hover {
+    transform: none;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    background: var(--color-white);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .appointment-preview {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .appointment-info-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .view-details-btn {
+        width: 100%;
+        text-align: center;
+    }
+    
+    .resources-grid {
+        grid-template-columns: 1fr;
+    }
+}

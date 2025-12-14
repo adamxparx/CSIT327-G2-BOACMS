@@ -364,17 +364,16 @@ def api_appointments_list(request):
 
 @login_required
 def appointments_calendar_view(request):
-    role = getattr(request.user, 'role')
-
-    if role == 'resident':
-        dashboard_template = 'accounts/dashboard.html'
-    else:
-        dashboard_template = 'accounts/staff_dashboard.html'
+    # Restrict calendar view to staff only
+    if request.user.role != 'staff':
+        messages.error(request, "You are not authorized to view this page.")
+        return redirect('appointments')
+    
+    dashboard_template = 'accounts/staff_dashboard.html'
 
     context = {
         'dashboard_template': dashboard_template,
     }
-
 
     return render(request, 'appointments/appointments_calendar.html', context)
 

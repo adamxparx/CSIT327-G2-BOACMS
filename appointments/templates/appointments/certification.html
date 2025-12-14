@@ -9,9 +9,9 @@
     <link rel="stylesheet" href="{% static 'appointments/css/certification.css' %}">
     {% block cert_content %}
     <div class="auth-wrapper">
-      <div class="auth-card auth-card--wide">
+      <div class="auth-card auth-card--stacked">
 
-        <div class="left-panel">
+        <div class="top-panel">
           <div class="auth-header">
             <h2 class="auth-title">Book a Certificate</h2>
             <p class="auth-subtitle">Provide your appointment details.</p>
@@ -24,24 +24,6 @@
                   {% for error in form.non_field_errors %}
                       <p>{{ error }}</p>
                   {% endfor %}
-              </div>
-          {% endif %}
-
-          {% if recommended_slot %}
-              <div class="auth-alert auth-alert--info recommended-slot-alert">
-                  <p>
-                      The selected slot is no longer available. Nearest available slot:
-                      <strong>{{ recommended_slot.date|date:"F j, Y" }}</strong>
-                      at
-                      <strong>{{ recommended_slot.time|time:"g:i A" }}</strong>.
-                  </p>
-                  <button type="button"
-                          id="apply-recommended-slot"
-                          class="btn"
-                          data-slot-date="{{ recommended_slot.date|date:"Y-m-d" }}"
-                          data-slot-time="{{ recommended_slot.time|time:"H:i" }}">
-                      Use this slot
-                  </button>
               </div>
           {% endif %}
 
@@ -72,20 +54,58 @@
               {% endfor %}
             </div>
 
-            <div class="form-field">
-              <label for="{{ form.preferred_date.id_for_label }}">{{ form.preferred_date.label }}</label>
-              {{ form.preferred_date }}
-              {% for error in form.preferred_date.errors %}
-                  <span class="field-error">{{ error }}</span>
-              {% endfor %}
-            </div>
+            <!-- Date and Session Selection -->
+            <div class="form-field form-field--full">
+              <label>Select Date and Session</label>
+              <div class="date-session-container">
+                <!-- Calendar -->
+                <div class="calendar-container">
+                  <div class="calendar-header">
+                    <button type="button" class="nav-btn" id="prev-month">
+                      &#8249;
+                    </button>
+                    <h3 id="current-month">December 2025</h3>
+                    <button type="button" class="nav-btn" id="next-month">
+                      &#8250;
+                    </button>
+                  </div>
+                  <div class="calendar-grid" id="calendar-grid">
+                    <!-- Calendar will be rendered here by JavaScript -->
+                  </div>
+                </div>
 
-            <div class="form-field">
-              <label for="{{ form.preferred_time.id_for_label }}">{{ form.preferred_time.label }}</label>
-              {{ form.preferred_time }}
-              {% for error in form.preferred_time.errors %}
-                  <span class="field-error">{{ error }}</span>
-              {% endfor %}
+                <!-- Session Selection -->
+                <div class="session-container">
+                  <h3>Select Session</h3>
+                  <div class="session-options">
+                    <div class="session-card" data-session="am">
+                      <div class="session-header">
+                        <h4>AM Session</h4>
+                        <i class="fas fa-check session-check"></i>
+                      </div>
+                      <p class="session-time">8:00 AM - 12:00 PM</p>
+                      <p class="session-slots"><span id="am-slots">30</span> slots available</p>
+                    </div>
+                    <div class="session-card" data-session="pm">
+                      <div class="session-header">
+                        <h4>PM Session</h4>
+                        <i class="fas fa-check session-check"></i>
+                      </div>
+                      <p class="session-time">1:00 PM - 5:00 PM</p>
+                      <p class="session-slots"><span id="pm-slots">30</span> slots available</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Hidden fields for form submission -->
+              <input type="hidden" name="preferred_date" id="selected_date" value="">
+              <input type="hidden" name="preferred_time" id="selected_time" value="">
+              
+              <!-- Error message for date/session selection -->
+              <div class="field-error" id="date-session-error" style="display: none; margin-top: 0.5rem; color: #dc2626; font-size: 0.875rem;">
+                Please select both a date and session before booking.
+              </div>
             </div>
 
             <div class="form-submit">
@@ -113,10 +133,188 @@
 <script src="{% static 'appointments/js/time_restriction.js' %}"></script>
 <script src="{% static 'appointments/js/disabled_booking_button.js' %}"></script>
 <script>
+  // Calendar and Session Selection
+  document.addEventListener('DOMContentLoaded', function() {
+    let currentDate = new Date();
+    let selectedDate = null;
+    let selectedSession = null;
+    
+    const monthNames = ["January", "February", "March", "April", "May", "June",
+                       "July", "August", "September", "October", "November", "December"];
+    
+    function renderCalendar(date) {
+      const year = date.getFullYear();
+      const month = date.getMonth();
+      
+      document.getElementById('current-month').textContent = `${monthNames[month]} ${year}`;
+      
+      const firstDay = new Date(year, month, 1).getDay();
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+      const daysInPrevMonth = new Date(year, month, 0).getDate();
+      
+      const calendarGrid = document.getElementById('calendar-grid');
+      calendarGrid.innerHTML = '';
+      
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const tomorrow = new Date(today);
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      
+      // Add day headers
+      const dayHeaders = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+      dayHeaders.forEach(day => {
+        const headerDiv = document.createElement('div');
+        headerDiv.className = 'calendar-day-header';
+        headerDiv.textContent = day;
+        calendarGrid.appendChild(headerDiv);
+      });
+      
+      // Previous month days
+      for (let i = firstDay - 1; i >= 0; i--) {
+        const dateDiv = document.createElement('div');
+        dateDiv.className = 'calendar-date other-month';
+        dateDiv.textContent = daysInPrevMonth - i;
+        calendarGrid.appendChild(dateDiv);
+      }
+      
+      // Current month days
+      for (let day = 1; day <= daysInMonth; day++) {
+        const dateDiv = document.createElement('div');
+        dateDiv.className = 'calendar-date';
+        dateDiv.textContent = day;
+        
+        const currentDateObj = new Date(year, month, day);
+        currentDateObj.setHours(0, 0, 0, 0);
+        
+        // Check if date is today
+        if (currentDateObj.getTime() === today.getTime()) {
+          dateDiv.classList.add('today');
+        }
+        
+        // Disable past dates and today
+        if (currentDateObj < tomorrow) {
+          dateDiv.classList.add('disabled');
+        } else {
+          dateDiv.addEventListener('click', function() {
+            selectDate(currentDateObj);
+          });
+        }
+        
+        // Check if this is the selected date
+        if (selectedDate && currentDateObj.getTime() === selectedDate.getTime()) {
+          dateDiv.classList.add('selected');
+        }
+        
+        calendarGrid.appendChild(dateDiv);
+      }
+      
+      // Next month days to fill the grid
+      const totalCells = calendarGrid.children.length - 7; // Subtract day headers
+      const remainingCells = (7 - (totalCells % 7)) % 7;
+      for (let i = 1; i <= remainingCells; i++) {
+        const dateDiv = document.createElement('div');
+        dateDiv.className = 'calendar-date other-month';
+        dateDiv.textContent = i;
+        calendarGrid.appendChild(dateDiv);
+      }
+    }
+    
+    function selectDate(date) {
+      selectedDate = date;
+      renderCalendar(currentDate);
+      updateSessionAvailability();
+    }
+    
+    function selectSession(session) {
+      selectedSession = session;
+      
+      document.querySelectorAll('.session-card').forEach(card => {
+        card.classList.remove('selected');
+      });
+      
+      const selectedCard = document.querySelector(`.session-card[data-session="${session}"]`);
+      if (selectedCard && !selectedCard.classList.contains('disabled')) {
+        selectedCard.classList.add('selected');
+      }
+      
+      updateHiddenFields();
+    }
+    
+    function updateSessionAvailability() {
+      // This would typically fetch from server, but for now using static data
+      // You can add AJAX call here to get real availability
+      document.getElementById('am-slots').textContent = '30';
+      document.getElementById('pm-slots').textContent = '30';
+    }
+    
+    function updateHiddenFields() {
+      if (selectedDate && selectedSession) {
+        const year = selectedDate.getFullYear();
+        const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
+        const day = String(selectedDate.getDate()).padStart(2, '0');
+        document.getElementById('selected_date').value = `${year}-${month}-${day}`;
+        
+        // Set time based on session
+        if (selectedSession === 'am') {
+          document.getElementById('selected_time').value = '09:00';
+        } else {
+          document.getElementById('selected_time').value = '13:00';
+        }
+        
+        // Hide error message when valid selection is made
+        const errorDiv = document.getElementById('date-session-error');
+        if (errorDiv) {
+          errorDiv.style.display = 'none';
+        }
+      }
+    }
+    
+    // Event listeners
+    document.getElementById('prev-month').addEventListener('click', function() {
+      currentDate.setMonth(currentDate.getMonth() - 1);
+      renderCalendar(currentDate);
+    });
+    
+    document.getElementById('next-month').addEventListener('click', function() {
+      currentDate.setMonth(currentDate.getMonth() + 1);
+      renderCalendar(currentDate);
+    });
+    
+    document.querySelectorAll('.session-card').forEach(card => {
+      card.addEventListener('click', function() {
+        if (!this.classList.contains('disabled') && selectedDate) {
+          selectSession(this.dataset.session);
+        }
+      });
+    });
+    
+    // Initial render
+    renderCalendar(currentDate);
+    
+    // Form validation for date and session
+    const appointmentForm = document.getElementById('appointment-form');
+    if (appointmentForm) {
+      appointmentForm.addEventListener('submit', function(e) {
+        const dateValue = document.getElementById('selected_date').value;
+        const timeValue = document.getElementById('selected_time').value;
+        const errorDiv = document.getElementById('date-session-error');
+        
+        if (!dateValue || !timeValue) {
+          e.preventDefault();
+          errorDiv.style.display = 'block';
+          // Scroll to error message
+          errorDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        } else {
+          errorDiv.style.display = 'none';
+        }
+      });
+    }
+  });
+  
+  // Purpose field toggle
   document.addEventListener('DOMContentLoaded', function () {
     const form = document.getElementById('appointment-form');
     const requirementsLink = document.getElementById('requirements-link');
-    const applyRecommendedButton = document.getElementById('apply-recommended-slot');
     const purposeSelect = document.getElementById('purpose_select');
     const customPurposeField = document.getElementById('custom_purpose_field');
 
@@ -144,7 +342,7 @@
     }
 
     const baseUrl = requirementsLink.dataset.baseUrl || requirementsLink.href;
-    const fieldNames = ['certificate_type', 'purpose', 'preferred_date', 'preferred_time'];
+    const fieldNames = ['certificate_type', 'purpose'];
 
     const updateLinkHref = () => {
       const params = new URLSearchParams();
@@ -191,44 +389,6 @@
 
     requirementsLink.addEventListener('click', updateLinkHref);
     updateLinkHref();
-
-    if (applyRecommendedButton) {
-      applyRecommendedButton.addEventListener('click', () => {
-        const dateField = form.elements['preferred_date'];
-        const timeField = form.elements['preferred_time'];
-
-        if (dateField) {
-          dateField.value = applyRecommendedButton.dataset.slotDate || '';
-          dateField.dispatchEvent(new Event('change'));
-        }
-
-        if (timeField) {
-          timeField.value = applyRecommendedButton.dataset.slotTime || '';
-          timeField.dispatchEvent(new Event('change'));
-          timeField.classList.remove('highlight-success');
-          // Force reflow to restart animation if applied multiple times
-          void timeField.offsetWidth;
-          timeField.classList.add('highlight-success');
-        }
-
-        const errorAlert = document.querySelector('.auth-alert--error');
-        if (errorAlert) {
-          errorAlert.classList.add('is-hidden');
-        }
-
-        const fieldErrors = form.querySelectorAll('.field-error');
-        fieldErrors.forEach((error) => {
-          error.classList.add('is-hidden');
-        });
-
-        const recommendedAlert = document.querySelector('.recommended-slot-alert');
-        if (recommendedAlert) {
-          recommendedAlert.classList.add('is-hidden');
-        }
-
-        updateLinkHref();
-      });
-    }
   });
 </script>
 
