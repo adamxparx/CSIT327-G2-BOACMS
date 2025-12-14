@@ -21,7 +21,6 @@
         <li><a href="{% url 'dashboard' %}" {% if request.resolver_match.url_name == 'dashboard' %}aria-current="page"{% endif %}>HOME</a></li>
         <li><a href="{% url 'certification' %}" {% if request.resolver_match.url_name == 'certification' or request.resolver_match.url_name == 'create_appointment' %}aria-current="page"{% endif %}>CERTIFICATIONS</a></li>
         <li><a href="{% url 'appointments' %}" {% if request.resolver_match.url_name == 'appointments' or request.resolver_match.url_name == 'appointment_detail' %}aria-current="page"{% endif %}>APPOINTMENTS {% if claimed_appointments %}<button class="appointment_count approved_count">{{ claimed_appointments }}</button>{% endif %}</a></li>
-        <li><a href="{% url 'appointments_calendar' %}" {% if request.resolver_match.url_name == 'appointments_calendar' %}aria-current="page"{% endif %}>CALENDAR</a></li>
     </ul>
 {% endblock %}
 
@@ -81,11 +80,6 @@
                 <div class="action-icon">📋</div>
                 <h3>View All</h3>
                 <p>See all appointments</p>
-            </a>
-            <a href="{% url 'appointments_calendar' %}" class="action-card">
-                <div class="action-icon">📆</div>
-                <h3>Calendar</h3>
-                <p>View appointments</p>
             </a>
             <a href="{% url 'profile' %}" class="action-card">
                 <div class="action-icon">👤</div>
