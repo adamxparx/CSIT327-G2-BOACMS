@@ -1,0 +1,210 @@
+{% extends "accounts/base_dashboard.html" %}
+{% load static %}
+
+{% block title %}Admin Dashboard | BOACMS{% endblock %}
+
+{% block admin_css %}
+<link rel="stylesheet" href="{% static 'accounts/css/admin_dashboard.css' %}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+{% endblock %}
+
+{% block content %}
+<div class="admin-layout">
+    <!-- Sidebar -->
+    <aside class="admin-sidebar">
+        <div class="sidebar-header">
+            <img src="{% static 'images/logo.png' %}" alt="BOACMS Logo" class="sidebar-logo">
+            <div class="sidebar-brand">
+                <h2>BOACMS</h2>
+                <p>Admin Portal</p>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <a href="{% url 'admin_dashboard' %}" class="nav-item active">
+                <i class="fas fa-chart-line"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="{% url 'resident_verification' %}" class="nav-item">
+                <i class="fas fa-user-check"></i>
+                <span>Resident Verification</span>
+            </a>
+            <a href="{% url 'staff_accounts' %}" class="nav-item">
+                <i class="fas fa-users-cog"></i>
+                <span>Staff Accounts</span>
+            </a>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="admin-main">
+        <!-- Header -->
+        <header class="admin-header">
+            <div class="header-left">
+                <i class="fas fa-chart-pie header-icon"></i>
+                <h1>Dashboard</h1>
+            </div>
+            <div class="header-right">
+                <div class="user-info">
+                    <div class="user-avatar">A</div>
+                    <span class="user-name">Admin User</span>
+                </div>
+                <form method="POST" action="{% url 'logout' %}" class="logout-form">
+                    {% csrf_token %}
+                    <button type="submit" class="logout-btn">Logout</button>
+                </form>
+            </div>
+        </header>
+
+        <!-- Dashboard Content -->
+        <div class="dashboard-content">
+            <!-- Stats Grid -->
+            <div class="stats-grid">
+                <div class="stat-card stat-warning">
+                    <div class="stat-info">
+                        <h3>Pending Verifications</h3>
+                        <div class="stat-indicator orange"></div>
+                    </div>
+                    <p class="stat-value">{{ pending_verifications }}</p>
+                    <a href="{% url 'resident_verification' %}" class="stat-link">View Details <i class="fas fa-arrow-right"></i></a>
+                </div>
+
+                <div class="stat-card stat-primary">
+                    <div class="stat-info">
+                        <h3>Approved Residents</h3>
+                        <div class="stat-indicator blue"></div>
+                    </div>
+                    <p class="stat-value">{{ approved_residents }}</p>
+                    <a href="{% url 'resident_verification' %}?status=approved" class="stat-link">View All <i class="fas fa-arrow-right"></i></a>
+                </div>
+
+                <div class="stat-card stat-success">
+                    <div class="stat-info">
+                        <h3>Active Staff Accounts</h3>
+                        <div class="stat-indicator blue"></div>
+                    </div>
+                    <p class="stat-value">{{ active_staff }}</p>
+                    <a href="{% url 'staff_accounts' %}" class="stat-link">Manage Staff <i class="fas fa-arrow-right"></i></a>
+                </div>
+            </div>
+
+            <!-- Two Column Layout -->
+            <div class="two-column-layout">
+                <!-- Left Column: Quick Actions + Recent Activity -->
+                <div class="left-column">
+                    <!-- Quick Actions -->
+                    <div class="section-card">
+                        <div class="section-header">
+                            <h2><i class="fas fa-bolt"></i> Quick Actions</h2>
+                        </div>
+                        <div class="quick-actions">
+                            <a href="{% url 'resident_verification' %}" class="quick-action-btn">
+                                <i class="fas fa-user-check"></i>
+                                <span>Review Verifications</span>
+                                {% if pending_verifications > 0 %}
+                                <span class="badge">{{ pending_verifications }}</span>
+                                {% endif %}
+                            </a>
+                            <a href="{% url 'staff_accounts' %}" class="quick-action-btn">
+                                <i class="fas fa-users-cog"></i>
+                                <span>Manage Staff</span>
+                            </a>
+                            <a href="{% url 'create_staff_account' %}" class="quick-action-btn">
+                                <i class="fas fa-user-plus"></i>
+                                <span>Add Staff Account</span>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Recent Activity -->
+                    <div class="section-card">
+                        <div class="section-header">
+                            <h2><i class="fas fa-history"></i> Recent Activity</h2>
+                            <a href="#" class="view-all-link">View All</a>
+                        </div>
+                        <div class="activity-list">
+                            {% if recent_registrations %}
+                                {% for resident in recent_registrations %}
+                                <div class="activity-item">
+                                    <div class="activity-icon pending">
+                                        <i class="fas fa-user"></i>
+                                    </div>
+                                    <div class="activity-details">
+                                        <p class="activity-text"><strong>{{ resident.first_name }} {{ resident.last_name }}</strong> registered</p>
+                                        <p class="activity-time">{{ resident.user.date_joined|timesince }} ago</p>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            {% else %}
+                                <div class="no-activity">
+                                    <i class="fas fa-inbox"></i>
+                                    <p>No recent activity</p>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column: System Status + Recent Approvals -->
+                <div class="right-column">
+                    <!-- System Status -->
+                    <div class="section-card">
+                        <div class="section-header">
+                            <h2><i class="fas fa-server"></i> System Status</h2>
+                        </div>
+                        <div class="system-status">
+                            <div class="status-item">
+                                <div class="status-label">
+                                    <i class="fas fa-database"></i>
+                                    <span>Database</span>
+                                </div>
+                                <span class="status-badge online">Online</span>
+                            </div>
+                            <div class="status-item">
+                                <div class="status-label">
+                                    <i class="fas fa-users"></i>
+                                    <span>Total Users</span>
+                                </div>
+                                <span class="status-value">{{ total_users }}</span>
+                            </div>
+                            <div class="status-item">
+                                <div class="status-label">
+                                    <i class="fas fa-calendar-day"></i>
+                                    <span>Last Update</span>
+                                </div>
+                                <span class="status-value">Today</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Approvals -->
+                    <div class="section-card">
+                        <div class="section-header">
+                            <h2><i class="fas fa-check-circle"></i> Recent Approvals</h2>
+                        </div>
+                        <div class="approvals-list">
+                            {% if recent_approvals %}
+                                {% for resident in recent_approvals %}
+                                <div class="approval-item">
+                                    <div class="approval-avatar">{{ resident.first_name|first }}{{ resident.last_name|first }}</div>
+                                    <div class="approval-info">
+                                        <p class="approval-name">{{ resident.first_name }} {{ resident.last_name }}</p>
+                                        <p class="approval-date">Approved {{ resident.approval_date|timesince }} ago</p>
+                                    </div>
+                                    <i class="fas fa-check-circle approval-check"></i>
+                                </div>
+                                {% endfor %}
+                            {% else %}
+                                <div class="no-activity">
+                                    <i class="fas fa-inbox"></i>
+                                    <p>No recent approvals</p>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+{% endblock %}

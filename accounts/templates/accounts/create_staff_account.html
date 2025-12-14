@@ -1,94 +1,207 @@
-{% extends "accounts/index.html" %}
+{% extends "accounts/base_dashboard.html" %}
 {% load static %}
 
-{% block title %}Create Staff Account{% endblock %}
+{% block title %}Create Staff Account | BOACMS{% endblock %}
+
+{% block admin_css %}
+<link rel="stylesheet" href="{% static 'accounts/css/admin_dashboard.css' %}">
+<link rel="stylesheet" href="{% static 'accounts/css/create_staff_account.css' %}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+{% endblock %}
 
 {% block content %}
-<div class="register-container">
-    <div class="register-card">
-        <div class="register-header">
-            <h1>Create Staff Account</h1>
-            <p>Enter the details for the new staff member</p>
+<div class="admin-layout">
+    <!-- Sidebar -->
+    <aside class="admin-sidebar">
+        <div class="sidebar-header">
+            <img src="{% static 'images/logo.png' %}" alt="BOACMS Logo" class="sidebar-logo">
+            <div class="sidebar-brand">
+                <h2>BOACMS</h2>
+                <p>Admin Portal</p>
+            </div>
         </div>
 
-        {% if messages %}
-            {% for message in messages %}
-                <div class="alert alert-{{ message.tags }}">
-                    {{ message }}
+        <nav class="sidebar-nav">
+            <a href="{% url 'admin_dashboard' %}" class="nav-item">
+                <i class="fas fa-chart-line"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="{% url 'resident_verification' %}" class="nav-item">
+                <i class="fas fa-user-check"></i>
+                <span>Resident Verification</span>
+            </a>
+            <a href="{% url 'staff_accounts' %}" class="nav-item active">
+                <i class="fas fa-users-cog"></i>
+                <span>Staff Accounts</span>
+            </a>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="admin-main">
+        <!-- Header -->
+        <header class="admin-header">
+            <div class="header-left">
+                <a href="{% url 'staff_accounts' %}" class="back-btn" title="Back to Staff Accounts">
+                    <i class="fas fa-arrow-left"></i>
+                </a>
+                <i class="fas fa-user-plus header-icon"></i>
+                <h1>Create Staff Account</h1>
+            </div>
+            <div class="header-right">
+                <div class="user-info">
+                    <div class="user-avatar">A</div>
+                    <span class="user-name">Admin User</span>
                 </div>
-            {% endfor %}
-        {% endif %}
+                <form method="POST" action="{% url 'logout' %}" class="logout-form">
+                    {% csrf_token %}
+                    <button type="submit" class="logout-btn">Logout</button>
+                </form>
+            </div>
+        </header>
 
-        {% if form.errors %}
-            <div class="alert alert-error">
-                <p>Please correct the errors below.</p>
-            </div>
-        {% endif %}
+        <!-- Form Content -->
+        <div class="form-content">
+            <div class="form-card">
+                <!-- Form Header -->
+                <div class="form-header">
+                    <div class="form-icon">
+                        <i class="fas fa-user-plus"></i>
+                    </div>
+                    <h2>Create New Staff Account</h2>
+                    <p>Enter the details for the new staff member below</p>
+                </div>
 
-        <form method="post" class="register-form">
-            {% csrf_token %}
-            
-            <div class="form-field">
-                <label for="{{ form.first_name.id_for_label }}">{{ form.first_name.label }}</label>
-                {{ form.first_name }}
-                {% for error in form.first_name.errors %}
-                    <span class="field-error">{{ error }}</span>
-                {% endfor %}
+                <!-- Messages -->
+                {% if messages %}
+                <div class="messages-container">
+                    {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">
+                        <i class="fas fa-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'error' %}exclamation-circle{% else %}info-circle{% endif %}"></i>
+                        {{ message }}
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                {% if form.errors %}
+                <div class="alert alert-error">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <strong>Please correct the errors below.</strong>
+                </div>
+                {% endif %}
+
+                <!-- Form -->
+                <form method="post" class="staff-form" id="staff-form">
+                    {% csrf_token %}
+                    
+                    <div class="form-section">
+                        <h3><i class="fas fa-user"></i> Personal Information</h3>
+                        
+                        <div class="form-row">
+                            <div class="form-field">
+                                <label for="{{ form.first_name.id_for_label }}">
+                                    <i class="fas fa-user"></i>
+                                    {{ form.first_name.label }} <span class="required">*</span>
+                                </label>
+                                {{ form.first_name }}
+                                {% for error in form.first_name.errors %}
+                                <span class="field-error"><i class="fas fa-exclamation-circle"></i> {{ error }}</span>
+                                {% endfor %}
+                            </div>
+
+                            <div class="form-field">
+                                <label for="{{ form.middle_name.id_for_label }}">
+                                    <i class="fas fa-user"></i>
+                                    {{ form.middle_name.label }}
+                                </label>
+                                {{ form.middle_name }}
+                                {% for error in form.middle_name.errors %}
+                                <span class="field-error"><i class="fas fa-exclamation-circle"></i> {{ error }}</span>
+                                {% endfor %}
+                            </div>
+
+                            <div class="form-field">
+                                <label for="{{ form.last_name.id_for_label }}">
+                                    <i class="fas fa-user"></i>
+                                    {{ form.last_name.label }} <span class="required">*</span>
+                                </label>
+                                {{ form.last_name }}
+                                {% for error in form.last_name.errors %}
+                                <span class="field-error"><i class="fas fa-exclamation-circle"></i> {{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3><i class="fas fa-envelope"></i> Account Information</h3>
+                        
+                        <div class="form-field full-width">
+                            <label for="{{ form.email.id_for_label }}">
+                                <i class="fas fa-envelope"></i>
+                                {{ form.email.label }} <span class="required">*</span>
+                            </label>
+                            {{ form.email }}
+                            <small class="field-hint">This will be used for login</small>
+                            {% for error in form.email.errors %}
+                            <span class="field-error"><i class="fas fa-exclamation-circle"></i> {{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3><i class="fas fa-lock"></i> Security</h3>
+                        
+                        <div class="form-row">
+                            <div class="form-field">
+                                <label for="{{ form.password1.id_for_label }}">
+                                    <i class="fas fa-lock"></i>
+                                    {{ form.password1.label }} <span class="required">*</span>
+                                </label>
+                                {{ form.password1 }}
+                                <small class="field-hint">Minimum 8 characters</small>
+                                {% for error in form.password1.errors %}
+                                <span class="field-error"><i class="fas fa-exclamation-circle"></i> {{ error }}</span>
+                                {% endfor %}
+                            </div>
+
+                            <div class="form-field">
+                                <label for="{{ form.password2.id_for_label }}">
+                                    <i class="fas fa-lock"></i>
+                                    {{ form.password2.label }} <span class="required">*</span>
+                                </label>
+                                {{ form.password2 }}
+                                <small class="field-hint">Re-enter password</small>
+                                {% for error in form.password2.errors %}
+                                <span class="field-error"><i class="fas fa-exclamation-circle"></i> {{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Form Actions -->
+                    <div class="form-actions">
+                        <a href="{% url 'staff_accounts' %}" class="btn-cancel">
+                            <i class="fas fa-times"></i>
+                            Cancel
+                        </a>
+                        <button type="submit" class="btn-submit">
+                            <i class="fas fa-check-circle"></i>
+                            Create Staff Account
+                        </button>
+                    </div>
+                </form>
             </div>
-            
-            <div class="form-field">
-                <label for="{{ form.middle_name.id_for_label }}">{{ form.middle_name.label }}</label>
-                {{ form.middle_name }}
-                {% for error in form.middle_name.errors %}
-                    <span class="field-error">{{ error }}</span>
-                {% endfor %}
-            </div>
-            
-            <div class="form-field">
-                <label for="{{ form.last_name.id_for_label }}">{{ form.last_name.label }}</label>
-                {{ form.last_name }}
-                {% for error in form.last_name.errors %}
-                    <span class="field-error">{{ error }}</span>
-                {% endfor %}
-            </div>
-            
-            <div class="form-field">
-                <label for="{{ form.email.id_for_label }}">{{ form.email.label }}</label>
-                {{ form.email }}
-                {% for error in form.email.errors %}
-                    <span class="field-error">{{ error }}</span>
-                {% endfor %}
-            </div>
-            
-            <div class="form-field">
-                <label for="{{ form.password1.id_for_label }}">{{ form.password1.label }}</label>
-                {{ form.password1 }}
-                {% for error in form.password1.errors %}
-                    <span class="field-error">{{ error }}</span>
-                {% endfor %}
-            </div>
-            
-            <div class="form-field">
-                <label for="{{ form.password2.id_for_label }}">{{ form.password2.label }}</label>
-                {{ form.password2 }}
-                {% for error in form.password2.errors %}
-                    <span class="field-error">{{ error }}</span>
-                {% endfor %}
-            </div>
-            
-            <button type="submit" class="btn btn-register">Create Staff Account</button>
-        </form>
-        
-        <div class="register-footer">
-            <p><a href="{% url 'staff_dashboard' %}">Back to Dashboard</a></p>
         </div>
-    </div>
+    </main>
 </div>
 
 <script>
+document.addEventListener('DOMContentLoaded', function() {
     // Function to check if first letter is capitalized
     function checkCapitalization(input) {
-        const value = input.value;
+        const value = input.value.trim();
         if (value.length > 0 && !value[0].match(/[A-Z]/)) {
             input.setCustomValidity("This field must start with a capital letter.");
         } else {
@@ -97,15 +210,26 @@
     }
 
     // Add event listeners to name fields
-    document.addEventListener('DOMContentLoaded', function() {
-        // Get all input fields with name attributes containing 'name'
-        const nameFields = document.querySelectorAll('input[name$="name"]');
+    const nameFields = document.querySelectorAll('input[name$="name"]');
+    
+    nameFields.forEach(function(field) {
+        field.addEventListener('input', function() { 
+            checkCapitalization(this);
+        });
         
-        nameFields.forEach(function(field) {
-            field.addEventListener('input', function() { 
-                checkCapitalization(this); 
-            });
+        field.addEventListener('blur', function() {
+            checkCapitalization(this);
         });
     });
+
+    // Form validation feedback
+    const form = document.getElementById('staff-form');
+    form.addEventListener('submit', function(e) {
+        const invalidFields = form.querySelectorAll(':invalid');
+        if (invalidFields.length > 0) {
+            invalidFields[0].focus();
+        }
+    });
+});
 </script>
-{% endblock content %}
+{% endblock %}

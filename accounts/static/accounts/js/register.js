@@ -88,3 +88,32 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+
+// Success Modal Functions
+function showSuccessModal() {
+    const modal = document.getElementById('successModal');
+    if (modal) {
+        modal.classList.add('show');
+        document.body.style.overflow = 'hidden'; // Prevent background scrolling
+    }
+}
+
+function closeSuccessModal() {
+    const modal = document.getElementById('successModal');
+    if (modal) {
+        modal.classList.remove('show');
+        document.body.style.overflow = ''; // Restore scrolling
+        // Redirect to login page after closing
+        window.location.href = "{% url 'login' %}";
+    }
+}
+
+// Auto-show modal if registration was successful
+document.addEventListener('DOMContentLoaded', function() {
+    // Check if success parameter exists in URL
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('success') === 'true') {
+        showSuccessModal();
+    }
+});
+

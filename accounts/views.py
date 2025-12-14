@@ -20,7 +20,6 @@ from django.db.models import Count, Q
 from django.utils import timezone
 from datetime import timedelta
 
-
 def is_admin(user):
     return user.is_authenticated and user.role == 'admin'
 
@@ -52,10 +51,10 @@ def auth_check(user, is_new_registration=False):
 
 class CustomLoginView(LoginView):
     template_name = 'accounts/login.html'
-   
+    
     def get_success_url(self):
         user = self.request.user
-       
+        
         if user.role == 'resident':
             # Check if resident is approved
             try:
@@ -71,7 +70,7 @@ class CustomLoginView(LoginView):
             return reverse('admin_dashboard')
         else:
             return reverse('index')
-   
+    
     def dispatch(self, request, *args, **kwargs):
         # Check if this is a new registration
         is_new_registration = 'new_registration' in request.GET
@@ -94,42 +93,33 @@ def index(request):
 
 
 def register(request):
-    response = auth_check(request.user)
-    if response:
-        return response
-    
     if request.method == 'POST':
         user_form = CustomUserCreationForm(request.POST)
         resident_form = ResidentForm(request.POST, request.FILES)
+        
         if user_form.is_valid() and resident_form.is_valid():
-            user = user_form.save()
+            # Create user account
+            user = user_form.save(commit=False)
+            user.role = 'resident'
+            user.is_active = True  # Allow login but pending approval
+            user.save()
+            
+            # Create resident profile
             resident = resident_form.save(commit=False)
             resident.user = user
-            
-            # Handle document upload to Supabase if provided
-            address_document = request.FILES.get('address_document_file')
-            if address_document:
-                try:
-                    # Upload to Supabase and get the URL
-                    document_url = upload_document_to_supabase(address_document, user.id)
-                    resident.address_document = document_url
-                except Exception as e:
-                    messages.error(request, f'Failed to upload document: {str(e)}')
-                    # Delete the user if document upload fails
-                    user.delete()
-                    return render(request, 'accounts/register.html', {
-                        'user_form': user_form,
-                        'resident_form': resident_form,
-                    })
-            
             resident.approval_status = 'pending'
+            resident.barangay = 'Labangon'
+            resident.city = 'Cebu City'
             resident.save()
-            # Redirect to login with a flag indicating new registration
-            return redirect('{}?new_registration=true'.format(reverse('login')))
+
+            
+            
+            # Redirect to register page with success parameter
+            return redirect(reverse('register') + '?success=true')
     else:
         user_form = CustomUserCreationForm()
         resident_form = ResidentForm()
-
+    
     context = {
         'user_form': user_form,
         'resident_form': resident_form,
@@ -143,10 +133,10 @@ def dashboard(request):
 
     if user.role == 'staff':
         return redirect('staff_dashboard')
-   
+    
     elif user.role == 'admin':
         return redirect('admin_dashboard')
-   
+    
     elif user.role == 'resident':
         # Check if the resident account is approved
         if hasattr(user, 'resident') and user.resident.approval_status != 'approved':
@@ -154,7 +144,7 @@ def dashboard(request):
             logout(request)
             messages.error(request, 'Your account is pending approval. Please wait for approval.')
             return redirect('login')
-       
+        
         # Get appointment statistics
         all_appointments = Appointment.objects.filter(resident=request.user)
         
@@ -236,10 +226,10 @@ def resident_approvals(request):
     if request.user.role not in ['staff', 'admin']:
         messages.error(request, 'You do not have permission to access this page.')
         return redirect('dashboard')
-   
+    
     # Get pending resident approvals
     pending_residents = Resident.objects.filter(approval_status='pending').select_related('user').order_by('user__date_joined')
-   
+    
     context = {
         "pending_residents": pending_residents,
     }
@@ -267,34 +257,15 @@ def profile(request):
     return render(request, 'accounts/profile.html', context)
 
 
-@login_required
-@user_passes_test(is_admin)
-def create_staff_account(request):
-    """View for admin to create new staff accounts"""
-    if request.method == 'POST':
-        form = StaffCreationForm(request.POST)
-        if form.is_valid():
-            user = form.save(commit=False)
-            user.role = 'staff'  # Ensure role is set to staff
-            user.save()
-           
-            # Create associated BarangayStaff record
-            BarangayStaff.objects.create(
-                user=user,
-                first_name=form.cleaned_data.get('first_name'),
-                middle_name=form.cleaned_data.get('middle_name'),
-                last_name=form.cleaned_data.get('last_name')
-            )
-           
-            messages.success(request, f'Staff account created successfully!')
-            return redirect('staff_accounts')
-    else:
-        form = StaffCreationForm()
-   
-    context = {
-        'form': form,
-    }
-    return render(request, 'accounts/create_staff_account.html', context)
+@csrf_exempt
+@require_http_methods(["POST"])
+def clear_approval_modal(request):
+    """
+    View to clear the approval modal flag from the session
+    """
+    if 'show_approval_modal' in request.session:
+        del request.session['show_approval_modal']
+    return HttpResponse(status=204)
 
 
 @login_required
@@ -306,24 +277,24 @@ def approve_resident(request, resident_id):
     if request.user.role not in ['staff', 'admin']:
         messages.error(request, 'You do not have permission to access this page.')
         return redirect('dashboard')
-   
+    
     try:
         resident = Resident.objects.get(id=resident_id)
         resident.approval_status = 'approved'
         resident.approval_date = datetime.datetime.now()
         resident.save()
-       
+        
         # Send approval email
         email_sent = False
         try:
             subject = 'Account Approved - Barangay Office Management System'
             from_email = 'no-reply@barangay-office.com'  # Change this to your actual email
             recipient_list = [resident.user.email]
-           
+            
             # Render email templates
             text_content = render_to_string('emails/resident_approval.txt', {'resident': resident})
             html_content = render_to_string('emails/resident_approval.html', {'resident': resident})
-           
+            
             # Create and send email
             msg = EmailMultiAlternatives(subject, text_content, from_email, recipient_list)
             msg.attach_alternative(html_content, "text/html")
@@ -332,14 +303,14 @@ def approve_resident(request, resident_id):
         except Exception as e:
             # If email fails, we still approve the account but log the error
             pass  # In production, you might want to log this error
-       
+        
         if email_sent:
             messages.success(request, f'Resident account for {resident.first_name} {resident.last_name} has been approved and notification email sent.')
         else:
             messages.success(request, f'Resident account for {resident.first_name} {resident.last_name} has been approved. (Notification email could not be sent)')
     except Resident.DoesNotExist:
         messages.error(request, 'Resident not found.')
-   
+    
     return redirect('staff_dashboard')
 
 
@@ -363,7 +334,7 @@ def reject_resident(request, resident_id):
     if request.user.role not in ['staff', 'admin']:
         messages.error(request, 'You do not have permission to access this page.')
         return redirect('dashboard')
-   
+    
     try:
         resident = Resident.objects.get(id=resident_id)
         user_email = resident.user.email  # Save email before deleting
@@ -400,7 +371,7 @@ def reject_resident(request, resident_id):
             messages.success(request, f'Resident account for {resident_name} has been rejected and removed. (Notification email could not be sent)')
     except Resident.DoesNotExist:
         messages.error(request, 'Resident not found.')
-   
+    
     return redirect('staff_dashboard')
 
 
@@ -412,24 +383,24 @@ def reject_resident(request, resident_id):
 def admin_dashboard(request):
     """Admin dashboard - enhanced version"""
     today = timezone.now().date()
-   
+    
     # Core statistics
     pending_verifications = Resident.objects.filter(approval_status='pending').count()
     approved_residents = Resident.objects.filter(approval_status='approved').count()
     active_staff = CustomUser.objects.filter(role='staff', is_active=True).count()
-   
+    
     # Total users (all roles)
     total_users = CustomUser.objects.all().count()
-   
+    
     # Recent registrations (last 5)
     recent_registrations = Resident.objects.select_related('user').order_by('-user__date_joined')[:5]
-   
+    
     # Recent approvals (last 5)
     recent_approvals = Resident.objects.filter(
         approval_status='approved',
         approval_date__isnull=False
     ).select_related('user').order_by('-approval_date')[:5]
-   
+    
     context = {
         'pending_verifications': pending_verifications,
         'approved_residents': approved_residents,
@@ -438,7 +409,7 @@ def admin_dashboard(request):
         'recent_registrations': recent_registrations,
         'recent_approvals': recent_approvals,
     }
-   
+    
     return render(request, 'accounts/admin_dashboard.html', context)
 
 
@@ -448,10 +419,10 @@ def resident_verification(request):
     """Admin view to see all resident verifications in table format"""
     status_filter = request.GET.get('status', 'pending')
     search_query = request.GET.get('search', '')
-   
+    
     # Base queryset
     residents = Resident.objects.select_related('user').all()
-   
+    
     # Apply status filter
     if status_filter == 'pending':
         residents = residents.filter(approval_status='pending')
@@ -460,7 +431,7 @@ def resident_verification(request):
     elif status_filter == 'rejected':
         # Note: Rejected residents are deleted, so we can't filter by status
         residents = Resident.objects.none()  # Empty queryset
-   
+    
     # Apply search filter
     if search_query:
         residents = residents.filter(
@@ -469,15 +440,15 @@ def resident_verification(request):
             Q(user__email__icontains=search_query) |
             Q(phone_number__icontains=search_query)
         )
-   
+    
     # Order by date joined (newest first)
     residents = residents.order_by('-user__date_joined')
-   
+    
     # Get counts for each status
     pending_count = Resident.objects.filter(approval_status='pending').count()
     approved_count = Resident.objects.filter(approval_status='approved').count()
     total_count = Resident.objects.all().count()
-   
+    
     context = {
         'pending_residents': residents,
         'status_filter': status_filter,
@@ -498,54 +469,54 @@ def resident_detail(request, resident_id):
     except Resident.DoesNotExist:
         messages.error(request, 'Resident not found.')
         return redirect('resident_verification')
-   
+    
     # Get related appointments
     appointments = Appointment.objects.filter(resident=resident.user).order_by('-created_at')[:5]
-   
+    
     if request.method == 'POST':
         action = request.POST.get('action')
         notes = request.POST.get('notes', '').strip()
-       
+        
         if action == 'approve':
             # Approve the resident
             resident.approval_status = 'approved'
             resident.approval_date = timezone.now()
             resident.approval_notes = notes if notes else 'Approved by admin'
             resident.save()
-           
+            
             # Send approval email
             try:
                 subject = 'Account Approved - Barangay Office Management System'
                 from_email = 'no-reply@barangay-office.com'
                 recipient_list = [resident.user.email]
-               
+                
                 text_content = render_to_string('emails/resident_approval.txt', {'resident': resident})
                 html_content = render_to_string('emails/resident_approval.html', {'resident': resident})
-               
+                
                 msg = EmailMultiAlternatives(subject, text_content, from_email, recipient_list)
                 msg.attach_alternative(html_content, "text/html")
                 msg.send()
                 messages.success(request, f'Resident {resident.first_name} {resident.last_name} approved. Email sent.')
             except Exception as e:
                 messages.success(request, f'Resident {resident.first_name} {resident.last_name} approved. (Email failed to send)')
-           
+            
             return redirect('resident_verification')
-           
+            
         elif action == 'reject':
             # Reject the resident
             user_email = resident.user.email
             resident_name = f'{resident.first_name} {resident.last_name}'
             user = resident.user
-           
+            
             # Store notes before deletion
             rejection_reason = notes if notes else 'Account did not meet requirements'
-           
+            
             # Send rejection email
             try:
                 subject = 'Account Rejected - Barangay Office Management System'
                 from_email = 'no-reply@barangay-office.com'
                 recipient_list = [user_email]
-               
+                
                 context = {
                     'resident': {
                         'first_name': resident.first_name,
@@ -553,23 +524,23 @@ def resident_detail(request, resident_id):
                         'rejection_reason': rejection_reason
                     }
                 }
-               
+                
                 text_content = render_to_string('emails/resident_rejection.txt', context)
                 html_content = render_to_string('emails/resident_rejection.html', context)
-               
+                
                 msg = EmailMultiAlternatives(subject, text_content, from_email, recipient_list)
                 msg.attach_alternative(html_content, "text/html")
                 msg.send()
             except Exception as e:
                 pass
-           
+            
             # Delete the accounts
             resident.delete()
             user.delete()
-           
+            
             messages.success(request, f'Resident {resident_name} rejected and removed.')
             return redirect('resident_verification')
-   
+    
     context = {
         'resident': resident,
         'appointments': appointments,
@@ -588,13 +559,13 @@ def staff_accounts(request):
     """Admin view to manage staff accounts"""
     search_query = request.GET.get('search', '')
     status_filter = request.GET.get('status', 'all')
-   
+    
     # Base queryset
     staff_members = CustomUser.objects.filter(role='staff').select_related('barangaystaff')
 
     active_count = staff_members.filter(is_active=True).count()
     inactive_count = staff_members.filter(is_active=False).count()
-   
+    
     # Apply search filter
     if search_query:
         staff_members = staff_members.filter(
@@ -602,18 +573,18 @@ def staff_accounts(request):
             Q(barangaystaff__first_name__icontains=search_query) |
             Q(barangaystaff__last_name__icontains=search_query)
         )
-   
+    
     # Apply status filter
     if status_filter == 'active':
         staff_members = staff_members.filter(is_active=True)
     elif status_filter == 'inactive':
         staff_members = staff_members.filter(is_active=False)
-   
+    
     # Get counts
     active_count = CustomUser.objects.filter(role='staff', is_active=True).count()
     inactive_count = CustomUser.objects.filter(role='staff', is_active=False).count()
     total_count = active_count + inactive_count
-   
+    
     context = {
         'staff_members': staff_members,
         'active_count': active_count,
@@ -623,6 +594,36 @@ def staff_accounts(request):
         'status_filter': status_filter,
     }
     return render(request, 'accounts/staff_accounts.html', context)
+
+
+@login_required
+@user_passes_test(is_admin)
+def create_staff_account(request):
+    """View for admin to create new staff accounts"""
+    if request.method == 'POST':
+        form = StaffCreationForm(request.POST)
+        if form.is_valid():
+            user = form.save(commit=False)
+            user.role = 'staff'  # Ensure role is set to staff
+            user.save()
+            
+            # Create associated BarangayStaff record
+            BarangayStaff.objects.create(
+                user=user,
+                first_name=form.cleaned_data.get('first_name'),
+                middle_name=form.cleaned_data.get('middle_name'),
+                last_name=form.cleaned_data.get('last_name')
+            )
+            
+            messages.success(request, f'Staff account created successfully!')
+            return redirect('staff_accounts')
+    else:
+        form = StaffCreationForm()
+    
+    context = {
+        'form': form,
+    }
+    return render(request, 'accounts/create_staff_account.html', context)
 
 
 @login_required
@@ -641,7 +642,7 @@ def toggle_staff_status(request, staff_id):
         messages.success(request, f'Staff account {action} successfully.')
     except CustomUser.DoesNotExist:
         messages.error(request, 'Staff account not found.')
-   
+    
     return redirect('staff_accounts')
 
 
@@ -656,28 +657,28 @@ def admin_reports(request):
     # Get report statistics
     today = timezone.now().date()
     month_start = today.replace(day=1)
-   
+    
     # Monthly statistics
     monthly_registrations = Resident.objects.filter(
         created_at__date__gte=month_start
     ).count()
-   
+    
     monthly_appointments = Appointment.objects.filter(
         preferred_date__gte=month_start
     ).count()
-   
+    
     # Status breakdowns
     appointment_statuses = Appointment.objects.values('status').annotate(
         count=Count('id')
     ).order_by('-count')
-   
+    
     resident_statuses = Resident.objects.values('approval_status').annotate(
         count=Count('id')
     )
-   
+    
     # Staff activity
     active_staff_count = CustomUser.objects.filter(role='staff', is_active=True).count()
-   
+    
     context = {
         'monthly_registrations': monthly_registrations,
         'monthly_appointments': monthly_appointments,
@@ -702,18 +703,18 @@ def activity_log(request):
     """Activity log page"""
     # Get recent activities from various models
     today = timezone.now().date()
-   
+    
     # Recent resident registrations
     recent_registrations = Resident.objects.select_related('user').order_by('-created_at')[:10]
-   
+    
     # Recent appointments
     recent_appointments = Appointment.objects.select_related('resident__user').order_by('-created_at')[:10]
-   
+    
     # Recent staff actions
     recent_staff_actions = CustomUser.objects.filter(
         role='staff'
     ).order_by('-date_joined')[:5]
-   
+    
     context = {
         'recent_registrations': recent_registrations,
         'recent_appointments': recent_appointments,
@@ -728,36 +729,36 @@ def activity_log(request):
 def generate_report(request):
     """Generate report view"""
     report_type = request.GET.get('type', 'daily')
-   
+    
     if report_type == 'daily':
         # Generate daily report
         today = timezone.now().date()
         new_registrations = Resident.objects.filter(
             created_at__date=today
         ).count()
-       
+        
         appointments_today = Appointment.objects.filter(
             preferred_date=today
         ).count()
-       
+        
         # You would typically generate a PDF or Excel file here
         messages.success(request, f'Daily report generated: {new_registrations} new registrations, {appointments_today} appointments today.')
-       
+        
     elif report_type == 'monthly':
         # Generate monthly report
         today = timezone.now().date()
         month_start = today.replace(day=1)
-       
+        
         monthly_registrations = Resident.objects.filter(
             created_at__date__gte=month_start
         ).count()
-       
+        
         monthly_appointments = Appointment.objects.filter(
             preferred_date__gte=month_start
         ).count()
-       
+        
         messages.success(request, f'Monthly report generated: {monthly_registrations} registrations, {monthly_appointments} appointments this month.')
-   
+    
     return redirect('admin_reports')
 
 
@@ -770,13 +771,13 @@ def announcements(request):
         title = request.POST.get('title')
         message = request.POST.get('message')
         recipient_type = request.POST.get('recipient_type', 'all')
-       
+        
         if title and message:
             # Here you would save the announcement and schedule sending
             messages.success(request, 'Announcement scheduled for sending.')
         else:
             messages.error(request, 'Please provide both title and message.')
-   
+    
     return render(request, 'accounts/announcements.html')
 
 
@@ -785,13 +786,13 @@ def announcements(request):
 def admin_profile(request):
     """Admin profile page"""
     user = request.user
-   
+    
     if request.method == 'POST':
         # Handle profile update
         first_name = request.POST.get('first_name', '')
         last_name = request.POST.get('last_name', '')
         email = request.POST.get('email', '')
-       
+        
         if first_name and last_name and email:
             user.first_name = first_name
             user.last_name = last_name
@@ -800,7 +801,7 @@ def admin_profile(request):
             messages.success(request, 'Profile updated successfully.')
         else:
             messages.error(request, 'Please fill in all required fields.')
-   
+    
     context = {
         'user': user,
     }
