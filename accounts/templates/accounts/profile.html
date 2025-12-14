@@ -9,8 +9,10 @@
         <div class="profile-avatar">
             <i class="bi bi-person-circle"></i>
         </div>
-        <h2>{{ user.resident.first_name }} {{ user.resident.last_name }}</h2>
-        <p class="text-muted">Member since {{ user.date_joined|date:"F Y" }}</p>
+        <div class="profile-header-text">
+            <h2>{{ user.resident.first_name }} {{ user.resident.last_name }}</h2>
+            <p class="text-muted">Member since {{ user.date_joined|date:"F Y" }}</p>
+        </div>
     </div>
 
     <div class="profile-card">
@@ -105,7 +107,7 @@
 
             <div class="form-actions">
                 <button type="submit" class="btn btn-primary btn-lg">
-                    <i class="bi bi-save me-2"></i>Save Changes
+                    Save Changes
                 </button>
             </div>
         </form>
@@ -186,6 +188,16 @@
 </script>
 
 <style>
+/* Define CSS variables to match certification page */
+:root {
+  --color-primary: #0038a8;
+  --color-secondary: #fcd116;
+  --color-accent: #ce1126;
+  --color-neutral: #ffffff;
+  --color-text: #000000;
+  --color-surface: rgba(0,56,168,0.04);
+}
+
 /* Base Typography */
 body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
@@ -211,30 +223,39 @@ h1, h2, h3, h4, h5, h6 {
 
 .profile-header {
     text-align: center;
-    margin-bottom: 1.5rem;
-    padding: 1.5rem;
+    margin-bottom: 1rem;
+    padding: 0.75rem 1rem;
     background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
     position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
 }
 
 .profile-avatar {
-    font-size: 3rem;
+    font-size: 2rem;
     color: #0d6efd;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0;
+    line-height: 1;
+}
+
+.profile-header-text {
+    text-align: left;
 }
 
 .profile-header h2 {
     color: #1a202c;
-    margin-bottom: 0.25rem;
-    font-size: 1.8rem;
+    margin: 0;
+    font-size: 1.25rem;
     font-weight: 700;
-    letter-spacing: -0.5px;
+    letter-spacing: -0.3px;
 }
 
 .profile-header p.text-muted {
-    font-size: 0.9rem;
+    font-size: 0.8rem;
     color: #718096;
     font-weight: 400;
     margin: 0;
@@ -342,14 +363,39 @@ h1, h2, h3, h4, h5, h6 {
     width: 100%;
 }
 
-.form-control:focus, .form-select:focus {
+/* Match select dropdowns with input styling */
+select.form-select,
+select#id_sex,
+select#id_civil_status {
+    padding: 0.7rem 1rem;
+    border-radius: 8px;
+    border: 2px solid #e2e8f0;
+    font-size: 0.95rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    font-family: 'Inter', sans-serif;
+    color: #1a202c;
+    background-color: #ffffff;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    width: 100%;
+    cursor: pointer;
+    display: block;
+    box-sizing: border-box;
+}
+
+.form-control:focus,
+.form-select:focus,
+select#id_sex:focus,
+select#id_civil_status:focus {
     border-color: #818cf8;
     box-shadow: 0 0 0 3px rgba(129, 140, 248, 0.2);
     outline: none;
     background-color: #ffffff;
 }
 
-.form-control:hover, .form-select:hover {
+.form-control:hover,
+.form-select:hover,
+select#id_sex:hover,
+select#id_civil_status:hover {
     border-color: #c7d2fe;
 }
 
@@ -379,23 +425,32 @@ textarea.form-control {
 }
 
 .btn-primary {
-    padding: 0.7rem 2rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.875rem 1.75rem;
     font-weight: 600;
-    letter-spacing: 0.5px;
-    transition: all 0.3s ease;
-    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    letter-spacing: 0.18px;
+    transition: all 0.12s ease;
+    background: #fcd116;
     border: none;
-    box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
-    color: #1f2937;
-    border-radius: 8px;
+    box-shadow: none;
+    color: #000000;
+    border-radius: 12px;
     font-size: 1rem;
+    cursor: pointer;
+    width: auto;
 }
 
 .btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(245, 158, 11, 0.4);
-    background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
-    color: #1f2937;
+    background: #fcd116;
+    color: #000000;
+}
+
+.btn-primary:active {
+    background: #fcd116;
+    color: #000000;
 }
 
 .invalid-feedback {
@@ -470,7 +525,7 @@ input, select, textarea, button {
     }
     
     .profile-header {
-        padding: 1rem;
+        padding: 0.5rem 0.75rem;
     }
     
     .form-row {
@@ -483,7 +538,7 @@ input, select, textarea, button {
     }
     
     .profile-header h2 {
-        font-size: 1.5rem;
+        font-size: 1.1rem;
     }
     
     .form-tabs {
