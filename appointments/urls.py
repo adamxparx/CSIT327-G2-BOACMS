@@ -16,4 +16,10 @@ urlpatterns = [
     path('api/appointments/', views.api_appointments_list, name='api_appointments_list'),
     path('calendar/', views.appointments_calendar_view, name='appointments_calendar'),
     path('appointment/<int:appointment_id>/', views.appointment_detail, name='appointment_detail'),
+    path(
+    "api/month-availability/",
+    views.api_month_availability,
+    name="api_month_availability"
+)
+
 ]
