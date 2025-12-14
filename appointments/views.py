@@ -21,7 +21,7 @@ TOTAL_PM_SLOTS = 20
 
 def find_nearest_available_slot(preferred_date, preferred_time, buffer_minutes=30, max_days=14):
     """Return the nearest future slot (date, time) that is free."""
-    open_time = datetime_time(9, 0)
+    open_time = datetime_time(8, 0)
     close_time = datetime_time(16, 30)  # Changed to 4:30 PM
     step = timedelta(minutes=30)  # Changed from 15 to 30 minutes
     
@@ -77,6 +77,7 @@ def create_appointment(request):
             try:
                 appointment = form.save(commit=False)
                 appointment.resident = request.user
+                appointment.status = 'approved'  # Auto-approve appointments
                 
                 # Convert string time to time object before saving
                 if isinstance(form.cleaned_data['preferred_time'], str):
@@ -85,7 +86,7 @@ def create_appointment(request):
                 
                 appointment.save()
                 messages.success(request, "Appointment booked successfully!")
-                return redirect('confirmation', appointment_id = appointment.id)
+                return redirect('appointments')
             except IntegrityError:
                 form.add_error(None, "This time slot is already taken. Please choose another time.")
                 recommended_slot = find_nearest_available_slot(
@@ -437,3 +438,38 @@ def api_month_availability(request):
         })
 
     return JsonResponse(response, safe=False)
+
+
+@login_required
+def api_date_availability(request):
+    """Get slot availability for a specific date"""
+    date_str = request.GET.get('date')
+    
+    if not date_str:
+        return JsonResponse({'error': 'Date parameter required'}, status=400)
+    
+    try:
+        selected_date = datetime.strptime(date_str, '%Y-%m-%d').date()
+    except ValueError:
+        return JsonResponse({'error': 'Invalid date format'}, status=400)
+    
+    # Count appointments for AM (before 12:00 PM) and PM (12:00 PM and after)
+    appointments = Appointment.objects.filter(
+        preferred_date=selected_date
+    ).exclude(status='cancelled')
+    
+    am_count = appointments.filter(preferred_time__lt=datetime_time(12, 0)).count()
+    pm_count = appointments.filter(preferred_time__gte=datetime_time(12, 0)).count()
+    
+    # Total slots per session (max 30 per session)
+    TOTAL_SLOTS = 30
+    
+    response = {
+        'date': date_str,
+        'am_available': max(TOTAL_SLOTS - am_count, 0),
+        'pm_available': max(TOTAL_SLOTS - pm_count, 0),
+        'am_booked': am_count,
+        'pm_booked': pm_count
+    }
+    
+    return JsonResponse(response)

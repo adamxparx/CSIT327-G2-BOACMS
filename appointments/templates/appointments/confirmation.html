@@ -9,82 +9,100 @@
 {% block title %}Appointment Confirmed | {{ block.super }}{% endblock %}
 
 {% block content %}
-<div class="confirmation-container">
-  <div class="confirmation-card">
-    <div class="confirmation-header">
-      <div class="confirmation-icon">
-        <i class="fas fa-check-circle"></i>
+<!-- Modal Backdrop -->
+<div class="modal-backdrop" id="confirmationModal">
+  <div class="modal-container">
+    <!-- Close Button -->
+    <button class="modal-close" id="closeModal">&times;</button>
+    
+    <!-- Success Icon & Title -->
+    <div class="success-header">
+      <div class="success-icon">
+        <svg viewBox="0 0 52 52" xmlns="http://www.w3.org/2000/svg">
+          <circle class="success-circle" cx="26" cy="26" r="25" fill="none"/>
+          <path class="success-check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+        </svg>
       </div>
-      <h1 class="confirmation-title">Confirmed!</h1>
-      <p class="confirmation-subtitle">{{ certificate_name }} scheduled.</p>
-      
-      <div class="appointment-status status-badge status-badge--confirmed">
-        Confirmed
+      <h1>Appointment Booked Successfully!</h1>
+      <p class="success-subtitle">{{ certificate_name }} has been scheduled.</p>
+    </div>
+
+    <!-- Appointment Details Card -->
+    <div class="info-card">
+      <div class="card-header">
+        <h2>Appointment Details</h2>
+      </div>
+      <div class="info-grid">
+        <div class="info-row">
+          <span class="label">Certificate Type:</span>
+          <span class="value">{{ certificate_name }}</span>
+        </div>
+        <div class="info-row">
+          <span class="label">Date:</span>
+          <span class="value">{{ appointment.preferred_date|date:"F j, Y" }}</span>
+        </div>
+        <div class="info-row">
+          <span class="label">Time:</span>
+          <span class="value">{{ appointment.preferred_time|time:"g:i A" }}</span>
+        </div>
+        <div class="info-row">
+          <span class="label">Purpose:</span>
+          <span class="value">
+            {% if appointment.purpose == 'others' %}
+              {{ appointment.get_purpose_display }}: {{ appointment.specify_purpose }}
+            {% else %}
+              {{ appointment.get_purpose_display }}
+            {% endif %}
+          </span>
+        </div>
       </div>
     </div>
 
-    <div class="confirmation-details">
-      <div class="detail-section">
-        <h2 class="section-title">Appointment Info</h2>
-        <div class="detail-grid">
-          {% if certificate_name %}
-          <div class="detail-item">
-            <span class="detail-label">Type</span>
-            <span class="detail-value">{{ certificate_name }}</span>
-          </div>
-          {% endif %}
-          <div class="detail-item">
-            <span class="detail-label">Date</span>
-            <span class="detail-value">{{ appointment.preferred_date|date:"F j, Y" }}</span>
-          </div>
-          <div class="detail-item">
-            <span class="detail-label">Time</span>
-            <span class="detail-value">{{ appointment.preferred_time|time:"g:i A" }}</span>
-          </div>
-          <div class="detail-item">
-            <span class="detail-label">Purpose</span>
-            <span class="detail-value">
-              {% if appointment.purpose == 'others' %}
-                {{ appointment.get_purpose_display }}: {{ appointment.specify_purpose }}
-              {% else %}
-                {{ appointment.get_purpose_display }}
-              {% endif %}
-            </span>
-          </div>
+    <!-- Resident Information Card -->
+    <div class="info-card">
+      <div class="card-header">
+        <h2>Resident Information</h2>
+      </div>
+      <div class="info-grid">
+        <div class="info-row">
+          <span class="label">Name:</span>
+          <span class="value">{{ appointment.resident.resident.first_name }} {{ appointment.resident.resident.last_name }}</span>
+        </div>
+        <div class="info-row">
+          <span class="label">Contact Number:</span>
+          <span class="value">{{ user.resident.phone_number|default:"Not provided" }}</span>
         </div>
       </div>
-
-      <div class="detail-section">
-        <h2 class="section-title">Resident Info</h2>
-        <div class="detail-grid">
-          <div class="detail-item">
-            <span class="detail-label">Name</span>
-            <span class="detail-value">{{ appointment.resident.resident.first_name }} {{ appointment.resident.resident.last_name }}</span>
-          </div>
-          <div class="detail-item">
-            <span class="detail-label">Contact</span>
-            <span class="detail-value">{{ user.resident.phone_number|default:"Not provided" }}</span>
-          </div>
-        </div>
-      </div>
-
-      {% if messages %}
-      <div class="detail-section">
-        <h2 class="section-title">Important Info</h2>
-        <div class="detail-notes">
-          {% for message in messages %}
-          <p><i class="fas fa-info-circle"></i> {{ message }}</p>
-          {% endfor %}
-        </div>
-      </div>
-      {% endif %}
     </div>
 
-    <div class="confirmation-actions">
-      <a href="{% url 'appointments' %}" class="btn btn--primary">
-        <i class="fas fa-calendar-alt"></i> View Appointments
+    <!-- Action Button -->
+    <div class="action-section">
+      <a href="{% url 'appointments' %}" class="view-appointments-btn">
+        View All Appointments
       </a>
     </div>
   </div>
 </div>
+
+<script>
+// Auto-show modal on page load
+document.addEventListener('DOMContentLoaded', function() {
+  const modal = document.getElementById('confirmationModal');
+  if (modal) {
+    modal.style.display = 'flex';
+  }
+  
+  // Close button handler
+  document.getElementById('closeModal').addEventListener('click', function() {
+    window.location.href = "{% url 'appointments' %}";
+  });
+});
+
+// Close modal when clicking backdrop
+document.getElementById('confirmationModal').addEventListener('click', function(e) {
+  if (e.target === this) {
+    window.location.href = "{% url 'appointments' %}";
+  }
+});
+</script>
 {% endblock %}

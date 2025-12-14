@@ -20,6 +20,11 @@ urlpatterns = [
     "api/month-availability/",
     views.api_month_availability,
     name="api_month_availability"
-)
+),
+    path(
+    "api/date-availability/",
+    views.api_date_availability,
+    name="api_date_availability"
+),
 
 ]
