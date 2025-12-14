@@ -1,0 +1,111 @@
+{% extends "accounts/index.html" %}
+{% load static %}
+
+{% block title %}Create Staff Account{% endblock %}
+
+{% block content %}
+<div class="register-container">
+    <div class="register-card">
+        <div class="register-header">
+            <h1>Create Staff Account</h1>
+            <p>Enter the details for the new staff member</p>
+        </div>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        {% if form.errors %}
+            <div class="alert alert-error">
+                <p>Please correct the errors below.</p>
+            </div>
+        {% endif %}
+
+        <form method="post" class="register-form">
+            {% csrf_token %}
+            
+            <div class="form-field">
+                <label for="{{ form.first_name.id_for_label }}">{{ form.first_name.label }}</label>
+                {{ form.first_name }}
+                {% for error in form.first_name.errors %}
+                    <span class="field-error">{{ error }}</span>
+                {% endfor %}
+            </div>
+            
+            <div class="form-field">
+                <label for="{{ form.middle_name.id_for_label }}">{{ form.middle_name.label }}</label>
+                {{ form.middle_name }}
+                {% for error in form.middle_name.errors %}
+                    <span class="field-error">{{ error }}</span>
+                {% endfor %}
+            </div>
+            
+            <div class="form-field">
+                <label for="{{ form.last_name.id_for_label }}">{{ form.last_name.label }}</label>
+                {{ form.last_name }}
+                {% for error in form.last_name.errors %}
+                    <span class="field-error">{{ error }}</span>
+                {% endfor %}
+            </div>
+            
+            <div class="form-field">
+                <label for="{{ form.email.id_for_label }}">{{ form.email.label }}</label>
+                {{ form.email }}
+                {% for error in form.email.errors %}
+                    <span class="field-error">{{ error }}</span>
+                {% endfor %}
+            </div>
+            
+            <div class="form-field">
+                <label for="{{ form.password1.id_for_label }}">{{ form.password1.label }}</label>
+                {{ form.password1 }}
+                {% for error in form.password1.errors %}
+                    <span class="field-error">{{ error }}</span>
+                {% endfor %}
+            </div>
+            
+            <div class="form-field">
+                <label for="{{ form.password2.id_for_label }}">{{ form.password2.label }}</label>
+                {{ form.password2 }}
+                {% for error in form.password2.errors %}
+                    <span class="field-error">{{ error }}</span>
+                {% endfor %}
+            </div>
+            
+            <button type="submit" class="btn btn-register">Create Staff Account</button>
+        </form>
+        
+        <div class="register-footer">
+            <p><a href="{% url 'staff_dashboard' %}">Back to Dashboard</a></p>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Function to check if first letter is capitalized
+    function checkCapitalization(input) {
+        const value = input.value;
+        if (value.length > 0 && !value[0].match(/[A-Z]/)) {
+            input.setCustomValidity("This field must start with a capital letter.");
+        } else {
+            input.setCustomValidity("");
+        }
+    }
+
+    // Add event listeners to name fields
+    document.addEventListener('DOMContentLoaded', function() {
+        // Get all input fields with name attributes containing 'name'
+        const nameFields = document.querySelectorAll('input[name$="name"]');
+        
+        nameFields.forEach(function(field) {
+            field.addEventListener('input', function() { 
+                checkCapitalization(this); 
+            });
+        });
+    });
+</script>
+{% endblock content %}

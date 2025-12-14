@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load staff_tags %}
 
 {% block title %}Home | Barangay Online Appointment & Certification Magement System{% endblock %}
 
@@ -21,6 +22,8 @@
         <div class="user-name" onclick="event.preventDefault()">
             {% if user.role == 'resident' %}
                 {{ user.resident.first_name }} {{ user.resident.last_name }}
+            {% elif user.role == 'staff' %}
+                {{ user|get_staff_name }}
             {% else %}
                 Barangay Office
             {% endif %}

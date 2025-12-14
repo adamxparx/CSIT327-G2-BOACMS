@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
-from .models import CustomUser, Resident
+from .models import CustomUser, Resident, BarangayStaff
 
 class CustomUserUpdateForm(forms.ModelForm):
     class Meta:
@@ -58,6 +58,98 @@ class CustomUserCreationForm(UserCreationForm):
         user.role = 'resident'
         if commit:
             user.save()
+        return user
+
+class StaffCreationForm(UserCreationForm):
+    """
+    Form for creating new staff accounts
+    """
+    first_name = forms.CharField(
+        required=True,
+        label='First Name',
+        widget=forms.TextInput(attrs={'placeholder': 'Enter first name'}),
+        max_length=50
+    )
+    
+    middle_name = forms.CharField(
+        required=False,
+        label='Middle Name',
+        widget=forms.TextInput(attrs={'placeholder': 'Enter middle name (optional)'}),
+        max_length=50
+    )
+    
+    last_name = forms.CharField(
+        required=True,
+        label='Last Name',
+        widget=forms.TextInput(attrs={'placeholder': 'Enter last name'}),
+        max_length=50
+    )
+    
+    class Meta:
+        model = CustomUser
+        fields = [
+            'email',
+            'password1',
+            'password2',
+        ]
+
+    email = forms.EmailField(
+        required=True,
+        label='Email Address',
+        widget=forms.EmailInput(attrs={'placeholder': 'Enter staff email'})
+    )
+
+    password1 = forms.CharField(
+        required=True,
+        label='Password',
+        widget=forms.PasswordInput(attrs={'placeholder': 'Enter password'}),
+    )
+
+    password2 = forms.CharField(
+        required=True,
+        label='Confirm Password',
+        widget=forms.PasswordInput(attrs={'placeholder': 'Confirm password'}),
+    )
+
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        if CustomUser.objects.filter(email=email).exists():
+            raise forms.ValidationError("This email address is already registered.")
+        return email
+    
+    def clean_first_name(self):
+        first_name = self.cleaned_data.get('first_name')
+        if first_name and not first_name[0].isupper():
+            raise forms.ValidationError("First name must start with a capital letter.")
+        return first_name
+    
+    def clean_middle_name(self):
+        middle_name = self.cleaned_data.get('middle_name')
+        if middle_name and not middle_name[0].isupper():
+            raise forms.ValidationError("Middle name must start with a capital letter.")
+        return middle_name
+    
+    def clean_last_name(self):
+        last_name = self.cleaned_data.get('last_name')
+        if last_name and not last_name[0].isupper():
+            raise forms.ValidationError("Last name must start with a capital letter.")
+        return last_name
+
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        user.role = 'staff'  # Set role to staff
+        if commit:
+            user.save()
+            # Create BarangayStaff record
+            first_name = self.cleaned_data.get('first_name')
+            middle_name = self.cleaned_data.get('middle_name')
+            last_name = self.cleaned_data.get('last_name')
+            BarangayStaff.objects.create(
+                user=user,
+                first_name=first_name,
+                middle_name=middle_name,
+                last_name=last_name
+            )
         return user
 
 class ResidentForm(forms.ModelForm):

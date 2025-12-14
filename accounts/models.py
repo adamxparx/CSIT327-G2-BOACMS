@@ -61,7 +61,12 @@ class Resident(models.Model):
     
 class BarangayStaff(models.Model):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
-    barangay_name = models.CharField(max_length=255)
+    first_name = models.CharField(max_length=50, default='Staff')
+    middle_name = models.CharField(max_length=50, null=True, blank=True)
+    last_name = models.CharField(max_length=50, default='Member')
 
     def __str__(self):
-        return f"{self.user.email} - {self.barangay_name}"
+        if self.middle_name:
+            return f"{self.first_name} {self.middle_name} {self.last_name} ({self.user.email})"
+        else:
+            return f"{self.first_name} {self.last_name} ({self.user.email})"

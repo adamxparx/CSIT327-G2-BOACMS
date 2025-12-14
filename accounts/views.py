@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import LoginView
 from django.contrib.auth import logout
 from django.contrib import messages
-from .forms import CustomUserCreationForm, CustomUserUpdateForm, ResidentForm
+from .forms import CustomUserCreationForm, CustomUserUpdateForm, ResidentForm, StaffCreationForm
 from appointments.models import Appointment
 from django.contrib.auth import get_user_model
 import datetime
@@ -181,3 +181,38 @@ def profile(request):
         'user': user,
     }
     return render(request, 'accounts/profile.html', context)
+
+
+@login_required
+def create_staff_account(request):
+    """
+    View for staff to create new staff accounts
+    """
+    # Check if the user is staff
+    if request.user.role != 'staff':
+        messages.error(request, 'You do not have permission to access this page.')
+        return redirect('staff_dashboard')
+    
+    if request.method == 'POST':
+        form = StaffCreationForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            first_name = form.cleaned_data.get('first_name')
+            middle_name = form.cleaned_data.get('middle_name')
+            last_name = form.cleaned_data.get('last_name')
+            
+            # Build full name for the message
+            if middle_name:
+                full_name = f'{first_name} {middle_name} {last_name}'
+            else:
+                full_name = f'{first_name} {last_name}'
+                
+            messages.success(request, f'Staff account for {full_name} ({user.email}) has been created successfully!')
+            return redirect('staff_dashboard')
+    else:
+        form = StaffCreationForm()
+    
+    context = {
+        'form': form,
+    }
+    return render(request, 'accounts/create_staff_account.html', context)
