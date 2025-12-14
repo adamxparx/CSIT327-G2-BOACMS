@@ -55,9 +55,19 @@ class Resident(models.Model):
     # Document showing address (now stores Supabase URL)
     address_document = models.URLField(null=True, blank=True,
                                        help_text="URL to the document showing your address")
+    
+    # Approval fields
+    APPROVAL_STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('approved', 'Approved'),
+        ('rejected', 'Rejected'),
+    ]
+    approval_status = models.CharField(max_length=20, choices=APPROVAL_STATUS_CHOICES, default='pending')
+    approval_date = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
         return f"{self.last_name}, {self.first_name}"
+    
     
 class BarangayStaff(models.Model):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)

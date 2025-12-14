@@ -1,0 +1,204 @@
+/* Resident Approvals Page Styles */
+
+.approvals-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.approvals-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.approvals-header h1 {
+    color: var(--color-primary);
+    margin-bottom: 10px;
+    font-size: 2rem;
+}
+
+.approvals-header p {
+    color: rgba(0, 0, 0, 0.7);
+    font-size: 1.1rem;
+    margin: 0;
+}
+
+/* Approval List Styles */
+.approval-list {
+    background: white;
+    border-radius: 12px;
+    padding: 25px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 30px;
+}
+
+.approval-list h2 {
+    color: var(--color-primary);
+    margin-bottom: 20px;
+    font-size: 1.5rem;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+/* Individual Resident Item */
+.resident-item {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    padding: 20px 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.resident-item:last-child {
+    border-bottom: none;
+}
+
+.resident-item:hover {
+    background-color: rgba(0, 56, 168, 0.03);
+}
+
+.resident-info {
+    flex: 1;
+    min-width: 300px;
+}
+
+.resident-name {
+    font-size: 1.3rem;
+    color: var(--color-primary);
+    margin: 0 0 10px 0;
+}
+
+.resident-detail {
+    margin: 8px 0;
+    font-size: 1rem;
+    color: rgba(0, 0, 0, 0.8);
+}
+
+.resident-detail strong {
+    color: #333;
+    min-width: 80px;
+    display: inline-block;
+}
+
+.document-link {
+    color: var(--color-primary);
+    text-decoration: none;
+    font-weight: 600;
+    border-bottom: 1px dotted var(--color-primary);
+}
+
+.document-link:hover {
+    text-decoration: none;
+    border-bottom: 1px solid var(--color-primary);
+}
+
+/* Action Buttons */
+.action-buttons {
+    display: flex;
+    gap: 15px;
+    margin-top: 15px;
+    flex-wrap: wrap;
+}
+
+.btn-approve {
+    background-color: #27ae60;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.btn-approve:hover {
+    background-color: #219653;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(39, 174, 96, 0.2);
+}
+
+.btn-reject {
+    background-color: #e74c3c;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.btn-reject:hover {
+    background-color: #c0392b;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(231, 76, 60, 0.2);
+}
+
+/* No Pending Residents Message */
+.no-pending-message {
+    text-align: center;
+    padding: 40px 20px;
+    color: rgba(0, 0, 0, 0.6);
+    font-size: 1.1rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .approvals-container {
+        padding: 15px;
+    }
+    
+    .approvals-header h1 {
+        font-size: 1.7rem;
+    }
+    
+    .approval-list {
+        padding: 15px;
+    }
+    
+    .resident-item {
+        flex-direction: column;
+    }
+    
+    .resident-info {
+        margin-bottom: 15px;
+    }
+    
+    .action-buttons {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .btn-approve,
+    .btn-reject {
+        flex: 1;
+        text-align: center;
+        max-width: 200px;
+    }
+}
+
+@media (max-width: 480px) {
+    .approvals-header h1 {
+        font-size: 1.5rem;
+    }
+    
+    .resident-name {
+        font-size: 1.1rem;
+    }
+    
+    .resident-detail {
+        font-size: 0.9rem;
+    }
+    
+    .btn-approve,
+    .btn-reject {
+        padding: 8px 15px;
+        font-size: 0.9rem;
+    }
+}

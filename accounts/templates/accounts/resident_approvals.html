@@ -1,0 +1,72 @@
+{% extends "accounts/index.html" %}
+{% load static %}
+
+{% block title %}BOACMS | Resident Approvals{% endblock %}
+
+{% block staff_css %}
+    <link rel="stylesheet" href="{% static 'accounts/css/dropdown.css' %}">
+    <link rel="stylesheet" href="{% static 'accounts/css/approvals.css' %}">
+    {% block staff_extra_css %}{% endblock %}
+{% endblock %}
+
+{% block appbar %}
+
+    <ul>
+        <li><a href="{% url 'staff_dashboard' %}" {% if request.resolver_match.url_name == 'staff_dashboard' %}aria-current="page"{% endif %}>HOME</a></li>
+        <li><a href="{% url 'pending_appointments' %}">APPOINTMENTS</a></li>
+        <li class="appointment_dropdown">
+            <ul class="dropdown_menu">
+                <li><a href="{% url 'pending_appointments' %}" {% if request.resolver_match.url_name == 'pending_appointments' %}aria-current="page"{% endif %}>Pending</a></li>
+                <li><a href="{% url 'approved_appointments' %}" {% if request.resolver_match.url_name == 'approved_appointments' %}aria-current="page"{% endif %}>Approved</a></li>
+                <li><a href="{% url 'cancelled_appointments' %}" {% if request.resolver_match.url_name == 'cancelled_appointments' %}aria-current="page"{% endif %}>Cancelled</a></li>
+                <li><a href="{% url 'completed_appointments' %}" {% if request.resolver_match.url_name == 'completed_appointments' %}aria-current="page"{% endif %}>Completed</a></li>
+            </ul>
+        </li>
+        <li><a href="{% url 'appointments_calendar' %}" {% if request.resolver_match.url_name == 'appointments_calendar' %}aria-current="page"{% endif %}>CALENDAR</a></li>
+        <li><a href="{% url 'resident_approvals' %}" {% if request.resolver_match.url_name == 'resident_approvals' %}aria-current="page"{% endif %}>REGISTRATION</a></li>
+    </ul>
+
+{% endblock %}
+
+{% block user %}
+<div>Barangay Office</div>
+{% endblock %}
+
+{% block content %}
+<div class="approvals-container">
+    <div class="approvals-header">
+        <h1>Resident Account Approvals</h1>
+        <p>Review and manage resident account registrations</p>
+    </div>
+
+    <!-- Pending Resident Approvals -->
+    <div class="approval-list">
+        <h2>Pending Resident Approvals</h2>
+        <div class="approval-items">
+            {% if pending_residents %}
+                {% for resident in pending_residents %}
+                <div class="resident-item">
+                    <div class="resident-info">
+                        <h3 class="resident-name">{{ resident.first_name }} {{ resident.middle_name }} {{ resident.last_name }}</h3>
+                        <p class="resident-detail"><strong>Email:</strong> {{ resident.user.email }}</p>
+                        <p class="resident-detail"><strong>Address:</strong> {{ resident.address }}</p>
+                        <p class="resident-detail"><strong>Registered:</strong> {{ resident.user.date_joined|date:"M d, Y" }} at {{ resident.user.date_joined|time:"g:i A" }}</p>
+                        {% if resident.address_document %}
+                            <p class="resident-detail"><strong>Document:</strong> <a href="{{ resident.address_document }}" target="_blank" class="document-link">View Document</a></p>
+                        {% endif %}
+                    </div>
+                    <div class="action-buttons">
+                        <a href="{% url 'approve_resident' resident.id %}" class="btn-approve">Approve</a>
+                        <a href="{% url 'reject_resident' resident.id %}" class="btn-reject">Reject</a>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="no-pending-message">
+                    <p>No pending resident approvals.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

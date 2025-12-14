@@ -22,6 +22,7 @@
             </ul>
         </li>
         <li><a href="{% url 'appointments_calendar' %}" {% if request.resolver_match.url_name == 'appointments_calendar' %}aria-current="page"{% endif %}>CALENDAR</a></li>
+        <li><a href="{% url 'resident_approvals' %}" {% if request.resolver_match.url_name == 'resident_approvals' %}aria-current="page"{% endif %}>REGISTRATION</a></li>
     </ul>
 
 {% endblock %}
