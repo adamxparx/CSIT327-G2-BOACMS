@@ -29,7 +29,16 @@
             </div>
         {% endif %}
 
-        <form method="post" class="register-form">
+        <!-- Messages -->
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <form method="post" class="register-form" enctype="multipart/form-data">
             {% csrf_token %}
 
             <div class="form-field">
@@ -112,6 +121,16 @@
                 {% endfor %}
             </div>
 
+            <!-- Document Upload Field -->
+            <div class="form-field full-width">
+                <label for="{{ resident_form.address_document_file.id_for_label }}">{{ resident_form.address_document_file.label }}</label>
+                {{ resident_form.address_document_file }}
+                <small class="help-text">{{ resident_form.address_document_file.help_text }}</small>
+                {% for error in resident_form.address_document_file.errors %}
+                    <span class="field-error">{{ error }}</span>
+                {% endfor %}
+            </div>
+
             <div class="form-field">
                 <label for="{{ user_form.password1.id_for_label }}">{{ user_form.password1.label }}</label>
                 {{ user_form.password1 }}
@@ -148,6 +167,17 @@
         }
     }
 
+    // Function to allow only numeric input for phone number
+    function validatePhoneNumber(input) {
+        // Remove any non-digit characters
+        input.value = input.value.replace(/\D/g, '');
+        
+        // Limit to 11 digits
+        if (input.value.length > 11) {
+            input.value = input.value.slice(0, 11);
+        }
+    }
+
     // Add event listeners to name fields
     document.addEventListener('DOMContentLoaded', function() {
         // Get all input fields with name attributes containing 'name' or 'citizenship'
@@ -158,6 +188,32 @@
                 checkCapitalization(this); 
             });
         });
+
+        // Add event listener for phone number field
+        const phoneField = document.querySelector('input[name="phone_number"]');
+        if (phoneField) {
+            phoneField.addEventListener('input', function() {
+                validatePhoneNumber(this);
+            });
+            
+            // Also prevent non-numeric keystrokes
+            phoneField.addEventListener('keypress', function(e) {
+                // Allow only digits (0-9)
+                if (e.which < 48 || e.which > 57) {
+                    // Allow control keys (backspace, delete, tab, etc.)
+                    if (e.which !== 8 && e.which !== 9 && e.which !== 46 && 
+                        e.which !== 37 && e.which !== 38 && e.which !== 39 && e.which !== 40 &&
+                        (e.which < 127 || e.which > 127)) {
+                        e.preventDefault();
+                    }
+                }
+                
+                // Prevent entering more than 11 digits
+                if (this.value.length >= 11 && (e.which >= 48 && e.which <= 57)) {
+                    e.preventDefault();
+                }
+            });
+        }
     });
 </script>
 {% endblock content %}

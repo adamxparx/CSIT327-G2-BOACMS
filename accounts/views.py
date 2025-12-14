@@ -7,6 +7,8 @@ from .forms import CustomUserCreationForm, CustomUserUpdateForm, ResidentForm
 from appointments.models import Appointment
 from django.contrib.auth import get_user_model
 import datetime
+from .utils import upload_document_to_supabase
+
 
 def auth_check(user):
     if user.is_authenticated:
@@ -16,6 +18,7 @@ def auth_check(user):
             return redirect('staff_dashboard')
     return None
 
+
 class CustomLoginView(LoginView):
     template_name = 'accounts/login.html'
     def dispatch(self, request, *args, **kwargs):
@@ -24,6 +27,7 @@ class CustomLoginView(LoginView):
             return response
         return super().dispatch(request, *args, **kwargs)
       
+
 def index(request):
     user = request.user
     response = auth_check(user)
@@ -35,6 +39,7 @@ def index(request):
     }
     return render(request, 'accounts/index.html', context)
 
+
 def register(request):
     response = auth_check(request.user)
     if response:
@@ -42,11 +47,28 @@ def register(request):
     
     if request.method == 'POST':
         user_form = CustomUserCreationForm(request.POST)
-        resident_form = ResidentForm(request.POST)
+        resident_form = ResidentForm(request.POST, request.FILES)
         if user_form.is_valid() and resident_form.is_valid():
             user = user_form.save()
             resident = resident_form.save(commit=False)
             resident.user = user
+            
+            # Handle document upload to Supabase if provided
+            address_document = request.FILES.get('address_document_file')
+            if address_document:
+                try:
+                    # Upload to Supabase and get the URL
+                    document_url = upload_document_to_supabase(address_document, user.id)
+                    resident.address_document = document_url
+                except Exception as e:
+                    messages.error(request, f'Failed to upload document: {str(e)}')
+                    # Delete the user if document upload fails
+                    user.delete()
+                    return render(request, 'accounts/register.html', {
+                        'user_form': user_form,
+                        'resident_form': resident_form,
+                    })
+            
             resident.save()
             messages.success(request, 'Your account has been created successfully!')
             return redirect('login') 
@@ -59,6 +81,7 @@ def register(request):
         'resident_form': resident_form,
     }
     return render(request, 'accounts/register.html', context)
+
 
 @login_required
 def dashboard(request):
@@ -114,6 +137,7 @@ def dashboard(request):
         messages.error(request, 'Invalid account. Please try again.')
         return redirect('login')
 
+
 @login_required
 def staff_dashboard(request):
     user = request.user
@@ -137,6 +161,7 @@ def staff_dashboard(request):
     }
 
     return render(request, 'accounts/staff_dashboard.html', context)
+
 
 @login_required
 def profile(request):

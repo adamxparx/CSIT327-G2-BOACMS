@@ -61,6 +61,17 @@ class CustomUserCreationForm(UserCreationForm):
         return user
 
 class ResidentForm(forms.ModelForm):
+    # Add a separate field for file upload (not bound to the model field)
+    address_document_file = forms.FileField(
+        required=False,
+        label='Upload document (document must show address)',
+        widget=forms.FileInput(attrs={
+            'accept': 'image/*,application/pdf',
+            'class': 'file-input'
+        }),
+        help_text='Upload a document showing your address (image or PDF)'
+    )
+    
     class Meta:
         model = Resident
         fields = [
@@ -108,7 +119,13 @@ class ResidentForm(forms.ModelForm):
     phone_number = forms.CharField(
         required=False,
         label='Phone Number',
-        widget=forms.TextInput(attrs={'placeholder': 'Enter your phone number'})
+        max_length=11,
+        widget=forms.TextInput(attrs={
+            'placeholder': 'Enter your phone number',
+            'maxlength': '11',
+            'pattern': '\d{11}',
+            'title': 'Phone number must be exactly 11 digits'
+        })
     )
 
     citizenship = forms.CharField(
@@ -119,8 +136,12 @@ class ResidentForm(forms.ModelForm):
 
     def clean_phone_number(self):
         phone_number = self.cleaned_data.get('phone_number')
-        if phone_number and Resident.objects.filter(phone_number=phone_number).exists():
-            raise forms.ValidationError("This phone number is already in use.")
+        if phone_number:
+            # Check if it's exactly 11 digits
+            if not phone_number.isdigit() or len(phone_number) != 11:
+                raise forms.ValidationError("Phone number must be exactly 11 digits.")
+            if Resident.objects.filter(phone_number=phone_number).exists():
+                raise forms.ValidationError("This phone number is already in use.")
         return phone_number
 
     def clean_first_name(self):

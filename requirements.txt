@@ -7,3 +7,4 @@ sqlparse==0.5.3
 tzdata==2025.2
 whitenoise==6.11.0
 gunicorn==23.0.0
+supabase==2.25.1
