@@ -1,0 +1,12 @@
+Account Approved
+
+Hello {{ resident.first_name }} {{ resident.last_name }},
+
+Your account registration for the Barangay Office Management System has been approved by our staff.
+
+You can now log in to the system using your email address ({{ resident.user.email }}) and the password you created during registration.
+
+If you have any questions or need assistance, please contact our office.
+
+Thank you,
+Barangay Office Team

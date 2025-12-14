@@ -48,4 +48,63 @@
         </div>
     </div>
 </div>
+
+<!-- Registration Pending Approval Modal -->
+<div id="approvalModal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Account Under Review</h2>
+        </div>
+        <div class="modal-body">
+            <p>Your account registration is currently under review by our staff. You will receive an email notification once your account has been approved.</p>
+            <p>Please check your email regularly for updates.</p>
+            <div class="modal-actions">
+                <button id="closeModal" class="btn btn-primary">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Show the modal if new_registration parameter is present
+document.addEventListener('DOMContentLoaded', function() {
+    var urlParams = new URLSearchParams(window.location.search);
+    var isNewRegistration = urlParams.get('new_registration');
+    
+    if (isNewRegistration === 'true') {
+        var modal = document.getElementById("approvalModal");
+        var closeModalBtn = document.getElementById("closeModal");
+        
+        modal.style.display = "block";
+        
+        // Close modal when OK button is clicked
+        closeModalBtn.onclick = function() {
+            modal.style.display = "none";
+            // Remove the new_registration parameter from URL
+            var newUrl = window.location.href.split('?')[0];
+            window.history.replaceState({}, document.title, newUrl);
+        }
+        
+        // Close modal when clicking outside of it
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+                // Remove the new_registration parameter from URL
+                var newUrl = window.location.href.split('?')[0];
+                window.history.replaceState({}, document.title, newUrl);
+            }
+        }
+        
+        // Close modal with Escape key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape' && modal.style.display !== 'none') {
+                modal.style.display = 'none';
+                // Remove the new_registration parameter from URL
+                var newUrl = window.location.href.split('?')[0];
+                window.history.replaceState({}, document.title, newUrl);
+            }
+        });
+    }
+});
+</script>
 {% endblock content %}

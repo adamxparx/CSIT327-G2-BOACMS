@@ -1,19 +1,34 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, HttpResponse
+from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import LoginView
 from django.contrib.auth import logout
 from django.contrib import messages
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_http_methods
+from django.core.mail import EmailMultiAlternatives
+from django.template.loader import render_to_string
 from .forms import CustomUserCreationForm, CustomUserUpdateForm, ResidentForm, StaffCreationForm
 from appointments.models import Appointment
 from django.contrib.auth import get_user_model
 import datetime
 from .utils import upload_document_to_supabase
+from .models import Resident
 
 
-def auth_check(user):
-    if user.is_authenticated:
+def auth_check(user, is_new_registration=False):
+    if user.is_authenticated and not is_new_registration:
         if user.role == 'resident':
-            return redirect('dashboard')
+            # Check if the resident account is approved
+            try:
+                if hasattr(user, 'resident') and user.resident.approval_status != 'approved':
+                    # If not approved, redirect to login with a message
+                    return redirect('login')
+                else:
+                    return redirect('dashboard')
+            except:
+                # If there's an issue accessing the resident record, redirect to login
+                return redirect('login')
         elif user.role == 'staff':
             return redirect('staff_dashboard')
     return None
@@ -21,8 +36,11 @@ def auth_check(user):
 
 class CustomLoginView(LoginView):
     template_name = 'accounts/login.html'
+    
     def dispatch(self, request, *args, **kwargs):
-        response = auth_check(request.user)
+        # Check if this is a new registration
+        is_new_registration = 'new_registration' in request.GET
+        response = auth_check(request.user, is_new_registration)
         if response:
             return response
         return super().dispatch(request, *args, **kwargs)
@@ -69,9 +87,10 @@ def register(request):
                         'resident_form': resident_form,
                     })
             
+            resident.approval_status = 'pending'
             resident.save()
-            messages.success(request, 'Your account has been created successfully!')
-            return redirect('login') 
+            # Redirect to login with a flag indicating new registration
+            return redirect('{}?new_registration=true'.format(reverse('login')))
     else:
         user_form = CustomUserCreationForm()
         resident_form = ResidentForm()
@@ -91,6 +110,13 @@ def dashboard(request):
         return redirect('staff_dashboard')
     
     elif user.role == 'resident':
+        # Check if the resident account is approved
+        if hasattr(user, 'resident') and user.resident.approval_status != 'approved':
+            # If not approved, log out the user and redirect to login with a message
+            logout(request)
+            messages.error(request, 'Your account is pending approval. Please wait for staff to approve your account.')
+            return redirect('login')
+        
         # Get appointment statistics
         all_appointments = Appointment.objects.filter(resident=request.user)
         
@@ -164,6 +190,26 @@ def staff_dashboard(request):
 
 
 @login_required
+def resident_approvals(request):
+    """
+    View to display all pending resident approvals
+    """
+    # Check if the user is staff
+    if request.user.role != 'staff':
+        messages.error(request, 'You do not have permission to access this page.')
+        return redirect('staff_dashboard')
+    
+    # Get pending resident approvals
+    pending_residents = Resident.objects.filter(approval_status='pending').select_related('user').order_by('user__date_joined')
+    
+    context = {
+        "pending_residents": pending_residents,
+    }
+
+    return render(request, 'accounts/resident_approvals.html', context)
+
+
+@login_required
 def profile(request):
     user = request.user
     
@@ -216,3 +262,121 @@ def create_staff_account(request):
         'form': form,
     }
     return render(request, 'accounts/create_staff_account.html', context)
+
+
+@csrf_exempt
+@require_http_methods(["POST"])
+def clear_approval_modal(request):
+    """
+    View to clear the approval modal flag from the session
+    """
+    if 'show_approval_modal' in request.session:
+        del request.session['show_approval_modal']
+    return HttpResponse(status=204)
+
+
+@login_required
+def approve_resident(request, resident_id):
+    """
+    View to approve a resident account
+    """
+    # Check if the user is staff
+    if request.user.role != 'staff':
+        messages.error(request, 'You do not have permission to access this page.')
+        return redirect('staff_dashboard')
+    
+    try:
+        resident = Resident.objects.get(id=resident_id)
+        resident.approval_status = 'approved'
+        resident.approval_date = datetime.datetime.now()
+        resident.save()
+        
+        # Send approval email
+        email_sent = False
+        try:
+            subject = 'Account Approved - Barangay Office Management System'
+            from_email = 'no-reply@barangay-office.com'  # Change this to your actual email
+            recipient_list = [resident.user.email]
+            
+            # Render email templates
+            text_content = render_to_string('emails/resident_approval.txt', {'resident': resident})
+            html_content = render_to_string('emails/resident_approval.html', {'resident': resident})
+            
+            # Create and send email
+            msg = EmailMultiAlternatives(subject, text_content, from_email, recipient_list)
+            msg.attach_alternative(html_content, "text/html")
+            msg.send()
+            email_sent = True
+        except Exception as e:
+            # If email fails, we still approve the account but log the error
+            pass  # In production, you might want to log this error
+        
+        if email_sent:
+            messages.success(request, f'Resident account for {resident.first_name} {resident.last_name} has been approved and notification email sent.')
+        else:
+            messages.success(request, f'Resident account for {resident.first_name} {resident.last_name} has been approved. (Notification email could not be sent)')
+    except Resident.DoesNotExist:
+        messages.error(request, 'Resident not found.')
+    
+    return redirect('staff_dashboard')
+
+
+@require_http_methods(["POST"])
+@csrf_exempt
+def clear_approval_modal(request):
+    """
+    View to clear the approval modal session flag
+    """
+    if 'show_approval_modal' in request.session:
+        del request.session['show_approval_modal']
+    return HttpResponse(status=204)
+
+
+@login_required
+def reject_resident(request, resident_id):
+    """
+    View to reject a resident account
+    """
+    # Check if the user is staff
+    if request.user.role != 'staff':
+        messages.error(request, 'You do not have permission to access this page.')
+        return redirect('staff_dashboard')
+    
+    try:
+        resident = Resident.objects.get(id=resident_id)
+        user_email = resident.user.email  # Save email before deleting
+        resident_name = f'{resident.first_name} {resident.last_name}'  # Save name before deleting
+        
+        # Delete the user account
+        user = resident.user
+        resident.delete()
+        user.delete()
+        
+        # Send rejection email
+        email_sent = False
+        try:
+            subject = 'Account Rejected - Barangay Office Management System'
+            from_email = 'no-reply@barangay-office.com'  # Change this to your actual email
+            recipient_list = [user_email]
+            
+            # Render email templates
+            text_content = render_to_string('emails/resident_rejection.txt', {'resident': {'first_name': resident_name.split()[0], 'last_name': resident_name.split()[-1]}})
+            html_content = render_to_string('emails/resident_rejection.html', {'resident': {'first_name': resident_name.split()[0], 'last_name': resident_name.split()[-1]}})
+            
+            # Create and send email
+            msg = EmailMultiAlternatives(subject, text_content, from_email, recipient_list)
+            msg.attach_alternative(html_content, "text/html")
+            msg.send()
+            email_sent = True
+        except Exception as e:
+            # If email fails, we still reject the account but log the error
+            pass  # In production, you might want to log this error
+        
+        if email_sent:
+            messages.success(request, f'Resident account for {resident_name} has been rejected and removed. Notification email sent.')
+        else:
+            messages.success(request, f'Resident account for {resident_name} has been rejected and removed. (Notification email could not be sent)')
+    except Resident.DoesNotExist:
+        messages.error(request, 'Resident not found.')
+    
+    return redirect('staff_dashboard')
