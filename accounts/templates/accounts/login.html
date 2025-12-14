@@ -1,50 +1,109 @@
-{% extends "accounts/index.html" %}
 {% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - BOACMS</title>
+    <link rel="icon" type="image/png" href="{% static 'images/logo.png' %}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'accounts/css/auth.css' %}">
+</head>
+<body>
+    <div class="auth-wrapper">
+        <!-- Left Sidebar -->
+        <div class="auth-sidebar">
+            <a href="{% url 'index' %}" class="back-link">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="19" y1="12" x2="5" y2="12"/>
+                    <polyline points="12 19 5 12 12 5"/>
+                </svg>
+                Back to Home
+            </a>
+            
+            <div class="sidebar-brand">
+                <div class="brand-icon">
+                    <img src="{% static 'images/logo.png' %}" alt="BOACMS Logo" />
+                </div>
+                <div class="brand-text">
+                    <h2>BOACMS</h2>
+                    <p>Barangay Services Portal</p>
+                </div>
+            </div>
 
-{% block title %}Login{% endblock %}
-
-{% block content %}
-<div class="login-container">
-    <div class="login-card">
-        <div class="login-header">
-            <h1>Welcome Back</h1>
-            <p>Sign in to manage your barangay appointments and certifications</p>
+            <div class="sidebar-content">
+                <h3>Welcome Back</h3>
+                <p>Sign in to your account to book appointments and manage your barangay service requests.</p>
+                
+                <div class="sidebar-features">
+                    <div class="feature-badge">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="20 6 9 17 4 12"/>
+                        </svg>
+                        Secure & Encrypted Login
+                    </div>
+                    <div class="feature-badge">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="20 6 9 17 4 12"/>
+                        </svg>
+                        Book Anytime, Anywhere
+                    </div>
+                    <div class="feature-badge">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="20 6 9 17 4 12"/>
+                        </svg>
+                        Get SMS Notifications
+                    </div>
+                </div>
+            </div>
         </div>
 
-        {% if messages %}
-            <div class="alert alert-info">
-                <ul>
-                    {% for message in messages %}
-                        <li>{{ message }}</li>
-                    {% endfor %}
-                </ul>
-            </div>
-        {% endif %}
+        <!-- Right Form Container -->
+        <div class="auth-form-container">
+            <div class="auth-card">
+                <div class="form-header">
+                    <h1>Sign In</h1>
+                    <p>Enter your credentials to access your account</p>
+                </div>
 
-        {% if form.errors %}
-            <div class="alert alert-error">
-                <p>Your email or password didn't match. Please try again.</p>
-            </div>
-        {% endif %}
+                {% if messages %}
+                    <div class="alert alert-info">
+                        {% for message in messages %}
+                            <p>{{ message }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
 
-        <form method="post" class="login-form">
-            {% csrf_token %}
-            
-            <div class="form-group">
-                <label for="id_username">Email Address</label>
-                {{ form.username }}
+                {% if form.errors %}
+                    <div class="alert alert-error">
+                        <p>Your email or password didn't match. Please try again.</p>
+                    </div>
+                {% endif %}
+
+                <form method="post" class="auth-form">
+                    {% csrf_token %}
+                    
+                    <div class="form-group">
+                        <label for="id_username">Email Address</label>
+                        <input type="email" name="username" id="id_username" 
+                               placeholder="Enter your email" required autocomplete="email">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="id_password">Password</label>
+                        <input type="password" name="password" id="id_password" 
+                               placeholder="Enter your password" required autocomplete="current-password">
+                    </div>
+                    
+                    <button type="submit" class="btn-submit">Sign In</button>
+                </form>
+                
+                <div class="form-footer">
+                    <p>Don't have an account? <a href="{% url 'register' %}">Create one</a></p>
+                </div>
             </div>
-            
-            <div class="form-group">
-                <label for="id_password">Password</label>
-                {{ form.password }}
-            </div>
-            
-            <button type="submit" class="btn btn-primary">Sign In</button>
-        </form>
-        
-        <div class="login-footer">
-            <p>Don't have an account yet? <a href="{% url 'register' %}">Register</a></p>
         </div>
     </div>
 </div>

@@ -1,46 +1,404 @@
 {% load static %}
-
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <title>{% block title %}Barangay Online Appointment and Certification Management System{% endblock %}</title>
-        <link rel="stylesheet" href="{% static 'css/styles.css' %}">
-        <link rel="icon" type="images/png" href="{% static 'images/logo.png' %}">
-        {% block extra_css %}{% endblock %}
-    </head>
-    <body>
-        <header class="site-header">
-            <div class="site-branding">
-                <a class="brand" href="{% url 'index' %}">
-                    <img src="{% static 'images/logo.png' %}" alt="Barangay OACMS logo" />
-                    <div class="brand-copy">
-                        <span class="brand-title">BOACMS</span>
-                        <span class="brand-subtitle">Online Services &amp; Certifications</span>
-                    </div>
-                </a>
-                <nav class="primary-nav" aria-label="Main navigation">
-                    {% block appbar %}{% endblock %}
-                </nav>
-            </div>
-            <div class="header-actions">
-                {% if user.is_authenticated %}
-                    {% block user_logout %}{% endblock %}
-                {% else %}
-                <div class="auth-links">
-                    <div class="primary-nav"><a href="{% url 'login' %}">Login</a></div>
-                    <div class="primary-nav"><a href="{% url 'register' %}">Register</a></div>  
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BOACMS - Barangay Online Appointment & Certification Management System</title>
+    <link rel="icon" type="image/png" href="{% static 'images/logo.png' %}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/landing.css' %}">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <img src="{% static 'images/logo.png' %}" alt="BOACMS Logo" class="nav-logo">
+                <div class="brand-text">
+                    <span class="brand-title">BOACMS</span>
+                    <span class="brand-subtitle">Online Services & Certifications</span>
                 </div>
-                {% endif %}
             </div>
-        </header>
+            <div class="nav-links">
+                <a href="{% url 'login' %}" class="btn-outline">Login</a>
+                <a href="{% url 'register' %}" class="btn-primary">Register</a>
+            </div>
+        </div>
+    </nav>
 
-        <main id="main-content" class="content">
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-container">
+            <div class="hero-content">
+                <div class="hero-badge">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                    </svg>
+                    Barangay Labangon, Cebu City
+                </div>
+                <h1>Streamline Your Barangay Services</h1>
+                <p class="hero-description">
+                    Effortlessly book appointments and request certifications—all from the comfort of your home. Fast, secure, and convenient service for Barangay Labangon residents.
+                </p>
+                <div class="hero-actions">
+                    <a href="{% url 'register' %}" class="btn-primary btn-large">Get Started</a>
+                    <a href="#services" class="btn-secondary btn-large">Our Services</a>
+                </div>
+                <div class="hero-stats">
+                    <div class="stat-item">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                            <line x1="16" y1="2" x2="16" y2="6"/>
+                            <line x1="8" y1="2" x2="8" y2="6"/>
+                            <line x1="3" y1="10" x2="21" y2="10"/>
+                        </svg>
+                        <div class="stat-content">
+                            <strong>Mon-Fri</strong>
+                            <span>8AM - 5PM</span>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-divider"></div>
+                    
+                    <div class="stat-item">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                            <polyline points="22 4 12 14.01 9 11.01"/>
+                        </svg>
+                        <div class="stat-content">
+                            <strong>4 Services</strong>
+                            <span>Available Online</span>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-divider"></div>
+                    
+                    <div class="stat-item">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                            <polyline points="22 4 12 14.01 9 11.01"/>
+                        </svg>
+                        <div class="stat-content">
+                            <strong>Secure</strong>
+                            <span>Online Appointment</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Right side cards -->
+            <div class="hero-image">
+                <div class="hero-card">
+                    <div class="card-icon blue">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                            <line x1="16" y1="2" x2="16" y2="6"/>
+                            <line x1="8" y1="2" x2="8" y2="6"/>
+                            <line x1="3" y1="10" x2="21" y2="10"/>
+                        </svg>
+                    </div>
+                    <div class="card-content">
+                        <h3>Book Appointment</h3>
+                        <p>Choose your preferred date and time slot</p>
+                    </div>
+                </div>
+                
+                <div class="hero-card">
+                    <div class="card-icon red">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                            <polyline points="14 2 14 8 20 8"/>
+                        </svg>
+                    </div>
+                    <div class="card-content">
+                        <h3>Request Certificate</h3>
+                        <p>Submit barangay certification requests</p>
+                    </div>
+                </div>
+                
+                <div class="hero-card">
+                    <div class="card-icon green">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+                            <line x1="8" y1="21" x2="16" y2="21"/>
+                            <line x1="12" y1="17" x2="12" y2="21"/>
+                        </svg>
+                    </div>
+                    <div class="card-content">
+                        <h3>Online Dashboard</h3>
+                        <p>Manage all your barangay service requests in one place</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
-            {% block content %}
-                <!-- BLOCK CONTENT -->
-            {% endblock %}
 
-        </main>
-    </body>
+    <!-- Services Section -->
+    <section id="services" class="services">
+        <div class="services-container">
+            <div class="section-header">
+                <h2>Available Certifications</h2>
+                <p>Request these essential barangay documents online with ease</p>
+            </div>
+            <div class="services-grid">
+                <!-- Barangay Clearance Card -->
+                <div class="service-card">
+                    <div class="service-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                            <polyline points="14 2 14 8 20 8"/>
+                        </svg>
+                    </div>
+                    <h3>Barangay Clearance</h3>
+                    <p>Required for employment, business permits, and various transactions</p>
+                    <div class="service-requirements">
+                        <div class="requirement">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M20 6L9 17l-5-5"/>
+                            </svg>
+                            <span>Valid Government-Issued ID</span>
+                        </div>
+                        <div class="requirement">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M20 6L9 17l-5-5"/>
+                            </svg>
+                            <span>Proof of Residency</span>
+                        </div>
+                        <div class="requirement">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M20 6L9 17l-5-5"/>
+                            </svg>
+                            <span>Community Tax Certificate</span>
+                        </div>
+                    </div>
+                </div>
+            
+                <!-- Certificate of Indigency Card -->
+                <div class="service-card">
+                    <div class="service-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                        </svg>
+                    </div>
+                    <h3>Certificate of Indigency</h3>
+                    <p>For educational, medical, and legal assistance purposes</p>
+                    <div class="service-requirements">
+                        <div class="requirement">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M20 6L9 17l-5-5"/>
+                            </svg>
+                            <span>Valid Government-Issued ID</span>
+                        </div>
+                        <div class="requirement">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M20 6L9 17l-5-5"/>
+                            </svg>
+                            <span>Proof of Residency</span>
+                        </div>
+                        <div class="requirement">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M20 6L9 17l-5-5"/>
+                            </svg>
+                            <span>Proof of Income / Affidavit</span>
+                        </div>
+                    </div>
+                </div>
+            
+                <!-- Community Tax Certificate Card -->
+                <div class="service-card">
+                    <div class="service-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                        </svg>
+                    </div>
+                    <h3>Community Tax Certificate</h3>
+                    <p>Official receipt of community tax payment (Cedula)</p>
+                    <div class="service-requirements">
+                        <div class="requirement">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M20 6L9 17l-5-5"/>
+                            </svg>
+                            <span>Valid Government-Issued ID</span>
+                        </div>
+                        <div class="requirement">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M20 6L9 17l-5-5"/>
+                            </svg>
+                            <span>Proof of Income</span>
+                        </div>
+                        <div class="requirement">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M20 6L9 17l-5-5"/>
+                            </svg>
+                            <span>Based on Income/Property</span>
+                        </div>
+                    </div>
+                </div>
+            
+                <!-- Solo Parent Certificate Card -->
+                <div class="service-card">
+                    <div class="service-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                            <circle cx="12" cy="7" r="4"/>
+                        </svg>
+                    </div>
+                    <h3>Solo Parent Certificate</h3>
+                    <p>Benefits and assistance for solo parents</p>
+                    <div class="service-requirements">
+                        <div class="requirement">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M20 6L9 17l-5-5"/>
+                            </svg>
+                            <span>Valid Government-Issued ID</span>
+                        </div>
+                        <div class="requirement">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M20 6L9 17l-5-5"/>
+                            </svg>
+                            <span>Birth Certificate/s of Child/ren</span>
+                        </div>
+                        <div class="requirement">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M20 6L9 17l-5-5"/>
+                            </svg>
+                            <span>Proof of Solo Parent Status</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works -->
+    <section class="how-it-works">
+        <div class="container">
+            <div class="section-header">
+                <h2>How It Works</h2>
+                <p>Simple steps to get your barangay certifications</p>
+            </div>
+            <div class="steps-grid">
+                <div class="step-item">
+                    <div class="step-number">1</div>
+                    <h3>Register Account</h3>
+                    <p>Create your account and verify your residency</p>
+                </div>
+                <div class="step-arrow">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M5 12h14M12 5l7 7-7 7"/>
+                    </svg>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">2</div>
+                    <h3>Book Appointment</h3>
+                    <p>Choose your service, date, and time slot</p>
+                </div>
+                <div class="step-arrow">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M5 12h14M12 5l7 7-7 7"/>
+                    </svg>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">3</div>
+                    <h3>Visit Barangay Hall</h3>
+                    <p>Bring required documents on your appointment</p>
+                </div>
+                <div class="step-arrow">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M5 12h14M12 5l7 7-7 7"/>
+                    </svg>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">4</div>
+                    <h3>Receive Certificate</h3>
+                    <p>Get your processed certification</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact/Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-section">
+                <div class="footer-brand">
+                    <img src="{% static 'images/logo.png' %}" alt="BOACMS Logo" class="footer-logo">
+                    <div>
+                        <h3>BOACMS</h3>
+                        <p>Barangay Online Appointment & Certification Management System</p>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-section">
+                <h4>Office Hours</h4>
+                <div class="footer-info">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                        <line x1="16" y1="2" x2="16" y2="6"/>
+                        <line x1="8" y1="2" x2="8" y2="6"/>
+                        <line x1="3" y1="10" x2="21" y2="10"/>
+                    </svg>
+                    <div>
+                        <p>Monday - Friday</p>
+                        <p>8:00 AM - 5:00 PM</p>
+                    </div>
+                </div>
+                <p class="closed">Closed on Holidays</p>
+            </div>
+            <div class="footer-section">
+                <h4>Location</h4>
+                <div class="footer-info">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                        <circle cx="12" cy="10" r="3"/>
+                    </svg>
+                    <div>
+                        <p>Labangon Barangay Hall</p>
+                        <p>132 Katipunan St</p>
+                        <p>Cebu City, 6000 Cebu</p>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-section">
+                <h4>Get Started</h4>
+                <a href="{% url 'register' %}" class="footer-link">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                        <circle cx="8.5" cy="7" r="4"/>
+                        <line x1="20" y1="8" x2="20" y2="14"/>
+                        <line x1="23" y1="11" x2="17" y2="11"/>
+                    </svg>
+                    Register Account
+                </a>
+                <a href="{% url 'login' %}" class="footer-link">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
+                        <polyline points="10 17 15 12 10 7"/>
+                        <line x1="15" y1="12" x2="3" y2="12"/>
+                    </svg>
+                    Login
+                </a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2025 BOACMS - Barangay Labangon. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+    </script>
+</body>
 </html>
