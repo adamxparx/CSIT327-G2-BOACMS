@@ -155,6 +155,20 @@ AUTHENTICATION_BACKENDS = (
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
+# Email configuration
+# Using Gmail SMTP with App Password for cost-free email service
+# Uncomment and configure these settings with your Gmail credentials
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'earlgeraldesparcia@gmail.com'  # Replace with your Gmail
+EMAIL_HOST_PASSWORD = 'wojw nghh xvbl ntqw'  # Replace with your 16-character app password
+DEFAULT_FROM_EMAIL = 'earlgeraldesparcia@gmail.com'  # Replace with your Gmail
+
+# For development, continue using console backend to prevent connection errors
+# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
 # Supabase configuration
 SUPABASE_URL = config('SUPABASE_URL', default='')
 SUPABASE_KEY = config('SUPABASE_KEY', default='')

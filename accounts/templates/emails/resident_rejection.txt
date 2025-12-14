@@ -1,0 +1,10 @@
+Account Rejected
+
+Hello {{ resident.first_name }} {{ resident.last_name }},
+
+We regret to inform you that your account registration for the Barangay Office Management System has been rejected.
+
+If you believe this is an error or would like more information, please contact our office.
+
+Thank you,
+Barangay Office Team

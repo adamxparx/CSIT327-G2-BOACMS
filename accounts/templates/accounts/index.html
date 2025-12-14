@@ -49,4 +49,60 @@
         <h2>Barangay Online Appointment and <br />Certification Management System.</h2>
     </div>
 
+    <!-- Registration Pending Approval Modal -->
+    <div id="approvalModal" class="modal" style="display: none;" data-show-modal="{% if request.session.show_approval_modal %}true{% else %}false{% endif %}">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Account Under Review</h2>
+            </div>
+            <div class="modal-body">
+                <p>Your account registration is currently under review by our staff. You will receive an email notification once your account has been approved.</p>
+                <p>Please check your email regularly for updates.</p>
+                <div class="modal-actions">
+                    <button id="closeModal" class="btn btn-primary">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    // Show the modal if the session flag is set
+document.addEventListener('DOMContentLoaded', function() {
+    var modal = document.getElementById("approvalModal");
+    var closeModalBtn = document.getElementById("closeModal");
+    
+    // Check if we need to show the modal
+    var showApprovalModal = modal.getAttribute('data-show-modal') === 'true';
+    
+    if (showApprovalModal) {
+        modal.style.display = "block";
+        
+        // Close modal when OK button is clicked
+        closeModalBtn.onclick = function() {
+            modal.style.display = "none";
+            // Clear the session flag
+            fetch('/clear_approval_modal/', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                },
+            });
+        }
+        
+        // Close modal when clicking outside of it
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+                // Clear the session flag
+                fetch('/clear_approval_modal/', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                    },
+                });
+            }
+        }
+    }
+});
+    </script>
 {% endblock %}
