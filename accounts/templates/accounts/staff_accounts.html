@@ -1,0 +1,249 @@
+{% extends "accounts/base_dashboard.html" %}
+{% load static %}
+
+{% block title %}Staff Accounts | BOACMS{% endblock %}
+
+{% block admin_css %}
+<link rel="stylesheet" href="{% static 'accounts/css/admin_dashboard.css' %}">
+<link rel="stylesheet" href="{% static 'accounts/css/staff_accounts.css' %}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+{% endblock %}
+
+{% block content %}
+<div class="admin-layout">
+    <!-- Sidebar -->
+    <aside class="admin-sidebar">
+        <div class="sidebar-header">
+            <img src="{% static 'images/logo.png' %}" alt="BOACMS Logo" class="sidebar-logo">
+            <div class="sidebar-brand">
+                <h2>BOACMS</h2>
+                <p>Admin Portal</p>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <a href="{% url 'admin_dashboard' %}" class="nav-item">
+                <i class="fas fa-chart-line"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="{% url 'resident_verification' %}" class="nav-item">
+                <i class="fas fa-user-check"></i>
+                <span>Resident Verification</span>
+            </a>
+            <a href="{% url 'staff_accounts' %}" class="nav-item active">
+                <i class="fas fa-users-cog"></i>
+                <span>Staff Accounts</span>
+            </a>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="admin-main">
+        <!-- Header -->
+        <header class="admin-header">
+            <div class="header-left">
+                <i class="fas fa-users-cog header-icon"></i>
+                <h1>Staff Accounts</h1>
+            </div>
+            <div class="header-right">
+                <div class="user-info">
+                    <div class="user-avatar">A</div>
+                    <span class="user-name">Admin User</span>
+                </div>
+                <form method="POST" action="{% url 'logout' %}" class="logout-form">
+                    {% csrf_token %}
+                    <button type="submit" class="logout-btn">Logout</button>
+                </form>
+            </div>
+        </header>
+
+        <!-- Staff Content -->
+        <div class="staff-content">
+            <!-- Page Header -->
+            <div class="page-header">
+                <div>
+                    <h2>Staff Accounts</h2>
+                    <p>Manage staff accounts and permissions</p>
+                </div>
+                <a href="{% url 'create_staff_account' %}" class="btn-create-staff">
+                    <i class="fas fa-plus-circle"></i>
+                    Create New Staff
+                </a>
+            </div>
+
+            <!-- Stats Overview -->
+            <div class="staff-stats">
+                <div class="stat-box">
+                    <div class="stat-icon active">
+                        <i class="fas fa-user-check"></i>
+                    </div>
+                    <div class="stat-details">
+                        <div class="stat-value">{{ active_count }}</div>
+                        <div class="stat-label">Active Staff</div>
+                    </div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-icon inactive">
+                        <i class="fas fa-user-times"></i>
+                    </div>
+                    <div class="stat-details">
+                        <div class="stat-value">{{ inactive_count }}</div>
+                        <div class="stat-label">Inactive Staff</div>
+                    </div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-icon total">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="stat-details">
+                        <div class="stat-value">{{ staff_members|length }}</div>
+                        <div class="stat-label">Total Staff</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Staff Table -->
+            <div class="table-card">
+                <div class="table-header">
+                    <h3><i class="fas fa-list"></i> Staff Members</h3>
+                    <div class="search-box-small">
+                        <i class="fas fa-search"></i>
+                        <input type="text" placeholder="Search staff..." id="search-staff">
+                    </div>
+                </div>
+                <div class="table-wrapper">
+                    <table class="staff-table">
+                        <thead>
+                            <tr>
+                                <th>Staff Member</th>
+                                <th>Email Address</th>
+                                <th>Role</th>
+                                <th>Status</th>
+                                <th class="actions-col">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for staff in staff_members %}
+                            <tr class="table-row">
+                                <td>
+                                    <div class="staff-info">
+                                        <div class="staff-avatar">
+                                            {% if staff.barangaystaff %}
+                                                {{ staff.barangaystaff.first_name|first|upper }}{{ staff.barangaystaff.last_name|first|upper }}
+                                            {% else %}
+                                                {{ staff.email|first|upper }}
+                                            {% endif %}
+                                        </div>
+                                        <div class="staff-details">
+                                            <div class="staff-name">
+                                                {% if staff.barangaystaff %}
+                                                    {{ staff.barangaystaff.first_name }} {{ staff.barangaystaff.last_name }}
+                                                {% else %}
+                                                    {{ staff.email }}
+                                                {% endif %}
+                                            </div>
+                                            <div class="staff-id">ID: {{ staff.id|stringformat:"06d" }}</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="email-info">
+                                        <i class="fas fa-envelope"></i>
+                                        {{ staff.email }}
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="role-badge staff">
+                                        <i class="fas fa-user-tag"></i>
+                                        {{ staff.get_role_display }}
+                                    </span>
+                                </td>
+                                <td>
+                                    {% if staff.is_active %}
+                                    <span class="status-badge active">
+                                        <i class="fas fa-circle"></i> Active
+                                    </span>
+                                    {% else %}
+                                    <span class="status-badge inactive">
+                                        <i class="fas fa-circle"></i> Inactive
+                                    </span>
+                                    {% endif %}
+                                </td>
+                                <td class="actions-col">
+                                    <form method="post" action="{% url 'toggle_staff_status' staff.id %}" class="toggle-form">
+                                        {% csrf_token %}
+                                        {% if staff.is_active %}
+                                        <button type="submit" class="btn-action btn-deactivate" title="Deactivate Staff">
+                                            <i class="fas fa-ban"></i>
+                                            Deactivate
+                                        </button>
+                                        {% else %}
+                                        <button type="submit" class="btn-action btn-activate" title="Activate Staff">
+                                            <i class="fas fa-check-circle"></i>
+                                            Activate
+                                        </button>
+                                        {% endif %}
+                                    </form>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" class="no-data">
+                                    <div class="empty-state">
+                                        <i class="fas fa-users"></i>
+                                        <h3>No Staff Accounts</h3>
+                                        <p>Create your first staff account to get started</p>
+                                        <a href="{% url 'create_staff_account' %}" class="btn-empty-action">
+                                            <i class="fas fa-plus"></i> Create Staff Account
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('search-staff');
+    
+    // Search functionality
+    if (searchInput) {
+        searchInput.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            const rows = document.querySelectorAll('.table-row');
+            
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(searchTerm) ? '' : 'none';
+            });
+        });
+    }
+    
+    // Confirm before deactivating
+    document.querySelectorAll('.btn-deactivate').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            if (!confirm('Are you sure you want to deactivate this staff member?')) {
+                e.preventDefault();
+            }
+        });
+    });
+    
+    // Confirm before activating
+    document.querySelectorAll('.btn-activate').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            if (!confirm('Are you sure you want to activate this staff member?')) {
+                e.preventDefault();
+            }
+        });
+    });
+});
+</script>
+{% endblock %}
