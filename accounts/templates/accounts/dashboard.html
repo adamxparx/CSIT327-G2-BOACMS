@@ -5,6 +5,15 @@
 
 {% block resident_css %}
     <link rel="stylesheet" href="{% static 'accounts/css/dropdown.css' %}">
+    <style>
+        .resident-name-link {
+            color: inherit;
+            text-decoration: none;
+        }
+        .resident-name-link:hover {
+            text-decoration: none;
+        }
+    </style>
 {% endblock %}
 
 {% block appbar %}
@@ -17,13 +26,13 @@
 {% endblock %}
 
 {% block user %}
-<div>{{ user.resident.first_name }} {{ user.resident.last_name }}</div>
+<div><a href="{% url 'profile' %}" class="resident-name-link">{{ user.resident.first_name }} {{ user.resident.last_name }}</a></div>
 {% endblock %}
 
 {% block content %}
 <div class="dashboard-container">
     <div class="welcome-section">
-        <h1>Welcome, {{ user.resident.first_name }}!</h1>
+        <h1>Welcome, <a href="{% url 'profile' %}" class="resident-name-link">{{ user.resident.first_name }}</a>!</h1>
         <p>Manage your appointments and certifications</p>
     </div>
 
