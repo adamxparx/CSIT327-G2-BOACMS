@@ -960,6 +960,30 @@ a {
     box-shadow: 0 0 0 3px rgba(0, 56, 168, 0.15);
 }
 
+/* File input styling */
+.form-field input[type="file"] {
+    padding: 0.5rem;
+    border: 1px solid rgba(0, 56, 168, 0.22);
+    border-radius: 8px;
+    font-size: 0.95rem;
+    background-color: white;
+    transition: all 0.2s ease;
+    box-sizing: border-box;
+}
+
+.form-field input[type="file"]:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(0, 56, 168, 0.15);
+}
+
+.help-text {
+    font-size: 0.85rem;
+    color: #666;
+    margin-top: 0.25rem;
+    display: block;
+}
+
 .field-error {
     color: var(--color-accent);
     font-size: 0.85rem;

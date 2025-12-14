@@ -16,7 +16,7 @@ class AppointmentForm(forms.ModelForm):
     while current_time <= end_time:
         time_str = current_time.strftime('%H:%M')
         # Format time as 9:00 AM instead of 09:00 AM
-        time_display = current_time.strftime('%-I:%M %p').lstrip()
+        time_display = current_time.strftime('%I:%M %p').lstrip('0')
         TIME_CHOICES.append((time_str, time_display))
         
         # Add 30 minutes to current time
@@ -177,7 +177,7 @@ class RescheduleForm(forms.Form):
     while current_time <= end_time:
         time_str = current_time.strftime('%H:%M')
         # Format time as 9:00 AM instead of 09:00 AM
-        time_display = current_time.strftime('%-I:%M %p').lstrip()
+        time_display = current_time.strftime('%I:%M %p').lstrip('0')
         TIME_CHOICES.append((time_str, time_display))
         
         # Add 30 minutes to current time
