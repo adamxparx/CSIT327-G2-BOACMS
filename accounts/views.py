@@ -171,6 +171,11 @@ def dashboard(request):
             preferred_date__gte=today,
             status__in=['pending', 'approved']
         ).order_by('preferred_date', 'preferred_time').first()
+        
+        # Completed appointments list (last 3)
+        completed_list = all_appointments.filter(
+            status='completed'
+        ).order_by('-preferred_date')[:3]
 
         context = {
             'user': user,
@@ -182,6 +187,7 @@ def dashboard(request):
             'completed_appointments': completed_appointments,
             'claimed_appointments': claimed_appointments,
             'next_appointment': next_appointment,
+            'completed_list': completed_list,
         }
 
         return render(request, 'accounts/dashboard.html', context)

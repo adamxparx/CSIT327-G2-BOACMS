@@ -184,6 +184,23 @@
 .btn-cancel:hover, .btn-cancel:focus, .btn-cancel:active { text-decoration: none !important; }
 .btn-none { color:rgba(0,0,0,0.35); font-weight:700; }
 
+.view-details-btn {
+    display: inline-block;
+    padding: 8px 16px;
+    background: #0f4c9a;
+    color: #fff;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 0.875rem;
+    text-decoration: none;
+    transition: background 0.2s;
+}
+
+.view-details-btn:hover {
+    background: #0a3d7a;
+    text-decoration: none;
+}
+
 @media (max-width:900px){ .appts-table thead th:nth-child(3), .appts-table thead th:nth-child(4) { display:none; } .appts-table tbody td:nth-child(3), .appts-table tbody td:nth-child(4) { display:none; } }
 @media (max-width:600px){ .appointments-card { padding:16px; } .appts-table thead { display:none; } .appts-table, .appts-table tbody, .appts-table tr, .appts-table td { display:block; width:100%; } .appts-table tr { margin-bottom:12px; border-radius:8px; border:1px solid rgba(0,0,0,0.04); padding:12px; } .appts-table td { padding:8px 12px; border-bottom:none; } }
 

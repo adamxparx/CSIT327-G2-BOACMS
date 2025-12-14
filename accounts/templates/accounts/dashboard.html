@@ -30,107 +30,195 @@
 
 {% block content %}
 <div class="dashboard-container">
-    <div class="welcome-section">
-        <h1>Welcome, <a href="{% url 'profile' %}" class="resident-name-link">{{ user.resident.first_name }}</a>!</h1>
-        <p>Manage your appointments and certifications</p>
-    </div>
-
-    <!-- Quick Stats Section -->
-    <div class="stats-grid">
-        <div class="stat-card">
-            <div class="stat-icon"></div>
-            <div class="stat-info">
-                <h3>{{ pending_appointments }}</h3>
-                <p>Pending</p>
+    
+    <!-- Hero Banner -->
+    <div class="hero-banner">
+        <div class="hero-content">
+            <div class="hero-greeting">
+                <svg class="sparkle-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 3L13.5 8.5L19 10L13.5 11.5L12 17L10.5 11.5L5 10L10.5 8.5L12 3Z"/>
+                    <path d="M19 14L19.5 16L21 16.5L19.5 17L19 19L18.5 17L17 16.5L18.5 16L19 14Z"/>
+                </svg>
+                <h1>Good day, <a href="{% url 'profile' %}" class="resident-name-link">{{ user.resident.first_name }} {{ user.resident.last_name }}</a>!</h1>
             </div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-icon"></div>
-            <div class="stat-info">
-                <h3>{{ approved_appointments }}</h3>
-                <p>Approved</p>
-            </div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-icon"></div>
-            <div class="stat-info">
-                <h3>{{ cancelled_appointments }}</h3>
-                <p>Cancelled</p>
-            </div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-icon"></div>
-            <div class="stat-info">
-                <h3>{{ completed_appointments }}</h3>
-                <p>Completed</p>
+            <div class="office-hours-badge">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <path d="M12 6v6l4 2"/>
+                </svg>
+                <span>Office Hours: Monday-Friday, 8:00 AM - 5:00 PM (except holidays)</span>
             </div>
         </div>
     </div>
 
-    <!-- Quick Actions -->
-    <div class="quick-actions">
-        <h2>Quick Actions</h2>
-        <div class="actions-grid">
-            <a href="{% url 'certification' %}" class="action-card">
-                <div class="action-icon">+</div>
-                <h3>Book Appointment</h3>
-                <p>Schedule a new certification</p>
-            </a>
-            <a href="{% url 'appointments' %}" class="action-card">
-                <div class="action-icon">📋</div>
-                <h3>View All</h3>
-                <p>See all appointments</p>
-            </a>
-            <a href="{% url 'profile' %}" class="action-card">
-                <div class="action-icon">👤</div>
-                <h3>Profile</h3>
-                <p>Update information</p>
-            </a>
-        </div>
-    </div>
-
-    <!-- Upcoming Appointments Preview -->
-    {% if next_appointment %}
-    <div class="upcoming-section">
-        <h2>Your Next Appointment</h2>
-        <div class="appointment-preview">
-            <div class="appointment-info-grid">
-                <div class="info-item">
-                    <span class="info-label">Certificate:</span>
-                    <span class="info-value">{{ next_appointment.get_certificate_type_display }}</span>
+    <!-- Main Content Grid -->
+    <div class="main-grid">
+        <!-- Left Column -->
+        <div class="left-column">
+            <!-- Next Appointment Card -->
+            <div class="section-card">
+                <div class="section-header">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="4" width="18" height="18" rx="2"/>
+                        <path d="M16 2v4M8 2v4M3 10h18"/>
+                    </svg>
+                    <h2>Next Appointment</h2>
                 </div>
-                <div class="info-item">
-                    <span class="info-label">Date:</span>
-                    <span class="info-value">{{ next_appointment.preferred_date|date:"F d, Y" }}</span>
+                
+                {% if next_appointment %}
+                <div class="appointment-card-inner">
+                    <div class="appointment-date-row">
+                        <span class="appointment-date">{{ next_appointment.preferred_date|date:"l, F j, Y" }}</span>
+                    </div>
+                    <div class="appointment-session">
+                        {% if next_appointment.preferred_time.hour < 12 %}
+                        AM Session (8:00 AM - 12:00 PM)
+                        {% else %}
+                        PM Session (1:00 PM - 5:00 PM)
+                        {% endif %}
+                    </div>
+                    
+                    <div class="appointment-details">
+                        <div class="detail-item">
+                            <span class="detail-label">Certificate Type</span>
+                            <span class="detail-value">{{ next_appointment.get_certificate_type_display }}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Location</span>
+                            <div class="location-value">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                                    <circle cx="12" cy="10" r="3"/>
+                                </svg>
+                                <span>Labangon Barangay Hall, 132 Katipunan St, Cebu City</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="info-item">
-                    <span class="info-label">Time:</span>
-                    <span class="info-value">{{ next_appointment.preferred_time|time:"g:i A" }}</span>
+                <a href="{% url 'appointments' %}" class="view-all-link">View all appointments <span>&rarr;</span></a>
+                {% else %}
+                <div class="no-appointment">
+                    <p>No upcoming appointments</p>
+                    <a href="{% url 'certification' %}" class="book-now-link">Book an appointment now</a>
                 </div>
-                <div class="info-item">
-                    <span class="info-label">Status:</span>
-                    <span class="info-value status-{{ next_appointment.status }}">{{ next_appointment.get_status_display }}</span>
-                </div>
+                {% endif %}
             </div>
-            <a href="{% url 'appointment_detail' next_appointment.id %}" class="view-details-btn">View Details</a>
+
+            <!-- Request Status Card -->
+            <div class="section-card">
+                <div class="section-header">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                        <polyline points="14,2 14,8 20,8"/>
+                        <line x1="16" y1="13" x2="8" y2="13"/>
+                        <line x1="16" y1="17" x2="8" y2="17"/>
+                    </svg>
+                    <h2>Completed Requests</h2>
+                </div>
+                
+                {% if completed_list %}
+                    {% for appt in completed_list %}
+                    <div class="request-item">
+                        <div class="request-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                                <polyline points="14,2 14,8 20,8"/>
+                            </svg>
+                        </div>
+                        <div class="request-info">
+                            <span class="request-name">{{ appt.get_certificate_type_display }}</span>
+                            <span class="request-date">{{ appt.preferred_date|date:"Y-m-d" }}</span>
+                        </div>
+                        <span class="status-badge completed">Completed</span>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                <div class="no-requests">
+                    <p>No completed requests yet</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Right Column - Barangay Services -->
+        <div class="right-column">
+            <div class="services-card">
+                <h2>Barangay Services</h2>
+                
+                <div class="services-list">
+                    <a href="{% url 'requirements' %}?certificate_type=barangay_clearance" class="service-item">
+                        <div class="service-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                                <polyline points="14,2 14,8 20,8"/>
+                            </svg>
+                        </div>
+                        <div class="service-info">
+                            <span class="service-name">Barangay Clearance</span>
+                            <span class="service-link">View Requirements</span>
+                        </div>
+                        <svg class="arrow-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M9 18l6-6-6-6"/>
+                        </svg>
+                    </a>
+                    
+                    <a href="{% url 'requirements' %}?certificate_type=indigency" class="service-item">
+                        <div class="service-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                                <polyline points="14,2 14,8 20,8"/>
+                            </svg>
+                        </div>
+                        <div class="service-info">
+                            <span class="service-name">Certificate of Indigency</span>
+                            <span class="service-link">View Requirements</span>
+                        </div>
+                        <svg class="arrow-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M9 18l6-6-6-6"/>
+                        </svg>
+                    </a>
+                    
+                    <a href="{% url 'requirements' %}?certificate_type=cedula" class="service-item">
+                        <div class="service-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                                <polyline points="14,2 14,8 20,8"/>
+                            </svg>
+                        </div>
+                        <div class="service-info">
+                            <span class="service-name">Community Tax Certificate</span>
+                            <span class="service-link">View Requirements</span>
+                        </div>
+                        <svg class="arrow-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M9 18l6-6-6-6"/>
+                        </svg>
+                    </a>
+                    
+                    <a href="{% url 'requirements' %}?certificate_type=solo_parent" class="service-item">
+                        <div class="service-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                                <polyline points="14,2 14,8 20,8"/>
+                            </svg>
+                        </div>
+                        <div class="service-info">
+                            <span class="service-name">Solo Parent Certificate</span>
+                            <span class="service-link">View Requirements</span>
+                        </div>
+                        <svg class="arrow-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M9 18l6-6-6-6"/>
+                        </svg>
+                    </a>
+                </div>
+                
+                <a href="{% url 'certification' %}" class="book-appointment-btn">Book Appointment</a>
+            </div>
         </div>
     </div>
-    {% endif %}
 
-    <!-- Helpful Resources -->
+    <!-- Contact Information -->
     <div class="resources-section">
-        <h2>Helpful Resources</h2>
         <div class="resources-grid">
-            <a href="{% url 'requirements' %}" class="resource-card">
-                <h3>Certificate Requirements</h3>
-                <p>See documents needed for each certification</p>
-            </a>
-            <div class="resource-card no-highlight">
-                <h3>Office Hours</h3>
-                <p>Monday - Friday: 9:00 AM - 5:00 PM</p>
-                <p>Saturday: Closed</p>
-                <p>Sunday: Closed</p>
-            </div>
             <div class="resource-card no-highlight">
                 <h3>Contact Information</h3>
                 <p>Email: barangay.labangon@yahoo.com</p>

@@ -1,138 +1,88 @@
 {% extends 'accounts/dashboard.html' %}
 {% load static %}
 
-{% block extra_css %}
-<link rel="stylesheet" href="{% static 'appointments/css/appointments.css' %}">
-<style>
-  .detail-section.reschedule-notice {
-    border-left: 4px solid #ffc107;
-    background-color: #fff8e1;
-    padding: 15px;
-    margin: 15px 0;
-  }
-  
-  .detail-section.reschedule-notice .section-title {
-    color: #e65100;
-  }
-</style>
-{% endblock %}
-
 {% block content %}
-<div class="content">
-  <div class="appointment-detail">
-    <div class="appointment-header">
-      <h1 class="appointment-title">Appointment Details</h1>
-      <div class="appointment-status status-badge status-badge--{{ appointment.status|lower }}">
-        {{ appointment.get_status_display }}
-      </div>
-    </div>
-
-    <div class="appointment-details">
-      <div class="detail-section">
-        <h2 class="section-title">Resident Information</h2>
-        <div class="detail-grid">
-          <div class="detail-item">
-            <span class="detail-label">Name</span>
-            <span class="detail-value">{{ appointment.resident.resident.first_name }} {{ appointment.resident.resident.last_name }}</span>
-          </div>
-          <div class="detail-item">
-            <span class="detail-label">Contact</span>
-            <span class="detail-value">{{ user.resident.phone_number | default:"Not provided" }}</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="detail-section">
-        <h2 class="section-title">Appointment Information</h2>
-        <div class="detail-grid">
-          <div class="detail-item">
-            <span class="detail-label">Purpose</span>
-            <span class="detail-value">
-              {% if appointment.purpose == 'others' %}
-                {{ appointment.get_purpose_display }}: {{ appointment.specify_purpose }}
-              {% else %}
-                {{ appointment.get_purpose_display }}
-              {% endif %}
-            </span>
-          </div>
-          {% if certificate_name %}
-          <div class="detail-item">
-            <span class="detail-label">Certificate Type</span>
-            <span class="detail-value">{{ certificate_name }}</span>
-          </div>
-          {% endif %}
-          <div class="detail-item">
-            <span class="detail-label">Date</span>
-            <span class="detail-value">{{ appointment.preferred_date|date:"F j, Y" }}</span>
-          </div>
-          <div class="detail-item">
-            <span class="detail-label">Time</span>
-            <span class="detail-value">{{ appointment.preferred_time|time:"g:i A" }}</span>
-          </div>
-        </div>
-      </div>
-
-      {% if appointment.notes %}
-      <div class="detail-section">
-        <h2 class="section-title">Additional Notes</h2>
-        <div class="detail-notes">
-          {{ appointment.notes|linebreaks }}
-        </div>
-      </div>
-      {% endif %}
-      
-      <!-- Show cancellation reason for cancelled appointments -->
-      {% if appointment.status == 'cancelled' and appointment.cancellation_reason %}
-      <div class="detail-section">
-        <h2 class="section-title">Cancellation Details</h2>
-        <div class="detail-grid">
-          <div class="detail-item">
-            <span class="detail-label">Reason</span>
-            <span class="detail-value">{{ appointment.cancellation_reason }}</span>
-          </div>
-        </div>
-      </div>
-      {% endif %}
-      
-      <!-- Show reschedule notice for rescheduled appointments -->
-      {% if appointment.rescheduled_at and appointment.reschedule_reason %}
-      <div class="detail-section reschedule-notice">
-        <h2 class="section-title">Reschedule Notice</h2>
-        <div class="detail-grid">
-          <div class="detail-item">
-            <span class="detail-label">Reason</span>
-            <span class="detail-value">{{ appointment.reschedule_reason }}</span>
-          </div>
-          <div class="detail-item">
-            <span class="detail-label">Rescheduled to</span>
-            <span class="detail-value">{{ appointment.preferred_date|date:"F j, Y" }} at {{ appointment.preferred_time|time:"g:i A" }}</span>
-          </div>
-        </div>
-      </div>
-      {% endif %}
-    </div>
-
-    <div class="appointment-actions">
-      <a href="{% url 'appointments_calendar' %}" class="btn btn--secondary">
-        <i class="fas fa-arrow-left"></i> Back to Calendar
-      </a>
-      {% if appointment.status == 'pending' and user.is_staff %}
-      <div class="status-actions">
-        <form method="post" action="{% url 'update_appointment_status' appointment.id 'approved' %}" class="status-actions__form">
-          {% csrf_token %}
-          <button type="submit" class="status-button status-button--approve">
-            <i class="fas fa-check"></i> Approve
-          </button>
-        </form>
-        <form method="post" action="{% url 'update_appointment_status' appointment.id 'declined' %}" class="status-actions__form">
-          {% csrf_token %}
-          <button type="submit" class="status-button status-button--decline">
-            <i class="fas fa-times"></i> Decline
-          </button>
-        </form>
-      </div>
-      {% endif %}
-    </div>
+<div style="max-width: 800px; margin: 0 auto; padding: 1.5rem 1rem;">
+  
+  <!-- Header -->
+  <div style="margin-bottom: 1.5rem;">
+    <h1 style="font-size: 1.75rem; font-weight: 700; color: #0038a8; margin: 0;">Appointment Details</h1>
   </div>
+
+  <!-- Combined Card -->
+  <div style="background: #fff; border-radius: 12px; padding: 1.25rem; box-shadow: 0 2px 8px rgba(0,0,0,0.08); border: 1px solid #e5e7eb;">
+    
+    <!-- Resident Section -->
+    <h2 style="font-size: 1rem; font-weight: 700; color: #0038a8; margin: 0 0 0.75rem 0;">Resident Information</h2>
+    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.5rem; margin-bottom: 1.25rem;">
+      <div style="background: #f8fafc; padding: 0.625rem 0.875rem; border-radius: 6px;">
+        <span style="font-size: 0.7rem; font-weight: 600; color: #6b7280; text-transform: uppercase; display: block;">Name</span>
+        <span style="font-size: 0.95rem; font-weight: 600; color: #1f2937;">{{ appointment.resident.resident.first_name }} {{ appointment.resident.resident.last_name }}</span>
+      </div>
+      <div style="background: #f8fafc; padding: 0.625rem 0.875rem; border-radius: 6px;">
+        <span style="font-size: 0.7rem; font-weight: 600; color: #6b7280; text-transform: uppercase; display: block;">Contact</span>
+        <span style="font-size: 0.95rem; font-weight: 600; color: #1f2937;">{{ user.resident.phone_number|default:"Not provided" }}</span>
+      </div>
+    </div>
+    
+    <!-- Divider -->
+    <div style="border-top: 1px solid #e5e7eb; margin-bottom: 1rem;"></div>
+    
+    <!-- Appointment Section -->
+    <h2 style="font-size: 1rem; font-weight: 700; color: #0038a8; margin: 0 0 0.75rem 0;">Appointment Information</h2>
+    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.5rem;">
+      {% if certificate_name %}
+      <div style="background: #f8fafc; padding: 0.625rem 0.875rem; border-radius: 6px;">
+        <span style="font-size: 0.7rem; font-weight: 600; color: #6b7280; text-transform: uppercase; display: block;">Certificate</span>
+        <span style="font-size: 0.95rem; font-weight: 600; color: #1f2937;">{{ certificate_name }}</span>
+      </div>
+      {% endif %}
+      <div style="background: #f8fafc; padding: 0.625rem 0.875rem; border-radius: 6px;">
+        <span style="font-size: 0.7rem; font-weight: 600; color: #6b7280; text-transform: uppercase; display: block;">Date</span>
+        <span style="font-size: 0.95rem; font-weight: 600; color: #1f2937;">{{ appointment.preferred_date|date:"F j, Y" }}</span>
+      </div>
+      <div style="background: #f8fafc; padding: 0.625rem 0.875rem; border-radius: 6px;">
+        <span style="font-size: 0.7rem; font-weight: 600; color: #6b7280; text-transform: uppercase; display: block;">Time</span>
+        <span style="font-size: 0.95rem; font-weight: 600; color: #1f2937;">{{ appointment.preferred_time|time:"g:i A" }}</span>
+      </div>
+      <div style="background: #f8fafc; padding: 0.625rem 0.875rem; border-radius: 6px;">
+        <span style="font-size: 0.7rem; font-weight: 600; color: #6b7280; text-transform: uppercase; display: block;">Purpose</span>
+        <span style="font-size: 0.95rem; font-weight: 600; color: #1f2937;">{% if appointment.purpose == 'others' %}{{ appointment.get_purpose_display }}: {{ appointment.specify_purpose }}{% else %}{{ appointment.get_purpose_display }}{% endif %}</span>
+      </div>
+    </div>
+    
+    {% if appointment.status == 'cancelled' and appointment.cancellation_reason %}
+    <!-- Divider -->
+    <div style="border-top: 1px solid #e5e7eb; margin: 1rem 0;"></div>
+    <h2 style="font-size: 1rem; font-weight: 700; color: #dc2626; margin: 0 0 0.75rem 0;">Cancellation Details</h2>
+    <div style="background: #fef2f2; padding: 0.625rem 0.875rem; border-radius: 6px;">
+      <span style="font-size: 0.7rem; font-weight: 600; color: #6b7280; text-transform: uppercase; display: block;">Reason</span>
+      <span style="font-size: 0.95rem; font-weight: 600; color: #1f2937;">{{ appointment.cancellation_reason }}</span>
+    </div>
+    {% endif %}
+
+    {% if appointment.rescheduled_at and appointment.reschedule_reason %}
+    <!-- Divider -->
+    <div style="border-top: 1px solid #e5e7eb; margin: 1rem 0;"></div>
+    <h2 style="font-size: 1rem; font-weight: 700; color: #d97706; margin: 0 0 0.75rem 0;">Reschedule Notice</h2>
+    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.5rem;">
+      <div style="background: #fffbeb; padding: 0.625rem 0.875rem; border-radius: 6px;">
+        <span style="font-size: 0.7rem; font-weight: 600; color: #6b7280; text-transform: uppercase; display: block;">Reason</span>
+        <span style="font-size: 0.95rem; font-weight: 600; color: #1f2937;">{{ appointment.reschedule_reason }}</span>
+      </div>
+      <div style="background: #fffbeb; padding: 0.625rem 0.875rem; border-radius: 6px;">
+        <span style="font-size: 0.7rem; font-weight: 600; color: #6b7280; text-transform: uppercase; display: block;">New Schedule</span>
+        <span style="font-size: 0.95rem; font-weight: 600; color: #1f2937;">{{ appointment.preferred_date|date:"F j, Y" }} at {{ appointment.preferred_time|time:"g:i A" }}</span>
+      </div>
+    </div>
+    {% endif %}
+    
+  </div>
+
+  <!-- Back Button -->
+  <div style="text-align: center; margin-top: 1.25rem;">
+    <a href="{% url 'appointments' %}" style="display: inline-block; padding: 0.75rem 2rem; background: #fcd116; color: #000; text-decoration: none; border-radius: 8px; font-weight: 700;">Back to Appointments</a>
+  </div>
+  
 </div>
 {% endblock %}

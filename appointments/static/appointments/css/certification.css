@@ -1086,3 +1086,23 @@ button#submit-button:active{
     font-size: 0.85rem;
   }
 }
+
+/* Disabled session card state */
+.session-card.disabled {
+  background: #f3f4f6;
+  border-color: #e5e7eb;
+  color: #9ca3af;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.session-card.disabled:hover {
+  background: #f3f4f6;
+  border-color: #e5e7eb;
+  transform: none;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.session-card.disabled .session-check {
+  display: none;
+}
