@@ -160,6 +160,47 @@ body {
     font-size: 0.9rem;
     opacity: 0.95;
 }
+
+/* Date Navigation */
+.date-navigation {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 0.5rem;
+    border-radius: 12px;
+    backdrop-filter: blur(10px);
+}
+
+.date-nav-btn {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    border-radius: 8px;
+    color: white;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none;
+    font-size: 1rem;
+}
+
+.date-nav-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
+}
+
+.current-date {
+    min-width: 150px;
+    text-align: center;
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: white;
+    padding: 0 1rem;
+}
  
 .view-btn {
     padding: 0.75rem 1.5rem;
@@ -532,6 +573,11 @@ body {
         flex-direction: column;
         align-items: flex-start;
         gap: 1.5rem;
+    }
+
+    .date-navigation {
+        width: 100%;
+        justify-content: space-between;
     }
  
     .stats-grid {
