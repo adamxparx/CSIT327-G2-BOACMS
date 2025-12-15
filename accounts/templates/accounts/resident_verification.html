@@ -67,10 +67,24 @@
                     <p>Review and manage resident account registrations</p>
                 </div>
                 <div class="header-stats">
+                    {% if status_filter == 'pending' or status_filter == 'all' %}
                     <div class="stat-chip pending">
                         <i class="fas fa-clock"></i>
                         <span>{{ pending_count }} Pending</span>
                     </div>
+                    {% endif %}
+                    {% if status_filter == 'approved' or status_filter == 'all' %}
+                    <div class="stat-chip approved" style="background: #DEF7EC; color: #03543F;">
+                        <i class="fas fa-check-circle"></i>
+                        <span>{{ approved_count }} Approved</span>
+                    </div>
+                    {% endif %}
+                    {% if status_filter == 'rejected' or status_filter == 'all' %}
+                    <div class="stat-chip rejected" style="background: #FDE8E8; color: #9B1C1C;">
+                        <i class="fas fa-times-circle"></i>
+                        <span>{{ rejected_count }} Rejected</span>
+                    </div>
+                    {% endif %}
                 </div>
             </div>
 
@@ -78,15 +92,21 @@
             <div class="filter-section">
                 <div class="search-box">
                     <i class="fas fa-search"></i>
-                    <input type="text" placeholder="Search by name, email, or ID..." id="search-residents">
+                    <input type="text" placeholder="Search by name, email, or ID..." id="search-residents" value="{{ search_query }}">
+                    <button type="button" id="search-btn" class="search-btn">
+                        <i class="fas fa-search"></i> Search
+                    </button>
                 </div>
                 <div class="filter-options">
                     <select id="status-filter" class="filter-select">
-                        <option value="all">All Status</option>
-                        <option value="pending" selected>Pending</option>
-                        <option value="approved">Approved</option>
-                        <option value="rejected">Rejected</option>
+                        <option value="all" {% if status_filter == 'all' %}selected{% endif %}>All Status</option>
+                        <option value="pending" {% if status_filter == 'pending' %}selected{% endif %}>Pending</option>
+                        <option value="approved" {% if status_filter == 'approved' %}selected{% endif %}>Approved</option>
+                        <option value="rejected" {% if status_filter == 'rejected' %}selected{% endif %}>Rejected</option>
                     </select>
+                    <button type="button" id="apply-filter-btn" class="apply-filter-btn">
+                        <i class="fas fa-filter"></i> Apply Filter
+                    </button>
                 </div>
             </div>
 
@@ -144,9 +164,19 @@
                                     </div>
                                 </td>
                                 <td>
+                                    {% if resident.approval_status == 'pending' %}
                                     <span class="status-badge pending">
                                         <i class="fas fa-clock"></i> Pending
                                     </span>
+                                    {% elif resident.approval_status == 'approved' %}
+                                    <span class="status-badge approved">
+                                        <i class="fas fa-check-circle"></i> Approved
+                                    </span>
+                                    {% elif resident.approval_status == 'rejected' %}
+                                    <span class="status-badge rejected">
+                                        <i class="fas fa-times-circle"></i> Rejected
+                                    </span>
+                                    {% endif %}
                                 </td>
                                 <td class="actions-col">
                                     <div class="action-buttons">
@@ -161,8 +191,18 @@
                                 <td colspan="6" class="no-data">
                                     <div class="empty-state">
                                         <i class="fas fa-check-circle"></i>
-                                        <h3>All Caught Up!</h3>
-                                        <p>All residents have been verified</p>
+                                        <h3>No Residents Found</h3>
+                                        <p>
+                                            {% if status_filter == 'pending' %}
+                                            All pending residents have been verified
+                                            {% elif status_filter == 'approved' %}
+                                            No approved residents yet
+                                            {% elif status_filter == 'rejected' %}
+                                            No rejected residents
+                                            {% else %}
+                                            No residents found
+                                            {% endif %}
+                                        </p>
                                     </div>
                                 </td>
                             </tr>
@@ -190,33 +230,85 @@
         </div>
     </main>
 </div>
-{% endblock %}
 
-{% block extra_js %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const searchInput = document.getElementById('search-residents');
+    const searchBtn = document.getElementById('search-btn');
     const statusFilter = document.getElementById('status-filter');
+    const applyFilterBtn = document.getElementById('apply-filter-btn');
     const selectAllCheckbox = document.getElementById('select-all');
     const residentCheckboxes = document.querySelectorAll('.resident-checkbox');
     const bulkActionsBar = document.getElementById('bulk-actions-bar');
     const selectedCountSpan = document.getElementById('selected-count');
     
-    // Search functionality
-    searchInput.addEventListener('input', function() {
-        const searchTerm = this.value.toLowerCase();
-        const rows = document.querySelectorAll('.table-row');
-        
-        rows.forEach(row => {
-            const text = row.textContent.toLowerCase();
-            row.style.display = text.includes(searchTerm) ? '' : 'none';
+    // Debug: Check if buttons exist
+    if (!applyFilterBtn) {
+        console.error('Apply Filter button not found!');
+        return;
+    }
+    
+    if (!searchBtn) {
+        console.error('Search button not found!');
+        return;
+    }
+    
+    // Function to apply filters and reload page
+    function applyFilters() {
+        const status = statusFilter.value;
+        const searchTerm = searchInput.value;
+        let url = `?status=${status}`;
+        if (searchTerm) {
+            url += `&search=${encodeURIComponent(searchTerm)}`;
+        }
+        console.log('Navigating to:', url);
+        window.location.href = url;
+    }
+    
+    // Function to perform search
+    function performSearch() {
+        const searchTerm = searchInput.value;
+        const status = statusFilter.value;
+        let url = `?status=${status}`;
+        if (searchTerm) {
+            url += `&search=${encodeURIComponent(searchTerm)}`;
+        }
+        console.log('Searching:', url);
+        window.location.href = url;
+    }
+    
+    // Search button click
+    if (searchBtn) {
+        searchBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            console.log('Search button clicked!');
+            performSearch();
         });
+    }
+    
+    // Apply filter button click
+    if (applyFilterBtn) {
+        applyFilterBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            console.log('Apply Filter button clicked!');
+            applyFilters();
+        });
+    }
+    
+    // Search functionality - submit on Enter to persist in URL
+    searchInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            performSearch();
+        }
     });
     
-    // Status filter
-    statusFilter.addEventListener('change', function() {
-        const status = this.value;
-        window.location.href = `?status=${status}`;
+    // Also allow Enter key on status filter
+    statusFilter.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            applyFilters();
+        }
     });
     
     // Select all functionality
