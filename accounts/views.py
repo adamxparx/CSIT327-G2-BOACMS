@@ -216,14 +216,37 @@ def staff_dashboard(request):
     if user.role == 'resident':
         return redirect('dashboard')
     
-    # Get today's date
-    today = datetime.date.today()
+    # Get the date from query parameter or use today's date
+    date_str = request.GET.get('date')
+    if date_str:
+        try:
+            selected_date = datetime.datetime.strptime(date_str, '%Y-%m-%d').date()
+        except ValueError:
+            selected_date = datetime.date.today()
+    else:
+        selected_date = datetime.date.today()
     
-    # Get all approved and claimed appointments for today
-    appointments_today = Appointment.objects.filter(
-        preferred_date=today,
-        status__in=['approved', 'claimed']
-    ).select_related('resident__resident').order_by('preferred_time')
+    # Calculate previous and next dates
+    previous_date = selected_date - datetime.timedelta(days=1)
+    next_date = selected_date + datetime.timedelta(days=1)
+    
+    # Check if selected date is before today
+    today = datetime.date.today()
+    is_past_date = selected_date < today
+    
+    # Get appointments based on whether it's a past date or not
+    if is_past_date:
+        # For past dates, show completed appointments
+        appointments_today = Appointment.objects.filter(
+            preferred_date=selected_date,
+            status='completed'
+        ).select_related('resident__resident').order_by('preferred_time')
+    else:
+        # For today and future dates, show approved and claimed appointments
+        appointments_today = Appointment.objects.filter(
+            preferred_date=selected_date,
+            status__in=['approved', 'claimed']
+        ).select_related('resident__resident').order_by('preferred_time')
     
     # Split appointments into AM (before 12:00 PM) and PM (12:00 PM and after)
     am_appointments = appointments_today.filter(preferred_time__lt=datetime.time(12, 0))
@@ -233,7 +256,7 @@ def staff_dashboard(request):
     am_appointments_count = am_appointments.count()
     pm_appointments_count = pm_appointments.count()
     total_appointments_today = appointments_today.count()
-    completed_count = Appointment.objects.filter(preferred_date=today, status='completed').count()
+    completed_count = Appointment.objects.filter(preferred_date=selected_date, status='completed').count()
     residents_count = get_user_model().objects.filter(role='resident').count()
 
     context = {
@@ -244,6 +267,11 @@ def staff_dashboard(request):
         "total_appointments_today": total_appointments_today,
         "completed_count": completed_count,
         "residents_count": residents_count,
+        "selected_date": selected_date,
+        "previous_date": previous_date,
+        "next_date": next_date,
+        "is_today": selected_date == datetime.date.today(),
+        "is_past_date": is_past_date,
     }
 
     return render(request, 'accounts/staff_dashboard.html', context)

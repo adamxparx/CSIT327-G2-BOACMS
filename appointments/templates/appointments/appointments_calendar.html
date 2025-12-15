@@ -88,6 +88,12 @@
     background: #F9FAFB;
 }
 
+.calendar-day.selected-day {
+    background: #E3F2FD;
+    border-color: #5B9BD5;
+    box-shadow: 0 0 0 2px rgba(91, 155, 213, 0.3);
+}
+
 .calendar-day.other-month {
     background: #F9FAFB;
     opacity: 0.5;
@@ -228,7 +234,7 @@
     </div>
 
     <div class="appointments-sidebar">
-        <h3 class="sidebar-title">All Appointments</h3>
+        <h3 class="sidebar-title" id="sidebar-title">All Appointments</h3>
         <div id="appointments-list">
             <!-- Appointments will be listed here -->
         </div>
@@ -238,6 +244,7 @@
 <script>
 let currentDate = new Date();
 let appointments = [];
+let selectedDate = null; // Track selected date for filtering
 
 // Fetch appointments
 fetch('{% url "api_appointments_list" %}')
@@ -245,12 +252,34 @@ fetch('{% url "api_appointments_list" %}')
     .then(data => {
         appointments = data;
         renderCalendar();
-        renderAppointmentsList();
+        renderAppointmentsList(); // Show all appointments by default
     });
 
 function changeMonth(delta) {
     currentDate.setMonth(currentDate.getMonth() + delta);
+    selectedDate = null; // Reset filter when changing month
     renderCalendar();
+    renderAppointmentsList(); // Show all appointments
+}
+
+function onDayClick(dateStr) {
+    // Toggle selection - if same day is clicked, show all
+    if (selectedDate === dateStr) {
+        selectedDate = null;
+        renderAppointmentsList();
+    } else {
+        selectedDate = dateStr;
+        renderAppointmentsList(dateStr);
+    }
+    
+    // Update visual indication of selected day
+    document.querySelectorAll('.calendar-day').forEach(day => {
+        day.classList.remove('selected-day');
+    });
+    
+    if (selectedDate) {
+        event.currentTarget.classList.add('selected-day');
+    }
 }
 
 function renderCalendar() {
@@ -295,6 +324,22 @@ function renderCalendar() {
         
         const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
         
+        // Add click handler
+        dayEl.style.cursor = 'pointer';
+        dayEl.onclick = function(event) {
+            // Toggle selection
+            if (selectedDate === dateStr) {
+                selectedDate = null;
+                renderAppointmentsList();
+                document.querySelectorAll('.calendar-day').forEach(d => d.classList.remove('selected-day'));
+            } else {
+                selectedDate = dateStr;
+                renderAppointmentsList(dateStr);
+                document.querySelectorAll('.calendar-day').forEach(d => d.classList.remove('selected-day'));
+                dayEl.classList.add('selected-day');
+            }
+        };
+        
         // Get appointments for this day
         const dayAppointments = appointments.filter(apt => apt.start.startsWith(dateStr));
         
@@ -323,6 +368,12 @@ function renderCalendar() {
         }
         
         dayEl.innerHTML = content;
+        
+        // Restore selected state if applicable
+        if (selectedDate === dateStr) {
+            dayEl.classList.add('selected-day');
+        }
+        
         grid.appendChild(dayEl);
     }
     
@@ -336,16 +387,32 @@ function renderCalendar() {
     }
 }
 
-function renderAppointmentsList() {
+function renderAppointmentsList(filterDate = null) {
     const listEl = document.getElementById('appointments-list');
+    const titleEl = document.getElementById('sidebar-title');
     
-    if (appointments.length === 0) {
+    // Update title based on filter
+    if (filterDate) {
+        const date = new Date(filterDate);
+        const dateStr = date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+        titleEl.textContent = `Appointments - ${dateStr}`;
+    } else {
+        titleEl.textContent = 'All Appointments';
+    }
+    
+    // Filter appointments if date is specified
+    let filteredAppointments = appointments;
+    if (filterDate) {
+        filteredAppointments = appointments.filter(apt => apt.start.startsWith(filterDate));
+    }
+    
+    if (filteredAppointments.length === 0) {
         listEl.innerHTML = '<p style="color: #9CA3AF; text-align: center;">No appointments found</p>';
         return;
     }
     
     // Sort appointments by date
-    const sortedAppointments = [...appointments].sort((a, b) => 
+    const sortedAppointments = [...filteredAppointments].sort((a, b) => 
         new Date(a.start) - new Date(b.start)
     );
     

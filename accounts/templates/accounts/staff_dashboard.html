@@ -31,14 +31,21 @@
                 <h1><i class="fas fa-calendar-check"></i> Appointment Management</h1>
                 <div class="header-meta">
                     <span class="meta-item">
-                        <i class="fas fa-calendar"></i>
-                        {% now "l, F j, Y" %}
-                    </span>
-                    <span class="meta-item">
                         <i class="fas fa-map-marker-alt"></i>
                         Labangon Barangay Hall
                     </span>
                 </div>
+            </div>
+            <div class="date-navigation">
+                <a href="?date={{ previous_date|date:'Y-m-d' }}" class="date-nav-btn" title="Previous Day">
+                    <i class="fas fa-chevron-left"></i>
+                </a>
+                <div class="current-date">
+                    {{ selected_date|date:"F j, Y" }}
+                </div>
+                <a href="?date={{ next_date|date:'Y-m-d' }}" class="date-nav-btn" title="Next Day">
+                    <i class="fas fa-chevron-right"></i>
+                </a>
             </div>
         </div>
  
@@ -49,7 +56,14 @@
                     <i class="fas fa-calendar"></i>
                 </div>
                 <div class="stat-content">
-                    <p class="stat-label">Today's Appointments</p>
+                    <p class="stat-label">
+                        {% now "Y-m-d" as today_str %}
+                        {% if selected_date|date:"Y-m-d" == today_str %}
+                            Today's Appointments
+                        {% else %}
+                            Appointments
+                        {% endif %}
+                    </p>
                     <h3 class="stat-value">{{ total_appointments_today }}</h3>
                 </div>
             </div>
@@ -103,9 +117,11 @@
                                     </span>
                                 </div>
                             </div>
-                            <span class="status-badge status-{{ appointment.status }}" {% if appointment.status == 'claimed' %}style="background: #F59E0B;"{% endif %}>
+                            <span class="status-badge status-{{ appointment.status }}" {% if appointment.status == 'claimed' %}style="background: #F59E0B;"{% elif appointment.status == 'completed' %}style="background: #10B981;"{% endif %}>
                                 {% if appointment.status == 'claimed' %}
                                 Claimed - Awaiting Confirmation
+                                {% elif appointment.status == 'completed' %}
+                                Completed
                                 {% else %}
                                 Confirmed
                                 {% endif %}
@@ -142,11 +158,11 @@
                         </div>
                        
                         <div class="appointment-actions">
-                            <button class="btn-action btn-no-show" data-id="{{ appointment.id }}" {% if appointment.status == 'claimed' %}disabled style="opacity: 0.5; cursor: not-allowed;"{% endif %}>
+                            <button class="btn-action btn-no-show" data-id="{{ appointment.id }}" {% if appointment.status == 'claimed' or not is_today %}disabled style="opacity: 0.5; cursor: not-allowed;"{% endif %}>
                                 <i class="fas fa-times"></i>
                                 No Show
                             </button>
-                            <button class="btn-action btn-claimed" data-id="{{ appointment.id }}" {% if appointment.status == 'claimed' %}disabled style="opacity: 0.6; cursor: not-allowed;"{% endif %}>
+                            <button class="btn-action btn-claimed" data-id="{{ appointment.id }}" {% if appointment.status == 'claimed' or not is_today %}disabled style="opacity: 0.6; cursor: not-allowed;"{% endif %}>
                                 <i class="fas fa-check"></i>
                                 {% if appointment.status == 'claimed' %}
                                 Marked as Claimed
@@ -191,9 +207,11 @@
                                     </span>
                                 </div>
                             </div>
-                            <span class="status-badge status-{{ appointment.status }}" {% if appointment.status == 'claimed' %}style="background: #F59E0B;"{% endif %}>
+                            <span class="status-badge status-{{ appointment.status }}" {% if appointment.status == 'claimed' %}style="background: #F59E0B;"{% elif appointment.status == 'completed' %}style="background: #10B981;"{% endif %}>
                                 {% if appointment.status == 'claimed' %}
                                 Claimed - Awaiting Confirmation
+                                {% elif appointment.status == 'completed' %}
+                                Completed
                                 {% else %}
                                 Confirmed
                                 {% endif %}
@@ -230,11 +248,11 @@
                         </div>
                        
                         <div class="appointment-actions">
-                            <button class="btn-action btn-no-show" data-id="{{ appointment.id }}" {% if appointment.status == 'claimed' %}disabled style="opacity: 0.5; cursor: not-allowed;"{% endif %}>
+                            <button class="btn-action btn-no-show" data-id="{{ appointment.id }}" {% if appointment.status == 'claimed' or not is_today %}disabled style="opacity: 0.5; cursor: not-allowed;"{% endif %}>
                                 <i class="fas fa-times"></i>
                                 No Show
                             </button>
-                            <button class="btn-action btn-claimed" data-id="{{ appointment.id }}" {% if appointment.status == 'claimed' %}disabled style="opacity: 0.6; cursor: not-allowed;"{% endif %}>
+                            <button class="btn-action btn-claimed" data-id="{{ appointment.id }}" {% if appointment.status == 'claimed' or not is_today %}disabled style="opacity: 0.6; cursor: not-allowed;"{% endif %}>
                                 <i class="fas fa-check"></i>
                                 {% if appointment.status == 'claimed' %}
                                 Marked as Claimed
