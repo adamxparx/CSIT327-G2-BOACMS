@@ -200,6 +200,14 @@
     background: #10B981;
 }
 
+.status-badge-sm.no_show {
+    background: #EF4444;
+}
+
+.status-badge-sm.claimed {
+    background: #F59E0B;
+}
+
 .calendar-layout {
     display: grid;
     grid-template-columns: 1fr 350px;
@@ -421,9 +429,31 @@ function renderAppointmentsList(filterDate = null) {
         const dateStr = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
         const timeStr = date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
         
-        const statusClass = apt.status === 'completed' ? 'completed' : '';
-        const statusText = apt.status === 'approved' ? 'Confirmed' : 
-                          apt.status === 'completed' ? 'Completed' : apt.status;
+        // Determine status class and text
+        let statusClass = '';
+        let statusText = '';
+        
+        switch(apt.status) {
+            case 'approved':
+                statusClass = '';
+                statusText = 'Confirmed';
+                break;
+            case 'completed':
+                statusClass = 'completed';
+                statusText = 'Completed';
+                break;
+            case 'no_show':
+                statusClass = 'no_show';
+                statusText = 'No Show';
+                break;
+            case 'claimed':
+                statusClass = 'claimed';
+                statusText = 'Claimed';
+                break;
+            default:
+                statusClass = '';
+                statusText = apt.status;
+        }
         
         // Use resident_name directly from API or extract from title
         const residentName = apt.resident_name || apt.title.split('(')[1]?.replace(')', '') || 'Unknown';
