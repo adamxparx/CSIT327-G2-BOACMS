@@ -19,6 +19,7 @@ from .models import CustomUser, Resident, BarangayStaff
 from django.db.models import Count, Q
 from django.utils import timezone
 from datetime import timedelta
+from django.http import JsonResponse
 
 def is_admin(user):
     return user.is_authenticated and user.role == 'admin'
@@ -204,20 +205,34 @@ def staff_dashboard(request):
     if user.role == 'resident':
         return redirect('dashboard')
     
-    pending_count = Appointment.objects.filter(status='pending').count()
-    approved_count = Appointment.objects.filter(status='approved').count()
-    total_appointments_today = Appointment.objects.filter(preferred_date=datetime.date.today()).count()
-    residents_count = get_user_model().objects.filter(role='resident').count()
+    # Get today's date
+    today = datetime.date.today()
     
-    # Get recent appointments (last 5 created) with prefetched resident data
-    recent_appointments = Appointment.objects.select_related('resident__resident').all().order_by('-created_at')[:5]
+    # Get all approved and claimed appointments for today
+    appointments_today = Appointment.objects.filter(
+        preferred_date=today,
+        status__in=['approved', 'claimed']
+    ).select_related('resident__resident').order_by('preferred_time')
+    
+    # Split appointments into AM (before 12:00 PM) and PM (12:00 PM and after)
+    am_appointments = appointments_today.filter(preferred_time__lt=datetime.time(12, 0))
+    pm_appointments = appointments_today.filter(preferred_time__gte=datetime.time(12, 0))
+    
+    # Counts
+    am_appointments_count = am_appointments.count()
+    pm_appointments_count = pm_appointments.count()
+    total_appointments_today = appointments_today.count()
+    completed_count = Appointment.objects.filter(preferred_date=today, status='completed').count()
+    residents_count = get_user_model().objects.filter(role='resident').count()
 
     context = {
-        "pending_count": pending_count,
-        "approved_count": approved_count,
+        "am_appointments": am_appointments,
+        "pm_appointments": pm_appointments,
+        "am_appointments_count": am_appointments_count,
+        "pm_appointments_count": pm_appointments_count,
         "total_appointments_today": total_appointments_today,
+        "completed_count": completed_count,
         "residents_count": residents_count,
-        "recent_appointments": recent_appointments,
     }
 
     return render(request, 'accounts/staff_dashboard.html', context)
@@ -829,3 +844,43 @@ def debug_role(request):
         <a href="/dashboard/">Try Resident Dashboard</a>
         """)
     return HttpResponse("Not logged in")
+
+
+@login_required
+@require_http_methods(["POST"])
+@csrf_exempt
+def update_appointment_status(request):
+    """AJAX endpoint to update appointment status (claimed or no_show)"""
+    if request.user.role not in ['staff', 'admin']:
+        return JsonResponse({'success': False, 'error': 'Unauthorized'}, status=403)
+    
+    try:
+        appointment_id = request.POST.get('appointment_id')
+        action = request.POST.get('action')  # 'claimed' or 'no_show'
+        
+        if not appointment_id or not action:
+            return JsonResponse({'success': False, 'error': 'Missing parameters'}, status=400)
+        
+        appointment = get_object_or_404(Appointment, id=appointment_id)
+        
+        if action == 'claimed':
+            appointment.status = 'claimed'
+            appointment.save()
+            return JsonResponse({
+                'success': True,
+                'message': 'Appointment marked as claimed',
+                'status': 'claimed'
+            })
+        elif action == 'no_show':
+            appointment.status = 'no_show'
+            appointment.save()
+            return JsonResponse({
+                'success': True,
+                'message': 'Appointment marked as no-show',
+                'status': 'no_show'
+            })
+        else:
+            return JsonResponse({'success': False, 'error': 'Invalid action'}, status=400)
+    
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)}, status=500)

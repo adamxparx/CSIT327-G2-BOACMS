@@ -35,6 +35,7 @@ urlpatterns = [
     path('staff/resident-approvals/', views.resident_approvals, name='resident_approvals'),
     path('staff/approve-resident/<int:resident_id>/', views.approve_resident, name='approve_resident'),
     path('staff/reject-resident/<int:resident_id>/', views.reject_resident, name='reject_resident'),
+    path('staff/update-appointment-status/', views.update_appointment_status, name='update_appointment_status'),
     
     # Resident URLs
     path('dashboard/', views.dashboard, name='dashboard'),

@@ -36,6 +36,7 @@ class Appointment(models.Model):
         ('completed', 'Completed'),
         ('claimed', 'Claimed'),
         ('cancelled', 'Cancelled'),
+        ('no_show', 'No Show'),
     ]
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
     

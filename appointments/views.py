@@ -148,6 +148,9 @@ def claimed_appointments(request):
             messages.success(request, "Successfully confirmed claimed appointment.")
         else: 
             messages.info(request, "Appointment is already completed")
+        
+        # Use POST/Redirect/GET pattern
+        return redirect('claimed_appointments')
 
     context = {
         'appointments': appointments,
@@ -355,11 +358,15 @@ def api_appointments_list(request):
         
     data = []
     for appointment in appointments:
+        # Get resident name from the Resident model
+        resident_name = f"{appointment.resident.resident.first_name} {appointment.resident.resident.last_name}"
+        
         data.append({
-            'title': f"{appointment.get_certificate_type_display()} ({appointment.resident.get_full_name()})",
+            'title': f"{appointment.get_certificate_type_display()} ({resident_name})",
             'start': f"{appointment.preferred_date}T{appointment.preferred_time}",
             'status': appointment.status,
-            'url': reverse('appointment_detail', args=[appointment.id]), 
+            'url': reverse('appointment_detail', args=[appointment.id]),
+            'resident_name': resident_name,
         })
     return JsonResponse(data, safe=False)
 
