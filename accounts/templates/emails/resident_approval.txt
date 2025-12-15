@@ -6,6 +6,8 @@ Your account registration for the Barangay Office Management System has been app
 
 You can now log in to the system using your email address ({{ resident.user.email }}) and the password you created during registration.
 
+Access the portal: https://boacms-portal.onrender.com/
+
 If you have any questions or need assistance, please contact our office.
 
 Thank you,
