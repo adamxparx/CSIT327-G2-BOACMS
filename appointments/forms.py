@@ -3,8 +3,7 @@ from .models import Appointment
 from django.core.exceptions import ValidationError
 from django.utils import timezone
 import datetime
-from datetime import time, timedelta
-from django.db import transaction, IntegrityError
+from datetime import time
 
 class AppointmentForm(forms.ModelForm):
     # Generate time choices in 30-minute intervals from 8:00 AM to 4:30 PM
@@ -101,49 +100,16 @@ class AppointmentForm(forms.ModelForm):
         return cleaned_data
     
     def save(self, commit=True):
-
-        with transaction.atomic():
-            instance = super().save(commit=False)
-
-            preferred_date = self.cleaned_data.get('preferred_date')
-            preferred_time = self.cleaned_data.get('preferred_time')
-
-            # Convert string time to time object
-            if isinstance(preferred_time, str):
-                hour, minute = map(int, preferred_time.split(':'))
-                preferred_time_obj = time(hour, minute)
-            else:
-                preferred_time_obj = preferred_time
-
-            buffer_minutes =  30  # Increased buffer to 30 minutes
-
-            start_datetime = timezone.make_aware(
-                timezone.datetime.combine(preferred_date, preferred_time_obj)
-            )
-                
-            slot_start = start_datetime - timedelta(minutes=buffer_minutes)
-            slot_end = start_datetime + timedelta(minutes=buffer_minutes)
-
-            conflicting_appointments = Appointment.objects.select_for_update().filter(
-                preferred_date = preferred_date,
-                preferred_time__range = (slot_start.time(), slot_end.time())
-            )
-
-            if self.instance and self.instance.pk:
-                conflicting_appointments = conflicting_appointments.exclude(pk=self.instance.pk)
-
-            # Allow up to 5 appointments per 30-minute interval
-            if conflicting_appointments.count() >= 5:
-                raise IntegrityError("Maximum 5 persons can book per 30-minute interval. Please choose a different time.")
+        instance = super().save(commit=False)
+        
+        # Save specify_purpose if 'Others' is selected
+        specify_purpose = self.cleaned_data.get('specify_purpose')
+        if specify_purpose:
+            instance.specify_purpose = specify_purpose
             
-            # Save specify_purpose if 'Others' is selected
-            specify_purpose = self.cleaned_data.get('specify_purpose')
-            if specify_purpose:
-                instance.specify_purpose = specify_purpose
-                
-            if commit:
-                instance.save()
-            return instance
+        if commit:
+            instance.save()
+        return instance
 
 class CancellationReasonForm(forms.Form):
     reason = forms.CharField(
