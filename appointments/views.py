@@ -38,63 +38,32 @@ def find_nearest_available_slot(preferred_date, preferred_time, buffer_minutes=3
             candidate_dt = datetime.combine(current_date, open_time)
 
         while candidate_dt.time() <= close_time:
-            slot_start_dt = candidate_dt - timedelta(minutes=buffer_minutes)
-            slot_end_dt = candidate_dt + timedelta(minutes=buffer_minutes)
-
-            slot_start_time = slot_start_dt.time()
-            slot_end_time = slot_end_dt.time()
-
-            if slot_start_dt.date() < current_date:
-                slot_start_time = open_time
-            if slot_end_dt.date() > current_date:
-                slot_end_time = close_time
-
-            # Count appointments in this time slot
-            conflicts = Appointment.objects.filter(
-                preferred_date=current_date,
-                preferred_time__range=(slot_start_time, slot_end_time)
-            ).exclude(status='cancelled')
-
-            # Allow up to 5 appointments per 30-minute interval
-            if conflicts.count() < 5:
-                return {
-                    'date': current_date,
-                    'time': candidate_dt.time(),
-                }
-
-            candidate_dt += step
+            # Return the slot without checking for conflicts
+            return {
+                'date': current_date,
+                'time': candidate_dt.time(),
+            }
 
     return None
 
 
 @login_required
 def create_appointment(request):
-    recommended_slot = None
-
     if request.method == 'POST':
         form = AppointmentForm(request.POST)
         if form.is_valid():
-            try:
-                appointment = form.save(commit=False)
-                appointment.resident = request.user
-                appointment.status = 'approved'  # Auto-approve appointments
-                
-                # Convert string time to time object before saving
-                if isinstance(form.cleaned_data['preferred_time'], str):
-                    hour, minute = map(int, form.cleaned_data['preferred_time'].split(':'))
-                    appointment.preferred_time = datetime_time(hour, minute)
-                
-                appointment.save()
-                messages.success(request, "Appointment booked successfully!")
-                return redirect('appointments')
-            except IntegrityError:
-                form.add_error(None, "This time slot is already taken. Please choose another time.")
-                recommended_slot = find_nearest_available_slot(
-                    form.cleaned_data['preferred_date'],
-                    form.cleaned_data['preferred_time']
-                )
-                if not recommended_slot:
-                    messages.info(request, "All nearby slots are currently full. Please choose another date or time.")
+            appointment = form.save(commit=False)
+            appointment.resident = request.user
+            appointment.status = 'approved'  # Auto-approve appointments
+            
+            # Convert string time to time object before saving
+            if isinstance(form.cleaned_data['preferred_time'], str):
+                hour, minute = map(int, form.cleaned_data['preferred_time'].split(':'))
+                appointment.preferred_time = datetime_time(hour, minute)
+            
+            appointment.save()
+            messages.success(request, "Appointment booked successfully!")
+            return redirect('appointments')
     else:
         initial_data = {}
         for field in ['certificate_type', 'purpose', 'preferred_date', 'preferred_time']:
@@ -106,7 +75,6 @@ def create_appointment(request):
 
     context = {
         'form': form,
-        'recommended_slot': recommended_slot,
     }
 
     return render(request, 'appointments/certification.html', context)
@@ -221,29 +189,13 @@ def approved_appointments(request):
                 elif not (datetime_time(9, 0) <= new_time_obj <= datetime_time(16, 30)):
                     messages.error(request, "Appointments are only available between 9:00 AM and 4:30 PM.")
                 else:
-                    # Check for conflicts (maximum 5 appointments per 30-minute slot)
-                    buffer_minutes = 30
-                    start_datetime = timezone.make_aware(
-                        dt.datetime.combine(new_date, new_time_obj)
-                    )
-                    slot_start = start_datetime - dt.timedelta(minutes=buffer_minutes)
-                    slot_end = start_datetime + dt.timedelta(minutes=buffer_minutes)
-                    
-                    conflicting_appointments = Appointment.objects.filter(
-                        preferred_date=new_date,
-                        preferred_time__range=(slot_start.time(), slot_end.time())
-                    ).exclude(status='cancelled').exclude(id=appointment.id)
-                    
-                    if conflicting_appointments.count() >= 5:
-                        messages.error(request, "Maximum 5 persons can book per 30-minute interval. Please choose a different time.")
-                    else:
-                        # Update the appointment with new date/time and reason
-                        appointment.preferred_date = new_date
-                        appointment.preferred_time = new_time_obj
-                        appointment.reschedule_reason = reason
-                        appointment.rescheduled_at = timezone.now()
-                        appointment.save()
-                        messages.success(request, "Appointment rescheduled successfully.")
+                    # Update the appointment with new date/time and reason
+                    appointment.preferred_date = new_date
+                    appointment.preferred_time = new_time_obj
+                    appointment.reschedule_reason = reason
+                    appointment.rescheduled_at = timezone.now()
+                    appointment.save()
+                    messages.success(request, "Appointment rescheduled successfully.")
             else:
                 messages.error(request, "Please correct the errors below.")
     
