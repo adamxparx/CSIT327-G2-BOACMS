@@ -113,7 +113,18 @@ def register(request):
             resident.city = 'Cebu City'
             resident.save()
 
-            
+            # Handle document upload to Supabase
+            if 'address_document_file' in request.FILES:
+                try:
+                    document_file = request.FILES['address_document_file']
+                    # Upload to Supabase and get the URL
+                    document_url = upload_document_to_supabase(document_file, resident.id)
+                    # Save the URL to the resident model
+                    resident.address_document = document_url
+                    resident.save()
+                except Exception as e:
+                    # Log the error but don't prevent registration
+                    print(f"Document upload failed: {str(e)}")
             
             # Redirect to register page with success parameter
             return redirect(reverse('register') + '?success=true')
