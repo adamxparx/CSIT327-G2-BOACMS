@@ -1086,3 +1086,22 @@ button#submit-button:active{
     font-size: 0.85rem;
   }
 }
+
+/* Selected date */
+.calendar-date.selected {
+  background-color: #2563eb;   /* blue (adjust if needed) */
+  color: #ffffff;              /* ✅ white text */
+  border-radius: 0.5rem;
+  font-weight: 600;
+}
+
+/* Keep today readable when selected */
+.calendar-date.today.selected {
+  color: #ffffff;
+}
+
+/* Hover effect (optional but nice) */
+.calendar-date:not(.disabled):hover {
+  background-color: #e5e7eb;
+  cursor: pointer;
+}
