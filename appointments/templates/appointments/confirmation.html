@@ -1,14 +1,14 @@
-{% extends 'accounts/dashboard.html' %}
-{% load static %}
-
-{% block extra_css %}
-<link rel="stylesheet" href="{% static 'appointments/css/appointments.css' %}">
-<link rel="stylesheet" href="{% static 'appointments/css/confirmation.css' %}">
-{% endblock %}
-
-{% block title %}Appointment Confirmed | {{ block.super }}{% endblock %}
-
-{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Appointment Confirmed | BOACMS</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'appointments/css/confirmation.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
 <!-- Modal Backdrop -->
 <div class="modal-backdrop" id="confirmationModal">
   <div class="modal-container">
@@ -43,7 +43,13 @@
         </div>
         <div class="info-row">
           <span class="label">Time:</span>
-          <span class="value">{{ appointment.preferred_time|time:"g:i A" }}</span>
+          <span class="value">
+            {% if appointment.preferred_time.hour < 12 %}
+              8:00 AM - 12:00 PM
+            {% else %}
+              1:00 PM - 5:00 PM
+            {% endif %}
+          </span>
         </div>
         <div class="info-row">
           <span class="label">Purpose:</span>
@@ -77,6 +83,9 @@
 
     <!-- Action Button -->
     <div class="action-section">
+      <a href="{% url 'dashboard' %}" class="close-btn">
+        Close
+      </a>
       <a href="{% url 'appointments' %}" class="view-appointments-btn">
         View All Appointments
       </a>
@@ -85,24 +94,25 @@
 </div>
 
 <script>
-// Auto-show modal on page load
+// Close button handler (X button)
 document.addEventListener('DOMContentLoaded', function() {
-  const modal = document.getElementById('confirmationModal');
-  if (modal) {
-    modal.style.display = 'flex';
+  const closeModalBtn = document.getElementById('closeModal');
+  if (closeModalBtn) {
+    closeModalBtn.addEventListener('click', function() {
+      window.location.href = "{% url 'dashboard' %}";
+    });
   }
   
-  // Close button handler
-  document.getElementById('closeModal').addEventListener('click', function() {
-    window.location.href = "{% url 'appointments' %}";
-  });
-});
-
-// Close modal when clicking backdrop
-document.getElementById('confirmationModal').addEventListener('click', function(e) {
-  if (e.target === this) {
-    window.location.href = "{% url 'appointments' %}";
+  // Close modal when clicking backdrop
+  const modal = document.getElementById('confirmationModal');
+  if (modal) {
+    modal.addEventListener('click', function(e) {
+      if (e.target === this) {
+        window.location.href = "{% url 'dashboard' %}";
+      }
+    });
   }
 });
 </script>
-{% endblock %}
+</body>
+</html>

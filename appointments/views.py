@@ -62,8 +62,8 @@ def create_appointment(request):
                 appointment.preferred_time = datetime_time(hour, minute)
             
             appointment.save()
-            messages.success(request, "Appointment booked successfully!")
-            return redirect('appointments')
+            # Redirect to confirmation page instead of appointments list
+            return redirect('confirmation', appointment_id=appointment.id)
     else:
         initial_data = {}
         for field in ['certificate_type', 'purpose', 'preferred_date', 'preferred_time']:
