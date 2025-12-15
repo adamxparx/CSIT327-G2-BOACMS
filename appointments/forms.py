@@ -7,9 +7,9 @@ from datetime import time, timedelta
 from django.db import transaction, IntegrityError
 
 class AppointmentForm(forms.ModelForm):
-    # Generate time choices in 30-minute intervals from 9:00 AM to 4:30 PM
+    # Generate time choices in 30-minute intervals from 8:00 AM to 4:30 PM
     TIME_CHOICES = []
-    start_time = time(9, 0)   # 9:00 AM
+    start_time = time(8, 0)   # 8:00 AM
     end_time = time(16, 30)   # 4:30 PM (changed from 5:00 PM)
     
     current_time = start_time
@@ -31,7 +31,7 @@ class AppointmentForm(forms.ModelForm):
     
     preferred_time = forms.ChoiceField(
         choices=TIME_CHOICES,
-        initial='9:00',
+        initial='8:00',
         widget=forms.Select(attrs={'class': 'form-control'})
     )
     
@@ -77,11 +77,11 @@ class AppointmentForm(forms.ModelForm):
         else:
             preferred_time_obj = preferred_time
 
-        open_time = time(9, 0)
+        open_time = time(8, 0)
         close_time = time(16, 30)  # Changed to 4:30 PM
 
         if preferred_time_obj and not (open_time <= preferred_time_obj <= close_time):
-            raise ValidationError("Appointments are only available between 9:00 AM and 4:30 PM")
+            raise ValidationError("Appointments are only available between 8:00 AM and 4:30 PM")
         
         return preferred_time
     

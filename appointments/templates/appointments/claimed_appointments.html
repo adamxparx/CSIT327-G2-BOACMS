@@ -10,15 +10,6 @@
 <div class="appointments-center">
 {% if appointments %}
     <div class="appointments-card">
-        {% if messages %}
-            <div>
-                {% for message in messages %}
-                    <div class="message_success">
-                        {{ message }}
-                    </div>
-                {% endfor %}
-            </div>
-        {% endif %}
         <div class="header">
             <div>
                 <h2 class="title">Completed Appointments</h2>
@@ -163,8 +154,8 @@
         
         rows.forEach(row => {
             row.addEventListener('click', function(e) {
-                // Prevent opening modal when clicking on the cancel button
-                if (e.target.closest('.btn-cancel')) {
+                // Prevent opening modal when clicking on buttons or forms
+                if (e.target.closest('.status-actions') || e.target.closest('button') || e.target.closest('form')) {
                     return;
                 }
                 

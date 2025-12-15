@@ -1,109 +1,385 @@
 {% extends dashboard_template %}
+{% load static %}
+
+{% block appbar %}
+<a href="{% url 'staff_dashboard' %}" class="nav-link">
+    HOME
+</a>
+<a href="{% url 'appointments_calendar' %}" class="nav-link active">
+    APPOINTMENTS
+</a>
+{% endblock %}
+
+{% block user %}
+<span class="user-name">Barangay Office</span>
+{% endblock %}
+
 {% block content %}
 
-<h2>Appointments Calendar</h2>
-
-<link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/main.min.css" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
-
 <style>
-#calendar-container {
-    background: #fff;
-    padding: 20px;
-    border-radius: 12px;
+/* Calendar Container */
+.calendar-wrapper {
+    background: white;
+    border-radius: 16px;
+    padding: 2rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
-.nbi-slot-box {
-    margin-top: 6px;
+.calendar-header {
     display: flex;
-    flex-direction: column;
-    gap: 4px;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
 }
 
-.nbi-slot {
-    background: #1da1d8;
-    color: white;
+.calendar-month {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #003DA5;
+}
+
+.calendar-nav {
+    display: flex;
+    gap: 1rem;
+}
+
+.nav-btn {
+    width: 40px;
+    height: 40px;
     border: none;
-    border-radius: 4px;
-    padding: 6px 4px;
+    background: #F3F4F6;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.nav-btn:hover {
+    background: #E5E7EB;
+}
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 0;
+}
+
+.calendar-day-header {
+    padding: 1rem;
+    text-align: center;
+    font-weight: 600;
+    font-size: 0.875rem;
+    color: #6B7280;
+    background: #F9FAFB;
+    border: 1px solid #E5E7EB;
+}
+
+.calendar-day {
+    min-height: 120px;
+    padding: 0.75rem;
+    border: 1px solid #E5E7EB;
+    background: white;
+    transition: all 0.2s;
+}
+
+.calendar-day:hover {
+    background: #F9FAFB;
+}
+
+.calendar-day.other-month {
+    background: #F9FAFB;
+    opacity: 0.5;
+}
+
+.day-number {
+    font-weight: 600;
+    font-size: 0.875rem;
+    color: #111827;
+    margin-bottom: 0.5rem;
+}
+
+.calendar-day.other-month .day-number {
+    color: #9CA3AF;
+}
+
+.appointment-indicator {
+    background: #5B9BD5;
+    color: white;
+    border-radius: 8px;
+    padding: 0.375rem 0.5rem;
     font-size: 0.75rem;
     font-weight: 600;
+    text-align: center;
+    margin-bottom: 0.25rem;
     cursor: pointer;
+    transition: all 0.2s;
 }
 
-.nbi-slot small {
+.appointment-indicator:hover {
+    background: #4A8BC4;
+    transform: translateY(-1px);
+}
+
+.appointment-indicator.completed {
+    background: #10B981;
+}
+
+.appointment-indicator.completed:hover {
+    background: #059669;
+}
+
+/* All Appointments Sidebar */
+.appointments-sidebar {
+    background: white;
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    max-height: 600px;
+    overflow-y: auto;
+}
+
+.sidebar-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #003DA5;
+    margin-bottom: 1.5rem;
+}
+
+.appointment-item {
+    padding: 1rem;
+    border: 1px solid #E5E7EB;
+    border-radius: 8px;
+    margin-bottom: 0.75rem;
+    transition: all 0.2s;
+}
+
+.appointment-item:hover {
+    border-color: #5B9BD5;
+    box-shadow: 0 2px 8px rgba(91, 155, 213, 0.2);
+}
+
+.appointment-name {
+    font-weight: 700;
+    color: #003DA5;
+    margin-bottom: 0.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.appointment-cert {
+    font-size: 0.875rem;
+    color: #6B7280;
+    margin-bottom: 0.25rem;
+}
+
+.appointment-datetime {
+    font-size: 0.8rem;
+    color: #003DA5;
+    font-weight: 500;
+}
+
+.status-badge-sm {
+    padding: 0.25rem 0.5rem;
+    border-radius: 999px;
     font-size: 0.65rem;
-    font-weight: normal;
+    font-weight: 600;
+    background: #5B9BD5;
+    color: white;
 }
 
-.nbi-slot:disabled {
-    background: #ccc;
-    cursor: not-allowed;
+.status-badge-sm.completed {
+    background: #10B981;
 }
 
-.fc-daygrid-day-number {
-    font-weight: bold;
+.calendar-layout {
+    display: grid;
+    grid-template-columns: 1fr 350px;
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+@media (max-width: 1200px) {
+    .calendar-layout {
+        grid-template-columns: 1fr;
+    }
 }
 </style>
 
-<div id="calendar-container">
-    <div id="calendar"></div>
+<div class="calendar-layout">
+    <div class="calendar-wrapper">
+        <div class="calendar-header">
+            <h2 class="calendar-month" id="current-month">December 2025</h2>
+            <div class="calendar-nav">
+                <button class="nav-btn" onclick="changeMonth(-1)">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <button class="nav-btn" onclick="changeMonth(1)">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+        </div>
+
+        <div class="calendar-grid" id="calendar-grid">
+            <!-- Calendar will be rendered here -->
+        </div>
+    </div>
+
+    <div class="appointments-sidebar">
+        <h3 class="sidebar-title">All Appointments</h3>
+        <div id="appointments-list">
+            <!-- Appointments will be listed here -->
+        </div>
+    </div>
 </div>
 
 <script>
-document.addEventListener("DOMContentLoaded", function () {
+let currentDate = new Date();
+let appointments = [];
 
-    const calendarEl = document.getElementById("calendar");
-    let availability = {};
+// Fetch appointments
+fetch('{% url "api_appointments_list" %}')
+    .then(res => res.json())
+    .then(data => {
+        appointments = data;
+        renderCalendar();
+        renderAppointmentsList();
+    });
 
-    fetch("{% url 'api_month_availability' %}")
-        .then(res => res.json())
-        .then(data => {
-            data.forEach(d => availability[d.date] = d);
-            initCalendar();
-        });
+function changeMonth(delta) {
+    currentDate.setMonth(currentDate.getMonth() + delta);
+    renderCalendar();
+}
 
-    function initCalendar() {
-        const calendar = new FullCalendar.Calendar(calendarEl, {
-            initialView: "dayGridMonth",
-            height: "auto",
-
-            hiddenDays: [0], // hide Sunday
-
-            dayCellDidMount(info) {
-                const dateStr = info.date.toISOString().split("T")[0];
-                const data = availability[dateStr] || { am: 0, pm: 0 };
-
-                const frame = info.el.querySelector(".fc-daygrid-day-frame");
-
-                frame.insertAdjacentHTML("beforeend", `
-                    <div class="nbi-slot-box">
-                        <button class="nbi-slot"
-                            ${data.am === 0 ? "disabled" : ""}
-                            onclick="selectSlot('${dateStr}','AM')">
-                            AM<br><small>${data.am} Slots</small>
-                        </button>
-
-                        <button class="nbi-slot"
-                            ${data.pm === 0 ? "disabled" : ""}
-                            onclick="selectSlot('${dateStr}','PM')">
-                            PM<br><small>${data.pm} Slots</small>
-                        </button>
-                    </div>
-                `);
-            }
-
-        });
-
-
-        calendar.render();
+function renderCalendar() {
+    const year = currentDate.getFullYear();
+    const month = currentDate.getMonth();
+    
+    // Update month title
+    const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
+                        'July', 'August', 'September', 'October', 'November', 'December'];
+    document.getElementById('current-month').textContent = `${monthNames[month]} ${year}`;
+    
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    const startingDayOfWeek = firstDay.getDay();
+    const daysInMonth = lastDay.getDate();
+    
+    const grid = document.getElementById('calendar-grid');
+    grid.innerHTML = '';
+    
+    // Day headers
+    const dayHeaders = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    dayHeaders.forEach(day => {
+        const header = document.createElement('div');
+        header.className = 'calendar-day-header';
+        header.textContent = day;
+        grid.appendChild(header);
+    });
+    
+    // Previous month days
+    const prevMonthDays = new Date(year, month, 0).getDate();
+    for (let i = startingDayOfWeek - 1; i >= 0; i--) {
+        const day = document.createElement('div');
+        day.className = 'calendar-day other-month';
+        day.innerHTML = `<div class="day-number">${prevMonthDays - i}</div>`;
+        grid.appendChild(day);
     }
+    
+    // Current month days
+    for (let day = 1; day <= daysInMonth; day++) {
+        const dayEl = document.createElement('div');
+        dayEl.className = 'calendar-day';
+        
+        const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        
+        // Get appointments for this day
+        const dayAppointments = appointments.filter(apt => apt.start.startsWith(dateStr));
+        
+        let content = `<div class="day-number">${day}</div>`;
+        
+        if (dayAppointments.length > 0) {
+            // Count by status
+            const approvedCount = dayAppointments.filter(a => a.status === 'approved').length;
+            const claimedCount = dayAppointments.filter(a => a.status === 'claimed').length;
+            const completedCount = dayAppointments.filter(a => a.status === 'completed').length;
+            
+            // Show confirmed appointments (approved + claimed)
+            const confirmedTotal = approvedCount + claimedCount;
+            if (confirmedTotal > 0) {
+                content += `<div class="appointment-indicator">
+                    ${confirmedTotal} appt${confirmedTotal > 1 ? 's' : ''}
+                </div>`;
+            }
+            
+            // Show completed appointments separately
+            if (completedCount > 0) {
+                content += `<div class="appointment-indicator completed">
+                    ${completedCount} done
+                </div>`;
+            }
+        }
+        
+        dayEl.innerHTML = content;
+        grid.appendChild(dayEl);
+    }
+    
+    // Next month days
+    const remainingCells = 42 - (startingDayOfWeek + daysInMonth);
+    for (let day = 1; day <= remainingCells; day++) {
+        const dayEl = document.createElement('div');
+        dayEl.className = 'calendar-day other-month';
+        dayEl.innerHTML = `<div class="day-number">${day}</div>`;
+        grid.appendChild(dayEl);
+    }
+}
 
-    window.selectSlot = function(date, period) {
-        alert(`Selected ${period} on ${date}`);
-        // redirect to booking form here
-    };
-});
+function renderAppointmentsList() {
+    const listEl = document.getElementById('appointments-list');
+    
+    if (appointments.length === 0) {
+        listEl.innerHTML = '<p style="color: #9CA3AF; text-align: center;">No appointments found</p>';
+        return;
+    }
+    
+    // Sort appointments by date
+    const sortedAppointments = [...appointments].sort((a, b) => 
+        new Date(a.start) - new Date(b.start)
+    );
+    
+    listEl.innerHTML = sortedAppointments.map(apt => {
+        const date = new Date(apt.start);
+        const dateStr = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        const timeStr = date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+        
+        const statusClass = apt.status === 'completed' ? 'completed' : '';
+        const statusText = apt.status === 'approved' ? 'Confirmed' : 
+                          apt.status === 'completed' ? 'Completed' : apt.status;
+        
+        // Use resident_name directly from API or extract from title
+        const residentName = apt.resident_name || apt.title.split('(')[1]?.replace(')', '') || 'Unknown';
+        const certType = apt.title.split('(')[0].trim();
+        
+        return `
+            <div class="appointment-item">
+                <div class="appointment-name">
+                    ${residentName}
+                    <span class="status-badge-sm ${statusClass}">${statusText}</span>
+                </div>
+                <div class="appointment-cert">
+                    <i class="fas fa-file-alt" style="font-size: 0.75rem;"></i>
+                    ${certType}
+                </div>
+                <div class="appointment-datetime">
+                    <i class="fas fa-calendar" style="font-size: 0.7rem;"></i> ${dateStr}
+                    <i class="fas fa-clock" style="font-size: 0.7rem; margin-left: 0.5rem;"></i> ${timeStr}
+                </div>
+            </div>
+        `;
+    }).join('');
+}
 </script>
 
 {% endblock %}

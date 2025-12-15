@@ -32,17 +32,16 @@
         <table class="appts-table">
             <thead>
                 <tr>
-                    <th style="width:22%">Date &amp; Time</th>
-                    <th style="width:28%">Certificate</th>
-                    <th style="width:22%">Purpose</th>
-                    <th style="width:14%">Status</th>
-                    <th style="width:14%;text-align:center;">Action</th>
+                    <th style="width:25%">Date &amp; Time</th>
+                    <th style="width:25%">Certificate</th>
+                    <th style="width:25%">Purpose</th>
+                    <th style="width:25%"></th>
                 </tr>
             </thead>
             <tbody>
                 {% for appointment in appointments %}
                 {% if appointment.status != 'completed' and appointment.status != 'claimed' %}
-                    <tr data-href="{% url 'appointment_detail' appointment.id %}" style="cursor: pointer;">
+                    <tr>
                         <td class="date-cell">
                             <span class="date-main">{{ appointment.preferred_date|date:"M. j, Y" }}</span>
                             <span class="date-time">{{ appointment.preferred_time|time:"g:i A" }}</span>
@@ -55,26 +54,8 @@
                             {{ appointment.get_purpose_display }}
                           {% endif %}
                         </td>
-                        <td style="vertical-align:middle;">
-                            {% if appointment.status == 'approved' %}
-                                <span class="status-badge badge-approved">Approved</span>
-                            {% elif appointment.status == 'cancelled' %}
-                                <span class="status-badge badge-cancelled">Cancelled</span>
-                            {% elif appointment.status == 'pending' %}
-                                <span class="status-badge badge-pending">Pending</span>
-                            {% endif %}
-                            
-                            <!-- Show reschedule indicator -->
-                            {% if appointment.rescheduled_at %}
-                                <br><span class="status-badge badge-rescheduled">Rescheduled</span>
-                            {% endif %}
-                        </td>
-                        <td style="text-align:center;">
-                            {% if appointment.status == 'pending' %}
-                                <a href="{% url 'cancel_appointment' appointment.id %}" role="button" aria-label="Cancel appointment {{ appointment.id }}" data-appointment-id="{{ appointment.id }}" class="btn-cancel" onclick="event.stopPropagation();">Cancel</a>
-                            {% else %}
-                                <span class="btn-none">—</span>
-                            {% endif %}
+                        <td>
+                            <a href="{% url 'appointment_detail' appointment.id %}" class="view-details-btn">View Details</a>
                         </td>
                     </tr>
                     {% endif %}

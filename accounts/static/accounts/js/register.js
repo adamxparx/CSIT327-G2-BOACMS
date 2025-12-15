@@ -104,7 +104,7 @@ function closeSuccessModal() {
         modal.classList.remove('show');
         document.body.style.overflow = ''; // Restore scrolling
         // Redirect to login page after closing
-        window.location.href = "{% url 'login' %}";
+        window.location.href = "/login/";
     }
 }
 

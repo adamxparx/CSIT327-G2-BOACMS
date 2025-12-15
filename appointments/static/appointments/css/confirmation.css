@@ -1,292 +1,268 @@
-/* Confirmation Page - Enhanced Modern Design */
+/* Confirmation Modal - Pop-up Design */
 
-.confirmation-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-  padding: 0.3rem;
-  background: linear-gradient(135deg, #f5f7fa 0%, #e4edf9 100%);
-  overflow: hidden;
-}
-
-.confirmation-card {
-  width: 100%;
-  max-width: 650px;
-  background: white;
-  border-radius: 12px;
-  padding: 1rem;
-  box-shadow: 0 8px 25px rgba(0, 56, 168, 0.15);
-  border: 1px solid rgba(0, 56, 168, 0.08);
-  position: relative;
-  overflow: hidden;
-  height: 95vh;
-  max-height: 850px;
-  display: flex;
-  flex-direction: column;
-}
-
-.confirmation-card::before {
-  content: '';
-  position: absolute;
+.modal-backdrop {
+  position: fixed;
   top: 0;
   left: 0;
-  right: 0;
-  height: 3px;
-  background: linear-gradient(90deg, #0038a8 0%, #0056cc 100%);
-}
-
-.confirmation-header {
-  text-align: center;
-  margin-bottom: 1rem;
-  padding-bottom: 0.8rem;
-  border-bottom: 1px solid rgba(0, 56, 168, 0.08);
-  flex-shrink: 0;
-}
-
-.confirmation-icon {
-  margin-bottom: 0.7rem;
-}
-
-.confirmation-icon i {
-  font-size: 2.5rem;
-  color: #2ecc71;
-  text-shadow: 0 2px 8px rgba(46, 204, 113, 0.3);
-}
-
-.confirmation-title {
-  margin: 0 0 0.3rem 0;
-  color: #0038a8;
-  font-size: 1.5rem;
-  font-weight: 800;
-  letter-spacing: -0.2px;
-}
-
-.confirmation-subtitle {
-  color: #555;
-  margin-bottom: 0.7rem;
-  font-size: 0.9rem;
-  line-height: 1.4;
-}
-
-.appointment-status {
-  display: inline-block;
-  padding: 0.3rem 0.8rem;
-  border-radius: 999px;
-  font-weight: 700;
-  font-size: 0.8rem;
-  text-transform: uppercase;
-  letter-spacing: 0.3px;
-  box-shadow: 0 2px 6px rgba(46, 204, 113, 0.25);
-  margin: 0.3rem 0;
-}
-
-.status-badge--confirmed {
-  background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
-  color: white;
-  border: none;
-}
-
-.confirmation-details {
-  flex: 1;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 1rem;
   overflow-y: auto;
-  padding-right: 0.2rem;
 }
 
-.detail-section {
-  margin-bottom: 0.6rem;
-  background: #fafbff;
-  border-radius: 10px;
-  padding: 0.8rem;
-  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.03);
-  border: 1px solid rgba(0, 56, 168, 0.05);
-}
-
-/* Specifically reduce space after resident info section */
-.detail-section:nth-child(2) {
-  margin-bottom: 0.4rem;
-}
-
-.section-title {
-  color: #0038a8;
-  font-size: 1rem;
-  font-weight: 700;
-  margin: 0 0 0.7rem 0;
+.modal-container {
   position: relative;
-  padding-bottom: 0.4rem;
+  width: 100%;
+  max-width: 550px;
+  max-height: 90vh;
+  background: white;
+  border-radius: 12px;
+  padding: 1.75rem;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  overflow-y: auto;
+  animation: modalSlideIn 0.3s ease-out;
 }
 
-.section-title::after {
-  content: '';
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Close Button */
+.modal-close {
   position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 30px;
-  height: 2px;
-  background: linear-gradient(90deg, #0038a8 0%, #0056cc 100%);
-  border-radius: 1px;
+  top: 0.75rem;
+  right: 0.75rem;
+  width: 32px;
+  height: 32px;
+  background: transparent;
+  border: none;
+  font-size: 2rem;
+  line-height: 1;
+  color: #64748b;
+  cursor: pointer;
+  transition: color 0.2s ease;
+  z-index: 10;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.detail-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 0.7rem;
+.modal-close:hover {
+  color: #0038a8;
 }
 
-.detail-item {
+/* Success Header */
+.success-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.success-icon {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 1.5rem;
+  position: relative;
+}
+
+.success-icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+.success-circle {
+  stroke: #10b981;
+  stroke-width: 2;
+  stroke-dasharray: 166;
+  stroke-dashoffset: 166;
+  animation: stroke 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards;
+}
+
+.success-check {
+  stroke: #10b981;
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 48;
+  stroke-dashoffset: 48;
+  animation: stroke 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.6s forwards;
+}
+
+@keyframes stroke {
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+.success-header h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #0038a8;
+  margin: 0 0 0.5rem 0;
+}
+
+.success-subtitle {
+  font-size: 1rem;
+  color: #64748b;
+  margin: 0;
+}
+
+/* Info Cards */
+.info-card {
+  background: #fafbfc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.card-header {
+  margin-bottom: 1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.card-header h2 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #0038a8;
+  margin: 0;
+}
+
+/* Info Grid */
+.info-grid {
   display: flex;
   flex-direction: column;
-  gap: 0.2rem;
-  padding: 0.6rem;
-  border-radius: 6px;
-  background: white;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
-  border: 1px solid rgba(0, 56, 168, 0.06);
+  gap: 0.75rem;
 }
 
-.detail-label {
-  font-size: 0.7rem;
-  color: #666;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.2px;
-}
-
-.detail-value {
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: #333;
-  word-break: break-word;
-}
-
-.detail-notes {
-  background: rgba(0, 56, 168, 0.05);
-  padding: 0.7rem;
-  border-radius: 6px;
-  border-left: 2px solid #0038a8;
-  font-size: 0.8rem;
-  line-height: 1.4;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
-}
-
-.detail-notes p {
-  margin: 0 0 0.3rem 0;
+.info-row {
   display: flex;
+  justify-content: space-between;
   align-items: flex-start;
-  gap: 0.4rem;
+  padding: 0.75rem;
+  background: white;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
 }
 
-.detail-notes i {
-  color: #0038a8;
-  margin-top: 2px;
-  font-size: 0.8rem;
-}
-
-.confirmation-actions {
-  display: flex;
-  justify-content: center;
-  margin-top: 0.8rem;
-  padding-top: 0.8rem;
-  border-top: 1px solid rgba(0, 0, 0, 0.08);
-  flex-shrink: 0;
-}
-
-.btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  padding: 0.7rem 2rem;
-  border-radius: 6px;
-  font-weight: 700;
+.info-row .label {
   font-size: 0.9rem;
-  cursor: pointer;
-  transition: all 0.2s ease;
+  font-weight: 600;
+  color: #64748b;
+  flex-shrink: 0;
+  margin-right: 1rem;
+}
+
+.info-row .value {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #1e293b;
+  text-align: right;
+}
+
+/* Action Section */
+.action-section {
+  margin-top: 2rem;
+  text-align: center;
+}
+
+.view-appointments-btn {
+  display: inline-block;
+  padding: 0.875rem 2.5rem;
+  background: #fcd116;
+  color: #000;
+  font-size: 1rem;
+  font-weight: 700;
   text-decoration: none;
-  border: none;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  white-space: nowrap;
-  background: linear-gradient(135deg, #0038a8 0%, #002a75 100%);
-  color: white;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(252, 209, 22, 0.3);
 }
 
-.btn:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+.view-appointments-btn:hover {
+  background: #e6bd00;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(252, 209, 22, 0.4);
 }
 
-.fas {
-  font-size: 0.9em;
-}
-
-/* Responsive adjustments */
+/* Responsive Design */
 @media (max-width: 768px) {
-  .confirmation-container {
-    padding: 0.2rem;
+  .modal-container {
+    padding: 1.5rem;
+    max-height: 95vh;
   }
   
-  .confirmation-card {
-    padding: 0.7rem;
-    border-radius: 10px;
-    height: 96vh;
+  .success-header h1 {
+    font-size: 1.75rem;
   }
   
-  .confirmation-title {
-    font-size: 1.3rem;
-  }
-  
-  .confirmation-subtitle {
-    font-size: 0.8rem;
-  }
-  
-  .detail-section {
-    padding: 0.6rem;
-    margin-bottom: 0.5rem;
-  }
-  
-  .detail-section:nth-child(2) {
-    margin-bottom: 0.3rem;
-  }
-  
-  .detail-grid {
-    grid-template-columns: 1fr;
-  }
-  
-  .confirmation-actions {
-    margin-top: 0.6rem;
-    padding-top: 0.6rem;
-  }
-  
-  .btn {
-    width: 100%;
-    justify-content: center;
-    padding: 0.7rem 1rem;
-    font-size: 0.9rem;
+  .success-icon {
+    width: 70px;
+    height: 70px;
   }
 }
 
 @media (max-width: 480px) {
-  .confirmation-card {
-    padding: 0.6rem;
-    height: 97vh;
-  }
-  
-  .confirmation-title {
-    font-size: 1.2rem;
-  }
-  
-  .confirmation-icon i {
-    font-size: 2rem;
-  }
-  
-  .detail-item {
+  .modal-backdrop {
     padding: 0.5rem;
   }
   
-  .section-title {
+  .modal-container {
+    padding: 1.25rem;
+    max-height: 96vh;
+  }
+  
+  .modal-close {
+    top: 0.5rem;
+    right: 0.5rem;
+  }
+  
+  .success-header h1 {
+    font-size: 1.5rem;
+  }
+  
+  .success-subtitle {
     font-size: 0.9rem;
   }
   
-  .detail-grid {
-    gap: 0.5rem;
+  .success-icon {
+    width: 60px;
+    height: 60px;
+  }
+  
+  .info-card {
+    padding: 1.25rem;
+  }
+  
+  .info-row {
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+  
+  .info-row .label {
+    margin-right: 0;
+    margin-bottom: 0.25rem;
+  }
+  
+  .info-row .value {
+    text-align: left;
+  }
+  
+  .view-appointments-btn {
+    width: 100%;
+    padding: 0.875rem 1.5rem;
   }
 }

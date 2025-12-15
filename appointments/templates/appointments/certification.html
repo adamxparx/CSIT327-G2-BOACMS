@@ -241,10 +241,57 @@
     }
     
     function updateSessionAvailability() {
-      // This would typically fetch from server, but for now using static data
-      // You can add AJAX call here to get real availability
-      document.getElementById('am-slots').textContent = '30';
-      document.getElementById('pm-slots').textContent = '30';
+      if (!selectedDate) {
+        // Reset to default if no date selected
+        document.getElementById('am-slots').textContent = '30';
+        document.getElementById('pm-slots').textContent = '30';
+        return;
+      }
+      
+      // Format date as YYYY-MM-DD
+      const year = selectedDate.getFullYear();
+      const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
+      const day = String(selectedDate.getDate()).padStart(2, '0');
+      const dateStr = `${year}-${month}-${day}`;
+      
+      // Fetch availability from server
+      fetch(`/appointments/api/date-availability/?date=${dateStr}`)
+        .then(response => response.json())
+        .then(data => {
+          // Update slot counts
+          document.getElementById('am-slots').textContent = data.am_available;
+          document.getElementById('pm-slots').textContent = data.pm_available;
+          
+          // Disable session cards if no slots available
+          const amCard = document.querySelector('.session-card[data-session="am"]');
+          const pmCard = document.querySelector('.session-card[data-session="pm"]');
+          
+          if (data.am_available === 0) {
+            amCard.classList.add('disabled');
+            if (selectedSession === 'am') {
+              selectedSession = null;
+              amCard.classList.remove('selected');
+            }
+          } else {
+            amCard.classList.remove('disabled');
+          }
+          
+          if (data.pm_available === 0) {
+            pmCard.classList.add('disabled');
+            if (selectedSession === 'pm') {
+              selectedSession = null;
+              pmCard.classList.remove('selected');
+            }
+          } else {
+            pmCard.classList.remove('disabled');
+          }
+        })
+        .catch(error => {
+          console.error('Error fetching availability:', error);
+          // Fallback to default values on error
+          document.getElementById('am-slots').textContent = '30';
+          document.getElementById('pm-slots').textContent = '30';
+        });
     }
     
     function updateHiddenFields() {
@@ -256,7 +303,7 @@
         
         // Set time based on session
         if (selectedSession === 'am') {
-          document.getElementById('selected_time').value = '09:00';
+          document.getElementById('selected_time').value = '08:00';
         } else {
           document.getElementById('selected_time').value = '13:00';
         }

@@ -1,139 +1,604 @@
 {% extends 'accounts/base_dashboard.html' %}
 {% load static %}
-
-{% block title %}BOACMS | Barangay Office{% endblock %}
-
+ 
+{% block title %}Staff Dashboard | BOACMS{% endblock %}
+ 
 {% block staff_css %}
-    <link rel="stylesheet" href="{% static 'accounts/css/dropdown.css' %}">
-    {% block staff_extra_css %}{% endblock %}
+<link rel="stylesheet" href="{% static 'accounts/css/staff_dashboard.css' %}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 {% endblock %}
 
 {% block appbar %}
-<ul>
-    <li><a href="{% url 'staff_dashboard' %}" {% if request.resolver_match.url_name == 'staff_dashboard' %}aria-current="page"{% endif %}>HOME</a></li>
-    <li><a href="{% url 'pending_appointments' %}">APPOINTMENTS</a></li>
-    <li class="appointment_dropdown">
-        <ul class="dropdown_menu">
-            <li><a href="{% url 'pending_appointments' %}" {% if request.resolver_match.url_name == 'pending_appointments' %}aria-current="page"{% endif %}>Pending {% if pending_count %}<button class="appointment_count pending_count">{{ pending_count }}</button>{% endif %}</a></li>
-            <li><a href="{% url 'approved_appointments' %}" {% if request.resolver_match.url_name == 'approved_appointments' %}aria-current="page"{% endif %}>Approved {% if approved_count %}<button class="appointment_count approved_count">{{ approved_count }}</button>{% endif %}</a></li>
-            <li><a href="{% url 'cancelled_appointments' %}">Cancelled</a></li>
-            <li><a href="{% url 'completed_appointments' %}">Completed</a></li>
-        </ul>
-    </li>
-    <li><a href="{% url 'appointments_calendar' %}">CALENDAR</a></li>
-    <li><a href="{% url 'resident_approvals' %}">REGISTRATION</a></li>
-</ul>
+<a href="{% url 'staff_dashboard' %}" class="nav-link active">
+    HOME
+</a>
+<a href="{% url 'appointments_calendar' %}" class="nav-link">
+    APPOINTMENTS
+</a>
 {% endblock %}
 
 {% block user %}
-<div>Barangay Office</div>
+<span class="user-name">Barangay Office</span>
 {% endblock %}
 
 {% block content %}
-<div class="dashboard-container">
-    <div class="welcome-section">
-        <h1>Office of the Barangay</h1>
-        <p>Welcome to the Barangay Office Management System</p>
-    </div>
-
-    <!-- Quick Stats Section -->
-    <div class="stats-grid">
-        <div class="stat-card">
-            <div class="stat-icon"></div>
-            <div class="stat-info">
-                <h3>{{ pending_count }}</h3>
-                <p>Pending Appointments</p>
-            </div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-icon"></div>
-            <div class="stat-info">
-                <h3>{{ approved_count }}</h3>
-                <p>Approved Appointments</p>
-            </div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-icon"></div>
-            <div class="stat-info">
-                <h3>{{ total_appointments_today }}</h3>
-                <p>Total Appointments Today</p>
-            </div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-icon"></div>
-            <div class="stat-info">
-                <h3>{{ residents_count }}</h3>
-                <p>Registered Residents</p>
-            </div>
-        </div>
-    </div>
-
-    <!-- Quick Actions -->
-    <div class="quick-actions">
-        <h2>Quick Actions</h2>
-        <div class="actions-grid">
-            <a href="{% url 'pending_appointments' %}" class="action-card">
-                <div class="action-icon"></div>
-                <h3>Review Pending</h3>
-                <p>Approve appointments</p>
-            </a>
-            <a href="{% url 'approved_appointments' %}" class="action-card">
-                <div class="action-icon"></div>
-                <h3>Today's Appointments</h3>
-                <p>View approved today</p>
-            </a>
-            <a href="{% url 'appointments_calendar' %}" class="action-card">
-                <div class="action-icon"></div>
-                <h3>Calendar View</h3>
-                <p>All appointments</p>
-            </a>
-            <a href="{% url 'create_staff_account' %}" class="action-card">
-                <div class="action-icon"></div>
-                <h3>Create Staff</h3>
-                <p>Add new staff member</p>
-            </a>
-        </div>
-    </div>
-
-    <!-- Recent Appointments -->
-    <div class="recent-activity">
-        <h2>Recent Appointments</h2>
-        <div class="activity-list">
-            {% if recent_appointments %}
-                {% for appointment in recent_appointments %}
-                <div class="activity-item">
-                    <div class="activity-icon"></div>
-                    <div class="activity-details">
-                        <h3>{{ appointment.get_certificate_type_display }}</h3>
-                        <p><strong>Resident:</strong> {{ appointment.resident.resident.first_name }} {{ appointment.resident.resident.last_name }}</p>
-                        <p><strong>Date:</strong> {{ appointment.created_at|date:"M d, Y" }} at {{ appointment.created_at|time:"g:i A" }}</p>
-                        <p><strong>Status:</strong> <span class="status-{{ appointment.status }}">{{ appointment.get_status_display }}</span></p>
-                    </div>
+<div class="staff-layout">
+    <!-- Main Content -->
+    <main class="staff-main">
+        <!-- Dashboard Header -->
+        <div class="dashboard-header">
+            <div class="header-left">
+                <h1><i class="fas fa-calendar-check"></i> Appointment Management</h1>
+                <div class="header-meta">
+                    <span class="meta-item">
+                        <i class="fas fa-calendar"></i>
+                        {% now "l, F j, Y" %}
+                    </span>
+                    <span class="meta-item">
+                        <i class="fas fa-map-marker-alt"></i>
+                        Labangon Barangay Hall
+                    </span>
                 </div>
-                {% endfor %}
-            {% else %}
-                <p>No recent appointments found.</p>
-            {% endif %}
+            </div>
+            <div class="header-right">
+                <a href="{% url 'appointments_calendar' %}" class="view-btn">
+                    <i class="fas fa-calendar"></i>
+                    Calendar View
+                </a>
+            </div>
         </div>
-    </div>
+ 
+        <!-- Stats Cards -->
+        <div class="stats-grid">
+            <div class="stat-card blue">
+                <div class="stat-icon">
+                    <i class="fas fa-calendar"></i>
+                </div>
+                <div class="stat-content">
+                    <p class="stat-label">Today's Appointments</p>
+                    <h3 class="stat-value">{{ total_appointments_today }}</h3>
+                </div>
+            </div>
+           
+            <div class="stat-card green">
+                <div class="stat-icon">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="stat-content">
+                    <p class="stat-label">Completed</p>
+                    <h3 class="stat-value">{{ completed_count }}</h3>
+                </div>
+            </div>
+           
+            <div class="stat-card orange">
+                <div class="stat-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="stat-content">
+                    <p class="stat-label">Total Residents</p>
+                    <h3 class="stat-value">{{ residents_count }}</h3>
+                </div>
+            </div>
+        </div>
+ 
+        <!-- Appointments Grid -->
+        <div class="appointments-grid">
+            <!-- AM Session -->
+            <div class="session-section">
+                <div class="session-header">
+                    <div class="session-title">
+                        <i class="fas fa-clock"></i>
+                        <h3>AM Session (8:00 AM - 12:00 PM)</h3>
+                    </div>
+                    <span class="session-badge">{{ am_appointments_count }} appointments</span>
+                </div>
+               
+                <div class="appointments-list">
+                    {% for appointment in am_appointments %}
+                    <div class="appointment-card">
+                        <div class="appointment-header">
+                            <div class="resident-info">
+                                <div class="resident-avatar">
+                                    {{ appointment.resident.resident.first_name|first|upper }}{{ appointment.resident.resident.last_name|first|upper }}
+                                </div>
+                                <div class="resident-details">
+                                    <h4>{{ appointment.resident.resident.first_name }} {{ appointment.resident.resident.last_name }}</h4>
+                                    <span class="appointment-time">
+                                        <i class="fas fa-clock"></i>
+                                        {{ appointment.preferred_time|time:"g:i A" }}
+                                    </span>
+                                </div>
+                            </div>
+                            <span class="status-badge status-{{ appointment.status }}" {% if appointment.status == 'claimed' %}style="background: #F59E0B;"{% endif %}>
+                                {% if appointment.status == 'claimed' %}
+                                Claimed - Awaiting Confirmation
+                                {% else %}
+                                Confirmed
+                                {% endif %}
+                            </span>
+                        </div>
+                       
+                        <div class="appointment-body">
+                            <div class="detail-row">
+                                <div class="detail-item">
+                                    <i class="fas fa-file-alt"></i>
+                                    <div>
+                                        <label>Certificate Type</label>
+                                        <span>{{ appointment.get_certificate_type_display }}</span>
+                                    </div>
+                                </div>
+                                <div class="detail-item">
+                                    <i class="fas fa-info-circle"></i>
+                                    <div>
+                                        <label>Purpose</label>
+                                        <span>{{ appointment.purpose }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="detail-row contact-row">
+                                <div class="detail-item">
+                                    <i class="fas fa-phone"></i>
+                                    <span>{{ appointment.resident.resident.phone_number }}</span>
+                                </div>
+                                <div class="detail-item">
+                                    <i class="fas fa-envelope"></i>
+                                    <span>{{ appointment.resident.email }}</span>
+                                </div>
+                            </div>
+                        </div>
+                       
+                        <div class="appointment-actions">
+                            <button class="btn-action btn-no-show" data-id="{{ appointment.id }}" {% if appointment.status == 'claimed' %}disabled style="opacity: 0.5; cursor: not-allowed;"{% endif %}>
+                                <i class="fas fa-times"></i>
+                                No Show
+                            </button>
+                            <button class="btn-action btn-claimed" data-id="{{ appointment.id }}" {% if appointment.status == 'claimed' %}disabled style="opacity: 0.6; cursor: not-allowed;"{% endif %}>
+                                <i class="fas fa-check"></i>
+                                {% if appointment.status == 'claimed' %}
+                                Marked as Claimed
+                                {% else %}
+                                Mark as Claimed
+                                {% endif %}
+                            </button>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="empty-state">
+                        <i class="fas fa-inbox"></i>
+                        <p>No appointments for AM session</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+ 
+            <!-- PM Session -->
+            <div class="session-section">
+                <div class="session-header">
+                    <div class="session-title">
+                        <i class="fas fa-clock"></i>
+                        <h3>PM Session (1:00 PM - 5:00 PM)</h3>
+                    </div>
+                    <span class="session-badge">{{ pm_appointments_count }} appointments</span>
+                </div>
+               
+                <div class="appointments-list">
+                    {% for appointment in pm_appointments %}
+                    <div class="appointment-card">
+                        <div class="appointment-header">
+                            <div class="resident-info">
+                                <div class="resident-avatar">
+                                    {{ appointment.resident.resident.first_name|first|upper }}{{ appointment.resident.resident.last_name|first|upper }}
+                                </div>
+                                <div class="resident-details">
+                                    <h4>{{ appointment.resident.resident.first_name }} {{ appointment.resident.resident.last_name }}</h4>
+                                    <span class="appointment-time">
+                                        <i class="fas fa-clock"></i>
+                                        {{ appointment.preferred_time|time:"g:i A" }}
+                                    </span>
+                                </div>
+                            </div>
+                            <span class="status-badge status-{{ appointment.status }}" {% if appointment.status == 'claimed' %}style="background: #F59E0B;"{% endif %}>
+                                {% if appointment.status == 'claimed' %}
+                                Claimed - Awaiting Confirmation
+                                {% else %}
+                                Confirmed
+                                {% endif %}
+                            </span>
+                        </div>
+                       
+                        <div class="appointment-body">
+                            <div class="detail-row">
+                                <div class="detail-item">
+                                    <i class="fas fa-file-alt"></i>
+                                    <div>
+                                        <label>Certificate Type</label>
+                                        <span>{{ appointment.get_certificate_type_display }}</span>
+                                    </div>
+                                </div>
+                                <div class="detail-item">
+                                    <i class="fas fa-info-circle"></i>
+                                    <div>
+                                        <label>Purpose</label>
+                                        <span>{{ appointment.purpose }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="detail-row contact-row">
+                                <div class="detail-item">
+                                    <i class="fas fa-phone"></i>
+                                    <span>{{ appointment.resident.resident.phone_number }}</span>
+                                </div>
+                                <div class="detail-item">
+                                    <i class="fas fa-envelope"></i>
+                                    <span>{{ appointment.resident.email }}</span>
+                                </div>
+                            </div>
+                        </div>
+                       
+                        <div class="appointment-actions">
+                            <button class="btn-action btn-no-show" data-id="{{ appointment.id }}" {% if appointment.status == 'claimed' %}disabled style="opacity: 0.5; cursor: not-allowed;"{% endif %}>
+                                <i class="fas fa-times"></i>
+                                No Show
+                            </button>
+                            <button class="btn-action btn-claimed" data-id="{{ appointment.id }}" {% if appointment.status == 'claimed' %}disabled style="opacity: 0.6; cursor: not-allowed;"{% endif %}>
+                                <i class="fas fa-check"></i>
+                                {% if appointment.status == 'claimed' %}
+                                Marked as Claimed
+                                {% else %}
+                                Mark as Claimed
+                                {% endif %}
+                            </button>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="empty-state">
+                        <i class="fas fa-inbox"></i>
+                        <p>No appointments for PM session</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
 
-    <!-- Office Information -->
-    <div class="office-info">
-        <h2>Office Information</h2>
-        <div class="info-grid">
-            <div class="info-card">
-                <h3>Office Hours</h3>
-                <p>Monday - Friday: 9:00 AM - 5:00 PM</p>
-                <p>Saturday: Closed</p>
-                <p>Sunday: Closed</p>
-            </div>
-            <div class="info-card">
-                <h3>Contact Information</h3>
-                <p>Email: barangay.labangon@yahoo.com</p>
-                <p>Phone:  260-7194</p>
-                <p>Address: Katipunan St., Labangon, Cebu City, Cebu 6000</p>
-            </div>
+<!-- Custom Popup Modal -->
+<div id="customModal" class="custom-modal" style="display: none;">
+    <div class="modal-overlay"></div>
+    <div class="modal-container">
+        <div class="modal-header">
+            <h3 id="modalTitle">Notification</h3>
+            <button class="modal-close" onclick="closeModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <p id="modalMessage"></p>
+        </div>
+        <div class="modal-footer">
+            <button class="modal-btn modal-btn-primary" onclick="closeModal()">OK</button>
         </div>
     </div>
 </div>
+
+<!-- Confirmation Modal -->
+<div id="confirmModal" class="custom-modal" style="display: none;">
+    <div class="modal-overlay"></div>
+    <div class="modal-container">
+        <div class="modal-header">
+            <h3 id="confirmTitle">Confirm Action</h3>
+            <button class="modal-close" onclick="closeConfirmModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <p id="confirmMessage"></p>
+        </div>
+        <div class="modal-footer">
+            <button class="modal-btn modal-btn-secondary" onclick="closeConfirmModal()">Cancel</button>
+            <button class="modal-btn modal-btn-primary" id="confirmBtn">Confirm</button>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Custom Modal Styles */
+.custom-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+}
+
+.modal-container {
+    position: relative;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    max-width: 450px;
+    width: 90%;
+    animation: modalSlideIn 0.3s ease-out;
+}
+
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.modal-header {
+    padding: 1.5rem 2rem;
+    border-bottom: 1px solid #E5E7EB;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.modal-header h3 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #003DA5;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    font-size: 2rem;
+    line-height: 1;
+    color: #6B7280;
+    cursor: pointer;
+    padding: 0;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    transition: all 0.2s;
+}
+
+.modal-close:hover {
+    background: #F3F4F6;
+    color: #111827;
+}
+
+.modal-body {
+    padding: 2rem;
+}
+
+.modal-body p {
+    margin: 0;
+    font-size: 1rem;
+    color: #4B5563;
+    line-height: 1.6;
+}
+
+.modal-footer {
+    padding: 1.5rem 2rem;
+    border-top: 1px solid #E5E7EB;
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+}
+
+.modal-btn {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.modal-btn-primary {
+    background: #003DA5;
+    color: white;
+}
+
+.modal-btn-primary:hover {
+    background: #002D7A;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 61, 165, 0.3);
+}
+
+.modal-btn-secondary {
+    background: white;
+    color: #6B7280;
+    border: 2px solid #E5E7EB;
+}
+
+.modal-btn-secondary:hover {
+    background: #F9FAFB;
+    border-color: #D1D5DB;
+}
+</style>
+
+<script>
+// Modal Functions
+function showModal(title, message) {
+    document.getElementById('modalTitle').textContent = title;
+    document.getElementById('modalMessage').textContent = message;
+    document.getElementById('customModal').style.display = 'flex';
+}
+
+function closeModal() {
+    document.getElementById('customModal').style.display = 'none';
+}
+
+function showConfirm(title, message, onConfirm) {
+    document.getElementById('confirmTitle').textContent = title;
+    document.getElementById('confirmMessage').textContent = message;
+    document.getElementById('confirmModal').style.display = 'flex';
+    
+    // Set up confirm button click handler
+    const confirmBtn = document.getElementById('confirmBtn');
+    const newConfirmBtn = confirmBtn.cloneNode(true);
+    confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
+    
+    newConfirmBtn.onclick = function() {
+        closeConfirmModal();
+        onConfirm();
+    };
+}
+
+function closeConfirmModal() {
+    document.getElementById('confirmModal').style.display = 'none';
+}
+
+// Close modal when clicking overlay
+document.addEventListener('click', function(e) {
+    if (e.target.classList.contains('modal-overlay')) {
+        closeModal();
+        closeConfirmModal();
+    }
+});
+
+// Handle appointment action buttons
+document.addEventListener('DOMContentLoaded', function() {
+    // Get CSRF token from cookies
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    const csrftoken = getCookie('csrftoken');
+
+    // Handle all action buttons
+    document.querySelectorAll('.btn-action').forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            const appointmentId = this.getAttribute('data-id');
+            const action = this.classList.contains('btn-claimed') ? 'claimed' : 'no_show';
+            const actionText = action === 'claimed' ? 'claimed' : 'no-show';
+            
+            // Show confirmation popup
+            showConfirm(
+                'Confirm Action',
+                `Are you sure you want to mark this appointment as ${actionText}?`,
+                () => {
+                    // This runs when user confirms
+                    processAction(this, appointmentId, action, actionText);
+                }
+            );
+        });
+    });
+    
+    function processAction(button, appointmentId, action, actionText) {
+        // Disable button during request
+        button.disabled = true;
+        const originalText = button.innerHTML;
+        button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+        
+        // Send AJAX request
+        fetch('{% url "update_appointment_status" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': csrftoken
+                },
+                body: `appointment_id=${appointmentId}&action=${action}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    if (action === 'claimed') {
+                        // For claimed status, disable the button and show it's marked
+                        button.innerHTML = '<i class="fas fa-check"></i> Marked as Claimed';
+                        button.disabled = true;
+                        button.style.opacity = '0.6';
+                        button.style.cursor = 'not-allowed';
+                        
+                        // Also disable the no-show button
+                        const card = button.closest('.appointment-card');
+                        const noShowBtn = card.querySelector('.btn-no-show');
+                        if (noShowBtn) {
+                            noShowBtn.disabled = true;
+                            noShowBtn.style.opacity = '0.5';
+                            noShowBtn.style.cursor = 'not-allowed';
+                        }
+                        
+                        // Update status badge
+                        const statusBadge = card.querySelector('.status-badge');
+                        if (statusBadge) {
+                            statusBadge.textContent = 'Claimed - Awaiting Confirmation';
+                            statusBadge.style.background = '#F59E0B';
+                        }
+                        
+                        // Show success message
+                        showModal('Success', 'Appointment marked as claimed. It will be removed once the resident confirms.');
+                    } else if (action === 'no_show') {
+                        // For no-show, remove the appointment card
+                        const card = button.closest('.appointment-card');
+                        card.style.transition = 'opacity 0.3s ease';
+                        card.style.opacity = '0';
+                        
+                        setTimeout(() => {
+                            card.remove();
+                            
+                            // Check if section is empty and show empty state
+                            const sessionSection = button.closest('.session-section');
+                            const appointmentsList = sessionSection.querySelector('.appointments-list');
+                            const remainingCards = appointmentsList.querySelectorAll('.appointment-card');
+                            
+                            if (remainingCards.length === 0) {
+                                const session = sessionSection.querySelector('.session-title h3').textContent.includes('AM') ? 'AM' : 'PM';
+                                appointmentsList.innerHTML = `
+                                    <div class="empty-state">
+                                        <i class="fas fa-inbox"></i>
+                                        <p>No appointments for ${session} session</p>
+                                    </div>
+                                `;
+                            }
+                            
+                            // Update session badge count
+                            const badge = sessionSection.querySelector('.session-badge');
+                            const currentCount = parseInt(badge.textContent);
+                            badge.textContent = `${currentCount - 1} appointments`;
+                        }, 300);
+                        
+                        showModal('Success', 'Appointment marked as no-show.');
+                    }
+                } else {
+                    showModal('Error', data.error);
+                    button.disabled = false;
+                    button.innerHTML = originalText;
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showModal('Error', 'An error occurred. Please try again.');
+                button.disabled = false;
+                button.innerHTML = originalText;
+            });
+    }
+});
+</script>
 {% endblock %}
