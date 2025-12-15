@@ -461,8 +461,8 @@ def resident_verification(request):
     elif status_filter == 'approved':
         residents = residents.filter(approval_status='approved')
     elif status_filter == 'rejected':
-        # Note: Rejected residents are deleted, so we can't filter by status
-        residents = Resident.objects.none()  # Empty queryset
+        residents = residents.filter(approval_status='rejected')
+    # 'all' status shows all residents (no filter applied)
     
     # Apply search filter
     if search_query:
@@ -479,6 +479,7 @@ def resident_verification(request):
     # Get counts for each status
     pending_count = Resident.objects.filter(approval_status='pending').count()
     approved_count = Resident.objects.filter(approval_status='approved').count()
+    rejected_count = Resident.objects.filter(approval_status='rejected').count()
     total_count = Resident.objects.all().count()
     
     context = {
@@ -487,6 +488,7 @@ def resident_verification(request):
         'search_query': search_query,
         'pending_count': pending_count,
         'approved_count': approved_count,
+        'rejected_count': rejected_count,
         'total_count': total_count,
     }
     return render(request, 'accounts/resident_verification.html', context)
